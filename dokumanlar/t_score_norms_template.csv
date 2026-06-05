@@ -1,0 +1,34 @@
+# CSV Template for MMPI T-score norms
+# Columns: test_version,locale,scale_name,gender,raw_score,t_score,age_group,notes
+# Notes:
+# - Fill with OFFICIAL norm tables for your version/locale.
+# - gender: male|female (use English to keep it consistent)
+# - age_group: adolescent|adult (or a free text like 14-18)
+# - raw_score is the final raw (after K-correction if your protocol requires). Be consistent.
+# - This file contains SAMPLE rows, replace with real values.
+
+test_version,locale,scale_name,gender,raw_score,t_score,age_group,notes
+MMPI-A,TR,L,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,L,male,1,40,adolescent,SAMPLE
+MMPI-A,TR,L,male,2,45,adolescent,SAMPLE
+MMPI-A,TR,F,male,0,40,adolescent,SAMPLE
+MMPI-A,TR,F,male,1,45,adolescent,SAMPLE
+MMPI-A,TR,F,male,2,50,adolescent,SAMPLE
+MMPI-A,TR,K,male,0,40,adolescent,SAMPLE
+MMPI-A,TR,K,male,1,45,adolescent,SAMPLE
+MMPI-A,TR,K,male,2,50,adolescent,SAMPLE
+MMPI-A,TR,Hs,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,D,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Hy,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Pd,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Mf_Male,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Pa,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Pt,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Sc,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Ma,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,Si,male,0,35,adolescent,SAMPLE
+MMPI-A,TR,L,female,0,35,adolescent,SAMPLE
+MMPI-A,TR,F,female,0,40,adolescent,SAMPLE
+MMPI-A,TR,K,female,0,40,adolescent,SAMPLE
+MMPI-A,TR,Mf_Female,female,0,35,adolescent,SAMPLE
+# Add remaining rows here for all raw_score values and all scales

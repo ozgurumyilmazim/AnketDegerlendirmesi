@@ -1,0 +1,682 @@
+/* MMPI Psychological Test System - Ana CSS Dosyası */
+
+/* Genel Stiller */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Kart Tasarımı */
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 20px 0;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Başlık Stilleri */
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+h2 {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+/* Mobil butonlar için özel padding */
+.btn-mobile {
+    padding: 12px 20px !important;
+}
+
+@media (max-width: 768px) {
+    .btn-mobile {
+        padding: 10px 15px !important;
+    }
+}
+
+h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+/* Form Stilleri */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Buton Stilleri */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+}
+
+/* Progress Bar */
+.progress-container {
+    background-color: #e1e8ed;
+    border-radius: 10px;
+    padding: 3px;
+    margin: 20px 0;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 20px;
+    border-radius: 8px;
+    transition: width 0.3s ease;
+    position: relative;
+    min-width: 120px; /* İlerleme çubuğu için minimum genişlik */
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px; /* Yazı boyutunu artır */
+    white-space: nowrap; /* Yazının satır atlamasını engelle */
+}
+
+/* Bilmiyorum Sayacı */
+#dontKnowCounter {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 15px;
+}
+
+#dontKnowCount {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* Test Soruları */
+.question-container {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    margin: 20px 0;
+    border-left: 5px solid #667eea;
+}
+
+.question-text {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.answer-options {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.answer-option {
+    flex: 1;
+    min-width: 120px;
+}
+
+.answer-option input[type="radio"] {
+    display: none;
+}
+
+.answer-option label {
+    display: block;
+    padding: 15px 20px;
+    background: white;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.answer-option label:hover {
+    border-color: #667eea;
+    background: #f0f3ff;
+}
+
+.answer-option input[type="radio"]:checked + label {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Bilmiyorum Seçeneği */
+.answer-option.dont-know input[type="radio"]:checked + label {
+    background: #f39c12;
+    border-color: #f39c12;
+}
+
+.answer-option.dont-know label:hover {
+    border-color: #f39c12;
+    background: #fef5e7;
+}
+
+/* Uyarı Mesajları */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+/* Checkbox Stili */
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e1e8ed;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.checkbox-container label {
+    flex: 1;
+    margin: 0;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 20px;
+        margin: 10px 0;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .answer-options {
+        flex-direction: column;
+    }
+
+    .answer-option {
+        min-width: auto;
+    }
+
+    .checkbox-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .question-text {
+        font-size: 16px;
+    }
+
+    .btn {
+        width: 45%;
+        margin: 10px 2.5%;
+        min-width: 120px;
+    }
+
+    /* Ana sayfa buton düzenlemesi */
+    .btn-lg {
+        width: auto !important;
+        min-width: 200px;
+        padding: 12px 30px !important;
+        font-size: 16px !important;
+        white-space: nowrap;
+    }
+
+    /* Navigasyon butonları arasında boşluk */
+    .d-flex.justify-content-between {
+        gap: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Butonlar için özel spacing */
+    #prevBtn, #nextBtn, #finishBtn {
+        margin: 10px 5px !important;
+        flex: 0 0 auto;
+    }
+
+    /* KVKK sayfası buton düzenlemesi */
+    .d-flex.justify-content-between .btn {
+        width: 48% !important;
+        margin: 5px 1% !important;
+        padding: 10px 15px !important;
+        font-size: 14px !important;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    /* KVKK sayfası için özel container */
+    .d-flex.justify-content-between {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Buton içerik düzenlemesi */
+.task-btn-check i,
+.task-btn-cross i {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Responsive düzenlemeler */
+@media (max-width: 768px) {
+    .task-btn-check,
+    .task-btn-cross {
+        min-width: 32px;
+        height: 32px;
+    }
+
+    .task-btn-check i,
+    .task-btn-cross i {
+        font-size: 12px;
+    }
+
+    .btn-group {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Görev Tanımları Değerlendirmesi Buton Stilleri */
+.task-btn-check,
+.task-btn-cross {
+    border-width: 2px !important;
+    transition: all 0.3s ease;
+    min-width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.task-btn-check:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.4);
+    z-index: 2;
+}
+
+.task-btn-cross:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.4);
+    z-index: 2;
+}
+
+/* Buton grubu bütünleşik tasarım */
+.btn-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+}
+
+.btn-group .btn {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-right: 1px solid #dee2e6;
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+}
+
+.btn-group .btn:first-child {
+    border-left: none;
+}
+
+.btn-group .btn:last-child {
+    border-right: none;
+}
+
+/* Aktif buton stilleri */
+.task-btn-check.btn-success {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+.task-btn-cross.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+/* Seçim iptal butonu efekti */
+.task-btn-check.btn-success:hover,
+.task-btn-cross.btn-danger:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    z-index: 3;
+}
+
+/* Sonuç gösterimi */
+.task-result {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Boş durum için stil */
+.task-result.empty {
+    color: #6c757d !important;
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+/* Yazmaya özel stilleri */
+@media print {
+    .task-btn-check,
+    .task-btn-cross {
+        display: none !important;
+    }
+
+    .task-result {
+        display: inline !important;
+        font-size: 16px;
+    }
+
+    .task-result.empty {
+        display: none !important;
+    }
+
+    .btn-group {
+        display: none !important;
+    }
+}
+
+/* Buton grup animasyonu */
+.btn-group {
+    transition: all 0.3s ease;
+}
+
+.btn-group:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Test Tamamlama Sayfası */
+.completion-icon {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.completion-icon i {
+    font-size: 4rem;
+    color: #27ae60;
+}
+
+.completion-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 20px 0;
+}
+
+/* Logo ve Branding */
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+/* Gizlilik ve KVKK */
+.privacy-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 20px 0;
+}
+
+.privacy-text h4 {
+    color: #2c3e50;
+    margin: 15px 0 10px 0;
+}
+
+.privacy-text p {
+    margin-bottom: 10px;
+}
+
+/* Yükleme Animasyonu */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Print Stilleri */
+@media print {
+    #participantDataForPDF {
+        display: block !important;
+    }
+
+    .row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+
+    .col-md-12 {
+        flex: 0 0 66.666667% !important;
+        max-width: 66.666667% !important;
+    }
+
+    .col-md-4 {
+        flex: 0 0 33.333333% !important;
+        max-width: 33.333333% !important;
+    }
+    
+    /* Görev tanımları özel PDF stilleri */
+    .task-btn-check,
+    .task-btn-cross,
+    .btn-group {
+        display: none !important;
+    }
+    
+    .task-result {
+        display: inline !important;
+        font-size: 14pt !important;
+        font-weight: bold !important;
+    }
+    
+    /* Tik işareti yeşil */
+    .task-result[data-value="true"] {
+        color: #28a745 !important;
+    }
+    
+    /* Çarpı işareti kırmızı */
+    .task-result[data-value="false"] {
+        color: #dc3545 !important;
+    }
+    
+    /* Boş görev sonuçlarını gizle */
+    .task-result.empty {
+        display: none !important;
+    }
+    
+    /* Boş sonuçlu satırları tamamen gizle */
+    tr:has(.task-result.empty),
+    tr.task-row-empty {
+        display: none !important;
+    }
+    
+    /* Seçim yapılmamış satırları gizle */
+    .no-print {
+        display: none !important;
+    }
+}
