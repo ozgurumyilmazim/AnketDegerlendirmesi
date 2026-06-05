@@ -29,6 +29,8 @@ if (typeof window.supabase === 'undefined') {
             window.SUPABASE_CONFIG.anonKey
         );
         console.log('Supabase client başarıyla başlatıldı.');
+        // Also expose client via the global name `supabase` used in other scripts
+        supabase = window.supabase;
     } else {
         console.warn('Supabase JS kütüphanesi bulunamadı – offline modda çalışılıyor.');
         window.supabase = null; // fallback
