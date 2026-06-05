@@ -35,6 +35,31 @@ if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'functio
 }
 
 // --------------------------------------------------------------------
+// Minimal AuthService wrapper
+window.AuthService = {
+    async signIn(email, password) {
+        const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        return data;
+    },
+    async signOut() {
+        const { error } = await window.supabase.auth.signOut();
+        if (error) throw error;
+    },
+    async isAdmin() {
+        const { data, error } = await window.supabase.from('users').select('role').eq('id', window.supabase.auth.user()?.id).single();
+        if (error) throw error;
+        return data?.role === 'admin';
+    },
+    async getSession() {
+        return window.supabase.auth.getSession();
+    },
+    onAuthStateChange(callback) {
+        return window.supabase.auth.onAuthStateChange(callback);
+    }
+};
+
+// --------------------------------------------------------------------
 // Başlangıç kontrolü (opsiyonel)
 // --------------------------------------------------------------------
 function initializeSupabase() {
