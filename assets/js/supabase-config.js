@@ -19,22 +19,19 @@ if (typeof window.SUPABASE_CONFIG === 'undefined') {
 // --------------------------------------------------------------------
 // Supabase client (singleton) oluşturma
 // --------------------------------------------------------------------
-if (typeof window.supabase === 'undefined') {
-    // Supabase JS kütüphanesi yüklü değilse hatayı yakala
-    if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
-        // Supabase client'ı global bir değişkene (window.supabase) atayarak 
-        // diğer scriptlerin aynı instance'ı paylaşmasını sağlarız.
-        window.supabase = supabase.createClient(
-            window.SUPABASE_CONFIG.url,
-            window.SUPABASE_CONFIG.anonKey
-        );
-        console.log('Supabase client başarıyla başlatıldı.');
-        // Also expose client via the global name `supabase` used in other scripts
-        supabase = window.supabase;
-    } else {
-        console.warn('Supabase JS kütüphanesi bulunamadı – offline modda çalışılıyor.');
-        window.supabase = null; // fallback
-    }
+if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+    // Supabase client'ı global bir değişkene (window.supabase) atayarak 
+    // diğer scriptlerin aynı instance'ı paylaşmasını sağlarız.
+    window.supabase = supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+    );
+    console.log('Supabase client başarıyla başlatıldı.');
+    // Also expose client via the global name `supabase` used in other scripts
+    supabase = window.supabase;
+} else {
+    console.warn('Supabase JS kütüphanesi bulunamadı – offline modda çalışılıyor.');
+    window.supabase = null; // fallback
 }
 
 // --------------------------------------------------------------------
