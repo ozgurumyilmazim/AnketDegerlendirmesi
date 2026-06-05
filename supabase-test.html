@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Bağlantı Testi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .test-container {
+            padding: 2rem 0;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-success {
+            background-color: #28a745;
+        }
+        
+        .status-error {
+            background-color: #dc3545;
+        }
+        
+        .status-warning {
+            background-color: #ffc107;
+        }
+        
+        .question-item {
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .btn-test {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container test-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h2><i class="fas fa-database me-2"></i>Supabase Bağlantı Testi</h2>
+                        <p class="mb-0">Questions tablosundan 5 kayıt getirme testi</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Bağlantı Durumu -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">
+                                            <span id="connectionStatus" class="status-indicator status-warning"></span>
+                                            Bağlantı Durumu
+                                        </h6>
+                                        <p id="connectionText" class="card-text text-muted">Henüz test edilmedi</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-question-circle me-2"></i>
+                                            Kayıt Sayısı
+                                        </h6>
+                                        <p id="recordCount" class="card-text text-muted">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Test Butonu -->
+                        <div class="text-center mb-4">
+                            <button id="testBtn" class="btn btn-test">
+                                <i class="fas fa-play me-2"></i>
+                                Bağlantıyı Test Et
+                            </button>
+                            <div id="loadingSpinner" class="loading-spinner mt-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Supabase'e bağlanılıyor...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Hata Mesajı -->
+                        <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Bağlantı Hatası:</strong>
+                            <span id="errorMessage"></span>
+                        </div>
+                        
+                        <!-- Başarı Mesajı -->
+                        <div id="successAlert" class="alert alert-success d-none" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Bağlantı Başarılı!</strong> Questions tablosundan kayıtlar getirildi.
+                        </div>
+                        
+                        <!-- Sorular Listesi -->
+                        <div id="questionsContainer" class="d-none">
+                            <h5 class="mb-3">
+                                <i class="fas fa-list me-2"></i>
+                                Getirilen Sorular (İlk 5 Kayıt)
+                            </h5>
+                            <div id="questionsList"></div>
+                        </div>
+                        
+                        <!-- Konfigürasyon Bilgisi -->
+                        <div class="mt-4">
+                            <h6><i class="fas fa-cog me-2"></i>Mevcut Konfigürasyon</h6>
+                            <div class="code-block">
+                                <div>URL: <span id="configUrl">-</span></div>
+                                <div>Anon Key: <span id="configKey">-</span></div>
+                                <div>Tablo: questions</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Yardım -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6><i class="fas fa-info-circle me-2"></i>Yardım</h6>
+                            <p class="mb-2"><strong>Bağlantı başarısız olursa:</strong></p>
+                            <ul class="mb-0">
+                                <li>Supabase URL ve Anon Key'in doğru olduğundan emin olun</li>
+                                <li>Questions tablosunun mevcut olduğunu kontrol edin</li>
+                                <li>RLS (Row Level Security) ayarlarını kontrol edin</li>
+                                <li>İnternet bağlantınızı kontrol edin</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Config -->
+    <script src="assets/js/supabase-config.js"></script>
+    
+    <!-- Test Script -->
+    <script>
+        // DOM elementleri
+        const testBtn = document.getElementById('testBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const connectionText = document.getElementById('connectionText');
+        const recordCount = document.getElementById('recordCount');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const successAlert = document.getElementById('successAlert');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionsList = document.getElementById('questionsList');
+        const configUrl = document.getElementById('configUrl');
+        const configKey = document.getElementById('configKey');
+        
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            // Konfigürasyon bilgilerini göster
+            showConfiguration();
+            
+            // Test butonuna event listener ekle
+            testBtn.addEventListener('click', testSupabaseConnection);
+        });
+        
+        // Konfigürasyon bilgilerini göster
+        function showConfiguration() {
+            if (typeof SUPABASE_CONFIG !== 'undefined') {
+                configUrl.textContent = SUPABASE_CONFIG.url || 'Tanımlanmamış';
+                configKey.textContent = SUPABASE_CONFIG.anonKey ? 
+                    SUPABASE_CONFIG.anonKey.substring(0, 20) + '...' : 'Tanımlanmamış';
+            } else {
+                configUrl.textContent = 'SUPABASE_CONFIG bulunamadı';
+                configKey.textContent = 'SUPABASE_CONFIG bulunamadı';
+            }
+        }
+        
+        // Supabase bağlantısını test et
+        async function testSupabaseConnection() {
+            // UI'yi sıfırla
+            resetUI();
+            
+            // Loading durumu
+            setLoadingState(true);
+            
+            try {
+                // Supabase client'ın mevcut olduğunu kontrol et
+                if (!supabase || typeof supabase.from !== 'function') {
+                    throw new Error('Supabase client bulunamadı veya başlatılamadı.');
+                }
+                
+                // Questions tablosundan 5 kayıt getir
+                const { data, error } = await supabase
+                    .from('questions')
+                    .select('*')
+                    .limit(5);
+                
+                console.log('Questions sorgu sonucu:', { data, error });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Başarılı sonuç
+                showSuccess(data);
+                
+            } catch (error) {
+                console.error('Supabase test hatası:', error);
+                showError(error.message);
+            } finally {
+                setLoadingState(false);
+            }
+        }
+        
+        // UI'yi sıfırla
+        function resetUI() {
+            errorAlert.classList.add('d-none');
+            successAlert.classList.add('d-none');
+            questionsContainer.classList.add('d-none');
+            questionsList.innerHTML = '';
+            recordCount.textContent = '-';
+        }
+        
+        // Loading durumunu ayarla
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                testBtn.disabled = true;
+                testBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Test Ediliyor...';
+                loadingSpinner.style.display = 'block';
+                connectionStatus.className = 'status-indicator status-warning';
+                connectionText.textContent = 'Test ediliyor...';
+            } else {
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="fas fa-play me-2"></i>Bağlantıyı Test Et';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        // Başarılı sonucu göster
+        function showSuccess(data) {
+            connectionStatus.className = 'status-indicator status-success';
+            connectionText.textContent = 'Bağlantı başarılı';
+            recordCount.textContent = data.length + ' kayıt';
+            
+            successAlert.classList.remove('d-none');
+            
+            if (data.length > 0) {
+                questionsContainer.classList.remove('d-none');
+                displayQuestions(data);
+            }
+        }
+        
+        // Hata göster
+        function showError(message) {
+            connectionStatus.className = 'status-indicator status-error';
+            connectionText.textContent = 'Bağlantı başarısız';
+            recordCount.textContent = '0 kayıt';
+            
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('d-none');
+        }
+        
+        // Soruları göster
+        function displayQuestions(questions) {
+            questionsList.innerHTML = '';
+            
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-item';
+                
+                questionDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2">
+                                <span class="badge bg-primary me-2">${index + 1}</span>
+                                ID: ${question.id || 'N/A'}
+                            </h6>
+                            <p class="mb-1">
+                                <strong>Soru:</strong> ${question.question_text || question.text || 'Soru metni bulunamadı'}
+                            </p>
+                            ${question.category ? `<small class="text-muted">Kategori: ${question.category}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                questionsList.appendChild(questionDiv);
+            });
+        }
+    </script>
+</body>
+</html>

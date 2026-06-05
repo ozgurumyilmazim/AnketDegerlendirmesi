@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tamamlandı - MMPI Psikolojik Test Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="card fade-in text-center">
+            <div class="completion-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <div class="logo">
+                <h1><i class="fas fa-brain"></i> MMPI Testi</h1>
+            </div>
+
+            <div class="completion-message">
+                <h2 class="text-success mb-4">
+                    <i class="fas fa-trophy"></i> Tebrikler!
+                </h2>
+
+                <div class="alert alert-success">
+                    <i class="fas fa-save"></i>
+                    <strong>Test Sonuçları Kaydedildi</strong><br>
+                    Verileriniz güvenli bir şekilde saklanmıştır ve psikolog tarafından değerlendirilecektir.
+                </div>
+            </div>
+
+            <!-- Test Özeti -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-question-circle text-primary"></i>
+                                Toplam Soru
+                            </h5>
+                            <h3 class="text-primary" id="totalQuestions">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-clock text-info"></i>
+                                Süre
+                            </h5>
+                            <h3 class="text-info" id="testDuration">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-question text-warning"></i>
+                                Bilmiyorum
+                            </h5>
+                            <h3 class="text-warning" id="dontKnowCount">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+
+
+
+            <!-- Test Kimlik Bilgileri -->
+            <div class="mt-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-id-card"></i> Test Bilgileri
+                        </h5>
+                        <div class="row text-start">
+                            <div class="col-md-6">
+                                <p><strong>Test ID:</strong> <span id="testId">-</span></p>
+                                <p><strong>Tarih:</strong> <span id="testDate">-</span></p>
+                                <p><strong>Saat:</strong> <span id="testTime">-</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Ad Soyad:</strong> <span id="participantName">-</span></p>
+                                <p><strong>Yaş:</strong> <span id="participantAge">-</span></p>
+                                <p><strong>Cinsiyet:</strong> <span id="participantGender">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Ana Sayfaya Dön -->
+            <div class="mt-4">
+                <a href="index.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i> Ana Sayfaya Dön
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    <i class="fas fa-heart text-danger"></i>
+                    Psikolojik sağlığınız için teşekkür ederiz.
+                </p>
+                <small class="text-muted">
+                    © 2025 MMPI Psikolojik Test Sistemi - Tüm hakları saklıdır.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- MMPI Scoring -->
+<script src="assets/js/mmpi-scoring.js"></script>
+
+<!-- Test Complete Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Test bilgilerini localStorage'dan al
+        const personalInfo = JSON.parse(localStorage.getItem('mmpiPersonalInfo') || '{}');
+        const testResults = JSON.parse(localStorage.getItem('mmpiTestResults') || '{}');
+        const testStartTime = localStorage.getItem('mmpiTestStartTime');
+        const testEndTime = localStorage.getItem('mmpiTestEndTime');
+
+        // Test ID oluştur
+        const testId = 'MMPI-' + Date.now().toString(36).toUpperCase();
+
+        // Test süresini hesapla
+        let duration = '-';
+        if (testStartTime && testEndTime) {
+            const start = new Date(testStartTime);
+            const end = new Date(testEndTime);
+            const diffMinutes = Math.round((end - start) / (1000 * 60));
+            duration = diffMinutes + ' dakika';
+        }
+
+        // Bilmiyorum sayısını hesapla
+        let dontKnowCount = 0;
+        if (testResults.answers) {
+            dontKnowCount = Object.values(testResults.answers).filter(answer => answer === 'Bilmiyorum').length;
+        }
+
+        // MMPI Puanlama
+        let mmpiResults = null;
+        let validityStatus = 'Analiz Ediliyor';
+
+        if (typeof MMPIScoring !== 'undefined' && testResults.answers) {
+            try {
+                const scorer = new MMPIScoring();
+                // Cevapları array formatına çevir (index: question_number - 1)
+                const keys = Object.keys(testResults.answers).map(k => parseInt(k, 10)).filter(n => !isNaN(n));
+                const maxQ = keys.length ? Math.max(...keys) : 0;
+                const answersArray = new Array(maxQ).fill(null);
+                keys.forEach(qNum => {
+                    const answer = testResults.answers[String(qNum)];
+                    if (answer === 'Bilmiyorum') {
+                        answersArray[qNum - 1] = null;
+                    } else if (answer === 'Doğru') {
+                        answersArray[qNum - 1] = true;
+                    } else if (answer === 'Yanlış') {
+                        answersArray[qNum - 1] = false;
+                    }
+                });
+
+                mmpiResults = scorer.calculateScores(answersArray, personalInfo);
+                validityStatus = mmpiResults.validity.isValid ? 'Geçerli' : 'Dikkat';
+
+            } catch (error) {
+                console.error('MMPI puanlama hatası:', error);
+                validityStatus = 'Hata';
+            }
+        }
+
+        // Bilgileri sayfaya yerleştir
+        document.getElementById('testId').textContent = testId;
+        document.getElementById('testDate').textContent = new Date().toLocaleDateString('tr-TR');
+        document.getElementById('testTime').textContent = new Date().toLocaleTimeString('tr-TR');
+        document.getElementById('participantName').textContent = (personalInfo.firstName || '') + ' ' + (personalInfo.lastName || '');
+        document.getElementById('participantAge').textContent = personalInfo.age || '-';
+        document.getElementById('participantGender').textContent = personalInfo.gender === 'male' ? 'Erkek' : personalInfo.gender === 'female' ? 'Kadın' : personalInfo.gender || '-';
+        document.getElementById('totalQuestions').textContent = Object.keys(testResults.answers || {}).length;
+        document.getElementById('testDuration').textContent = duration;
+        document.getElementById('dontKnowCount').textContent = dontKnowCount + ' / 10';
+
+
+        // Test ID'yi localStorage'a kaydet
+        localStorage.setItem('mmpiTestId', testId);
+
+        // Sayfa yüklendiğinde animasyon
+        setTimeout(() => {
+            document.querySelector('.card').classList.add('fade-in');
+        }, 100);
+    });
+
+
+</script>
+</body>
+</html>

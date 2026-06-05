@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMPI Test Raporu</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="assets/js/pdf-utils.js"></script>
+    <style>
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .scale-card {
+            border-left: 2px solid #007bff;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .scale-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .scale-card .card-body {
+            padding: 0.5rem;
+        }
+
+        .scale-card .card-title {
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .scale-card .h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .scale-card small {
+            font-size: 0.65rem;
+        }
+
+        .scale-card .card-text {
+            font-size: 0.7rem;
+            margin-top: 0.25rem !important;
+            line-height: 1.2;
+        }
+
+        .scale-high {
+            border-left-color: #dc3545;
+        }
+
+        .scale-moderate {
+            border-left-color: #ffc107;
+        }
+
+        .scale-normal {
+            border-left-color: #28a745;
+        }
+
+        .auto-resize-textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 120px;
+            border: none;
+        }
+
+        .validity-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        /* Yetkinlik değerlendirmesi tabloları için margin kaldırma */
+        .table-container {
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .table-container + .table-container {
+            margin-top: -1px !important;
+        }
+
+        .table-container .table {
+            margin-bottom: 0 !important;
+        }
+
+        .table {
+            margin-bottom: 0 !important;
+        }
+
+        @media print {
+            /* Yazdırılmayacak elementler */
+            .no-print {
+                display: none !important;
+            }
+
+            /* Sayfa ayarları */
+            @page {
+                margin: 1cm 0;
+                size: A4;
+            }
+
+            /* İlk sayfa için özel ayarlar */
+            @page :first {
+                margin: 0 0 0 0;
+            }
+
+            /* Genel stil ayarları */
+            body {
+                font-size: 12pt;
+                line-height: 1.4;
+                /*color: #000;*/
+                /*background: white !important;*/
+            }
+
+            /* Başlık stilleri */
+            .report-header {
+                /*background: #667eea !important;*/
+                -webkit-print-color-adjust: exact;
+                /*color: white !important;*/
+                padding: 15pt 0 !important;
+                margin-bottom: 20pt !important;
+            }
+
+            /*.report-header h1 {*/
+            /*    font-size: 18pt !important;*/
+            /*    color: white !important;*/
+            /*}*/
+            /* Kart stilleri */
+            .card {
+                /*border: 1pt solid #ddd !important;*/
+                /*box-shadow: none !important;*/
+                margin-bottom: 15pt !important;
+            }
+
+            #report_result,
+            #pdp-result-evaluation-list,
+            #task-definition-evaluation,
+            #pdpParametersSection {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .card-header {
+                border-bottom: 1pt solid #ddd !important;
+                -webkit-print-color-adjust: exact;
+                padding: 10pt !important;
+            }
+
+            .card-body {
+                padding: 10pt !important;
+            }
+
+            /* Tablo stilleri - Bootstrap table-bordered ile uyumlu */
+            .table {
+                font-size: 10pt !important;
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .table th {
+                /*background-color: #0dcaf0 !important;*/
+                /*color: white !important;*/
+                -webkit-print-color-adjust: exact;
+                border: 1pt solid #dee2e6 !important;
+                padding: 8pt !important;
+                font-weight: bold !important;
+                text-align: left !important;
+            }
+
+            .table td {
+                border: 1pt solid #dee2e6 !important;
+                padding: 8pt !important;
+                vertical-align: top !important;
+            }
+
+            .table-bordered {
+                border: 1pt solid #dee2e6 !important;
+            }
+
+            .table-bordered th,
+            .table-bordered td {
+                border: 1pt solid #dee2e6 !important;
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                /*background-color: rgba(0, 0, 0, 0.05) !important;*/
+                -webkit-print-color-adjust: exact;
+            }
+
+            /* Başlık hiyerarşisi */
+            h1 {
+                font-size: 18pt !important;
+            }
+
+            h2 {
+                font-size: 16pt !important;
+            }
+
+            h3 {
+                font-size: 14pt !important;
+            }
+
+            h4 {
+                font-size: 12pt !important;
+            }
+
+            h5 {
+                font-size: 11pt !important;
+            }
+
+            /* Input ve textarea stilleri - kenarları gizle */
+            input, textarea, select {
+                border: none !important;
+                /*background: transparent !important;*/
+                box-shadow: none !important;
+                outline: none !important;
+                padding: 2pt !important;
+                font-size: 10pt !important;
+            }
+
+            /* Özel alanlar için çerçeve kaldırma */
+            #dataUsageRecommendations {
+                border: none !important;
+                /*background: transparent !important;*/
+                font-size: 8pt !important;
+            }
+
+            #evaluationProcess,
+            #measurementProcess,
+            #sessionNeedAssessment {
+                border: none !important;
+                /*background: transparent !important;*/
+            }
+
+            /* Psikolog bilgileri alanları - web sayfasındaki gibi border */
+            #psychologistName,
+            #evaluationDate,
+            #participationAssessment,
+            #validityAssessment {
+                border: 0.5px solid #ced4da !important;
+                /*background: white !important;*/
+                border-radius: 0.375rem !important;
+                padding: 0.375rem 0.75rem !important;
+            }
+
+            /* Özet bölümü textarea'ları - border kaldır ve boşluk düzelt */
+            #validityScalesSummary,
+            #clinicalScalesResult,
+            #additionalNote {
+                border: none !important;
+                /*background: transparent !important;*/
+                padding: 4pt !important;
+                margin: 0 !important;
+                min-height: auto !important;
+            }
+
+            /* Yazdırmada clinicalScalesResult yerine printClinicalScalesResult'u göster */
+            #clinicalScalesResult {
+                display: none !important;
+            }
+
+            #printClinicalScalesResult {
+                display: block !important;
+                padding: 0 4pt !important;
+                white-space: pre-wrap !important;
+            }
+
+            /* Yazdırmada measurementProcess yerine printMeasurementProcess'u göster */
+            #measurementProcess {
+                display: none !important;
+            }
+
+            #printMeasurementProcess {
+                display: block !important;
+                padding: 0 4pt !important;
+                white-space: pre-wrap !important;
+            }
+
+            /* Checkbox ve radio button stilleri - PDF'te gizle (PDP hariç) */
+            input[type="checkbox"]:not([id^="pdp_"]), input[type="radio"] {
+                display: none !important;
+            }
+
+            /* PDP Checkbox'ları için özel PDF stilleri - Web ile aynı mavi görünüm */
+            input[type="checkbox"][id^="pdp_"] {
+                display: inline-block !important;
+                width: 12pt !important;
+                height: 12pt !important;
+                margin-right: 6pt !important;
+                border: 1pt solid #000000 !important;
+                background: white !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                position: relative !important;
+                border-radius: 2pt !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* PDP Checkbox işaretli durumu - Mavi arka plan */
+            input[type="checkbox"][id^="pdp_"]:checked {
+                background: #0d6efd !important;
+                border-color: #0d6efd !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            input[type="checkbox"][id^="pdp_"]:checked::after {
+                content: "✓" !important;
+                position: absolute !important;
+                top: -2pt !important;
+                left: 1pt !important;
+                font-size: 10pt !important;
+                font-weight: bold !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* PDP Checkbox label'ları */
+            #pdpParametersSection .form-check-label {
+                font-size: 10pt !important;
+                line-height: 1.3 !important;
+                margin-left: 0 !important;
+            }
+
+            /* PDP form-check container'ları */
+            #pdpParametersSection .form-check {
+                margin-bottom: 4pt !important;
+                display: flex !important;
+                align-items: flex-start !important;
+            }
+
+            /* Checkbox yanındaki işaretleri göster */
+            .task-result {
+                display: inline !important;
+                font-size: 12pt !important;
+                font-weight: bold !important;
+            }
+
+            /* Görev tanımları butonlarını PDF'te gizle */
+            .task-btn-check,
+            .task-btn-cross,
+            .btn-group {
+                display: none !important;
+            }
+
+            /* Görev Tanımları tablosunda No kolonunu PDF'te gizle */
+            #task-definition-evaluation table th:first-child,
+            #task-definition-evaluation table td:first-child {
+                display: none !important;
+            }
+
+            /* Seçilmemiş görev satırlarını PDF'te gizle */
+            .task-unselected {
+                display: none !important;
+            }
+
+            /* Sadece seçilmiş görevleri göster */
+            .task-selected {
+                display: table-row !important;
+            }
+
+            /* Boş task result'ları gizle */
+            .task-result[data-value=""],
+            .task-result:not([data-value="true"]):not([data-value="false"]) {
+                display: none !important;
+            }
+
+            /*!* Görev tanımları satırlarını kontrol et *!*/
+            /*.no-print {*/
+            /*    display: none !important;*/
+            /*}*/
+            /* Sadece seçilmiş görevleri göster */
+            tr:has(.task-result.empty) {
+                display: none !important;
+            }
+
+            /* Alternatif: boş görev satırları için sınıf bazlı gizleme */
+            tr.task-row-empty {
+                display: none !important;
+            }
+
+            /* Task result için özel PDF stilleri */
+            .task-result:not(.empty) {
+                display: inline !important;
+                font-size: 14pt !important;
+                font-weight: bold !important;
+            }
+
+            /* Tik işareti yeşil */
+            .task-result[data-value="true"] {
+                color: #28a745 !important;
+            }
+
+            /* Çarpı işareti kırmızı */
+            .task-result[data-value="false"] {
+                color: #dc3545 !important;
+            }
+
+            /* Boş görev sonuçlarını gizle */
+            .task-result.empty {
+                display: none !important;
+            }
+
+            /* Input alanları */
+            input, textarea {
+                border: 1pt solid #000 !important;
+                background: white !important;
+            }
+
+            /* Grafik ve resimler */
+            img, canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            /* Bootstrap grid sistemi için PDF düzenlemeleri */
+            .container {
+                max-width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .row {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+            .col-7, .col-8, .col-9, .col-10, .col-11, .col-12,
+            .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6,
+            .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12,
+            .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6,
+            .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12,
+            .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6,
+            .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {
+                padding-left: 5pt !important;
+                padding-right: 5pt !important;
+            }
+
+            /* 2 kolonlu düzen için özel ayarlar */
+            .col-md-6 {
+                width: 50% !important;
+                float: left !important;
+                display: block !important;
+            }
+
+            .col-md-4 {
+                width: 33.333333% !important;
+                float: left !important;
+                display: block !important;
+            }
+
+            .col-md-8 {
+                width: 66.666667% !important;
+                float: left !important;
+                display: block !important;
+            }
+
+            .col-md-12 {
+                width: 100% !important;
+                float: none !important;
+                display: block !important;
+            }
+
+            .pdf-participant-table {
+                border: 2px solid #000 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .pdf-participant-table td {
+                border: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            .pdf-participant-label {
+                background-color: #f8f9fa !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+        }
+
+        /* PDF Katılımcı Bilgileri Tablosu Stilleri */
+        .pdf-participant-table {
+            border: 2px solid #000 !important;
+            border-collapse: collapse !important;
+            margin-bottom: 10px !important;
+            font-size: 12px !important;
+            width: 100% !important;
+        }
+
+        .pdf-participant-table td {
+            border: 1px solid #000 !important;
+            padding: 6px 8px !important;
+            vertical-align: middle !important;
+            line-height: 1.2 !important;
+        }
+
+        .pdf-participant-label {
+            /*background-color: #f8f9fa !important;*/
+            font-weight: bold !important;
+            width: 40% !important;
+            text-align: left !important;
+        }
+
+        .pdf-participant-value {
+            /*background-color: #ffffff !important;*/
+            width: 60% !important;
+            text-align: left !important;
+        }
+    </style>
+</head>
+<body>
+<div class="report-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-0"><i class="fas fa-file-medical-alt me-2"></i>MMPI Test Raporu</h1>
+                <p class="mb-0 mt-2">Minnesota Çok Yönlü Kişilik Envanteri</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-light ms-2 no-print" onclick="printWithCustomName()">
+                    <i class="fas fa-print me-2"></i>PDF İndir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-4">
+    <!-- Yükleme Göstergesi -->
+    <div id="loadingIndicator" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p class="mt-3">Rapor yükleniyor...</p>
+    </div>
+
+    <!-- Rapor İçeriği -->
+    <div id="reportContent" style="display: none;">
+        <!-- Katılımcı Bilgileri -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Katılımcı Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Ad Soyad:</strong> <span id="participantName">-</span></p>
+                        <p><strong>TC Kimlik No:</strong> <span id="participantTcNo">-</span></p>
+                        <p><strong>Cinsiyet:</strong> <span id="participantGender">-</span></p>
+                        <p><strong>Yaş:</strong> <span id="participantAge">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Eğitim Durumu:</strong> <span id="participantEducation">-</span></p>
+                        <p><strong>Medeni Durum:</strong> <span id="participantMaritalStatus">-</span></p>
+                        <p><strong>Test Tarihi:</strong> <span id="testDate">-</span></p>
+                        <p><strong>Test Süresi:</strong> <span id="testDuration">-</span></p>
+                        <p><strong>Boş Soru Sayısı:</strong> <span id="dontKnowCount">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geçerlilik Değerlendirmesi -->
+        <div id="validitySection" class="card mb-4 no-print">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Geçerlilik Değerlendirmesi</h5>
+            </div>
+            <div class="card-body">
+                <div id="validityContent"></div>
+            </div>
+        </div>
+
+        <!-- K Oranları -->
+        <div id="kRatiosSection" class="card mb-4 no-print" style="display:none;">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i>K Oranları</h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="h6 mb-1">K Ham Puan</div>
+                        <div class="display-6" id="kRawValue">-</div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead>
+                                <tr>
+                                    <th scope="col">0.5K (Hs)</th>
+                                    <th scope="col">0.4K (Pd)</th>
+                                    <th scope="col">1.0K (Pt, Sc)</th>
+                                    <th scope="col">0.2K (Ma)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td id="k05Cell">-</td>
+                                    <td id="k04Cell">-</td>
+                                    <td id="k10Cell">-</td>
+                                    <td id="k02Cell">-</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted d-block mt-2" id="kSourceNote"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profil Grafiği -->
+        <div class="card mb-4 no-print">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>MMPI Profil Grafiği</h5>
+                <button type="button" class="btn btn-light btn-sm" onclick="downloadMmpiProfilChartAsPDF()">
+                    <i class="fas fa-download me-1"></i>PDF İndir
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chart-container">
+                            <canvas id="profileChart"></canvas>
+                        </div>
+                        <!-- Gizli PDF canvas - sadece PDF için kullanılacak -->
+                        <canvas id="profileChartForPdf" style="display: none;"></canvas>
+                    </div>
+                    <div class="col-md-4 d-none d-print-block" id="participantDataForPDF">
+                        <!-- Adı Soyadı - Üstte tek satır -->
+                        <table class="table table-bordered pdf-participant-table mb-2">
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Adı Soyadı</strong></td>
+                                <td class="pdf-participant-value" id="pdfParticipantName">-</td>
+                            </tr>
+                        </table>
+
+                        <!-- Diğer bilgiler - Alt kısımda 2 sütunlu -->
+                        <table class="table table-bordered pdf-participant-table">
+                            <tr>
+                                <td class="pdf-participant-label"><strong>TC Kimlik No</strong></td>
+                                <td class="pdf-participant-value" id="pdfParticipantTcNo">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Meslek</strong></td>
+                                <td class="pdf-participant-value" id="pdfProfession">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Uygulama Tarihi</strong></td>
+                                <td class="pdf-participant-value" id="pdfTestDate">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Eğitim</strong></td>
+                                <td class="pdf-participant-value" id="pdfEducation">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Yaş</strong></td>
+                                <td class="pdf-participant-value" id="pdfAge">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>Medeni Durumu</strong></td>
+                                <td class="pdf-participant-value" id="pdfMaritalStatus">-</td>
+                            </tr>
+                            <tr>
+                                <td class="pdf-participant-label"><strong>İstekte Bulunan</strong></td>
+                                <td class="pdf-participant-value">Psikolog</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ölçek Sonuçları -->
+        <div class="card mb-4 no-print">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Ölçek Sonuçları</h5>
+            </div>
+            <div class="card-body">
+                <div id="scaleResults" class="row"></div>
+            </div>
+        </div>
+
+        <!-- Özet ve Yorumlama -->
+        <div class="card mb-4 no-print">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Özet ve Yorumlama</h5>
+            </div>
+            <div class="card-body">
+                <div id="summaryContent"></div>
+            </div>
+        </div>
+
+        <!-- Öneriler -->
+        <div class="card mb-4 no-print">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Öneriler</h5>
+            </div>
+            <div class="card-body">
+                <div id="recommendationsContent"></div>
+            </div>
+        </div>
+
+
+        <!-- Psikolog Değerlendirmesi -->
+        <div class="card mb-4">
+            <div class="card-header bg-purple text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Psikolog Değerlendirmesi</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="psychologistName" class="form-label"><strong>Psikolog Adı:</strong></label>
+                        <input type="text" class="form-control" id="psychologistName" placeholder="Dr. Psikolog Adı">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="evaluationDate" class="form-label"><strong>Değerlendirme Tarihi:</strong></label>
+                        <input type="date" class="form-control" id="evaluationDate">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="participationAssessment" class="form-label"><strong>Katılım:</strong></label>
+                        <textarea class="form-control" id="participationAssessment" rows="4" placeholder="Katılımcının teste katılım durumu ve motivasyonu hakkında değerlendirme..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="validityAssessment" class="form-label"><strong>Geçerlilik:</strong></label>
+                        <textarea class="form-control" id="validityAssessment" rows="4" placeholder="Test sonuçlarının geçerliliği hakkında değerlendirme..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Özet -->
+                <div class="card mb-3 ">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>Özet</h6>
+                    </div>
+                    <textarea class="form-control auto-resize-textarea" id="validityScalesSummary" rows="4" placeholder="L, F, K ölçekleri için otomatik değerlendirme burada görünecek..."></textarea>
+                </div>
+
+                <!-- Rapor Sonucu -->
+                <div id="report_result" class="card mb-3 ">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Rapor Sonucu</h6>
+                    </div>
+                    <textarea class="form-control auto-resize-textarea" id="clinicalScalesResult" rows="4" placeholder="Hs, D, Hy, Pd, Mf, Pa, Pt, Sc, Ma, Si ölçekleri için otomatik değerlendirme burada görünecek..."></textarea>
+                    <div id="printClinicalScalesResult" style="display: none; white-space: pre-wrap;"></div>
+                </div>
+
+                <!-- Ek Değerlendirme Notu -->
+                <div class="card mb-3" id="additionalNoteCard">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="fas fa-edit me-2"></i>Ek Değerlendirme Notu</h6>
+                    </div>
+                    <textarea class="form-control auto-resize-textarea" id="additionalNote" rows="3" placeholder="Ek değerlendirme notunuz..."></textarea>
+                </div>
+
+                <!-- Veri Kullanımına Dair Öneriler -->
+                <div class="mt-4">
+                    <textarea class="form-control auto-resize-textarea" id="dataUsageRecommendations" rows="3" placeholder="Kurumun ve kişinin değişimi olasılığı sebebiyle, bu rapordaki verilerin değerlendirme tarihinden itibaren iki yıl süresince kullanılmasını önermektedir..." style="font-size: 0.7em;"></textarea>
+                </div>
+
+                <!-- PDP Sonuçları Değerlendirme Listesi -->
+                <div class="card mb-3 page-break-before" id="pdp-result-evaluation-list">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fas fa-list-check me-2"></i>PDP sonuçları açısından parametreler incelendiğinde;</h6>
+                        <button type="button" class="btn btn-sm btn-outline-light" id="togglePdpSection">
+                            <i class="fas fa-eye-slash" id="pdpToggleIcon"></i>
+                        </button>
+                    </div>
+                    <div class="card-body" id="pdpParametersSection">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_pasif_bagimli">
+                                    <label class="form-check-label" for="pdp_pasif_bagimli">Pasif bağımlı kişilik bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_somatizasyon">
+                                    <label class="form-check-label" for="pdp_somatizasyon">Somatizasyon bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_pasif_agresif">
+                                    <label class="form-check-label" for="pdp_pasif_agresif">Pasif agresif kişilik</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_anksiyete">
+                                    <label class="form-check-label" for="pdp_anksiyete">Anksiyete ya da psikofizyolojik reaksiyon</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_borderline">
+                                    <label class="form-check-label" for="pdp_borderline">Borderline kişilik bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_organik_beyin">
+                                    <label class="form-check-label" for="pdp_organik_beyin">Organik beyin sendromu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_alkolizm">
+                                    <label class="form-check-label" for="pdp_alkolizm">Alkolizm</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_maskeli_depresyon">
+                                    <label class="form-check-label" for="pdp_maskeli_depresyon">Maskeli depresyon</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_prepsikotik">
+                                    <label class="form-check-label" for="pdp_prepsikotik">Prepsikotik bozukluk</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_organik_guclukleri">
+                                    <label class="form-check-label" for="pdp_organik_guclukleri">Organik beyin bozukluğuna bağlı güçlükler</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_depresif">
+                                    <label class="form-check-label" for="pdp_depresif">Depresif</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_depresif_nevroz">
+                                    <label class="form-check-label" for="pdp_depresif_nevroz">Depresif nevroz</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_depresif_reaksiyon">
+                                    <label class="form-check-label" for="pdp_depresif_reaksiyon">Depresif reaksiyon ya da somatoform bozukluk</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_dusuk_kontrol">
+                                    <label class="form-check-label" for="pdp_dusuk_kontrol">Düşük kontrol bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_stres_alkol">
+                                    <label class="form-check-label" for="pdp_stres_alkol">Stres karşısında alkol ya da madde kullanımı</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_pasif_agresif_kisilik">
+                                    <label class="form-check-label" for="pdp_pasif_agresif_kisilik">Pasif-agresif kişilik bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizoid_kisilik">
+                                    <label class="form-check-label" for="pdp_sizoid_kisilik">Şizoid kişilik bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_depresif_semptomlar">
+                                    <label class="form-check-label" for="pdp_depresif_semptomlar">Depresif semptomlar</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_anksiyete_bozuklugu">
+                                    <label class="form-check-label" for="pdp_anksiyete_bozuklugu">Anksiyete bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizoid_kisilik2">
+                                    <label class="form-check-label" for="pdp_sizoid_kisilik2">Şizoid kişilik bozukluğu</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_melankoli">
+                                    <label class="form-check-label" for="pdp_melankoli">Melankoli</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizoaffektif">
+                                    <label class="form-check-label" for="pdp_sizoaffektif">Şizoaffektif şizofreni</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_pasif_agresif_tip">
+                                    <label class="form-check-label" for="pdp_pasif_agresif_tip">Pasif agresif kişilik bozukluğu/agresif tip</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_histerik_nevroz">
+                                    <label class="form-check-label" for="pdp_histerik_nevroz">Histerik nevroz</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_somatoform">
+                                    <label class="form-check-label" for="pdp_somatoform">Somatoform bozukluk</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_pasif_agresif_pasif">
+                                    <label class="form-check-label" for="pdp_pasif_agresif_pasif">Pasif agresif kişilik bozukluğu/pasif tip</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_antisosyal">
+                                    <label class="form-check-label" for="pdp_antisosyal">Antisosyal, paranoid, şizoid kişilik bozukluğu</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_antisosyal_karakter">
+                                    <label class="form-check-label" for="pdp_antisosyal_karakter">Antisosyal kişilikle birlikte bazı tip karakter bozuklukları</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_psikozun_erken">
+                                    <label class="form-check-label" for="pdp_psikozun_erken">Psikozun erken dönemi</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_dekompanze">
+                                    <label class="form-check-label" for="pdp_dekompanze">Dekompanze obsesif kompulsif bozukluk</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_akut_psikotik">
+                                    <label class="form-check-label" for="pdp_akut_psikotik">Akut psikotik epizod</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sosyal_ice">
+                                    <label class="form-check-label" for="pdp_sosyal_ice">Sosyal İçe Dönüklük</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizofreni_paranoid">
+                                    <label class="form-check-label" for="pdp_sizofreni_paranoid">Şizofreni paranoid tip</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_obsesif_kompulsif">
+                                    <label class="form-check-label" for="pdp_obsesif_kompulsif">Obsesif kompulsif bozukluk</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizofrenik_reaksiyon">
+                                    <label class="form-check-label" for="pdp_sizofrenik_reaksiyon">Şizofrenik reaksiyon</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_manik_bozuklugun">
+                                    <label class="form-check-label" for="pdp_manik_bozuklugun">Manik bozukluğun bazı tipleri</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizofreni">
+                                    <label class="form-check-label" for="pdp_sizofreni">Şizofreni</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_madde_kullanimi">
+                                    <label class="form-check-label" for="pdp_madde_kullanimi">Madde kullanımına bağlı psikoz</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_sizoid_kisilik3">
+                                    <label class="form-check-label" for="pdp_sizoid_kisilik3">Şizoid kişilik</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pdp_paranoid_durum">
+                                    <label class="form-check-label" for="pdp_paranoid_durum">Paranoid durum</label>
+                                </div>
+                            </div>
+
+                            <!-- PDP Sonuç Mesajı -->
+                            <div id="pdpResultMessage" class="mt-3" style="display: none;">
+                                <div id="pdpResultAlert" class="alert alert-info">
+                                    <strong id="pdpResultText">Psikopatolojik bulguya rastlanılmamıştır.</strong>
+                                    <br><small class="text-muted">(İşaretlenmiş kutucuklar olası psikopatolojileri göstermektedir)</small>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Görev Tanımları Değerlendirmesi -->
+                <div class="card mt-4" id="task-definition-evaluation">
+                    <div class="card-header">
+                        <h5 class="mb-0">Görev Tanımları Değerlendirmesi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="task-definitions-loading" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yüklüyor...</span>
+                            </div>
+                            <p class="mt-2">Görev tanımları yüklüyor...</p>
+                        </div>
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h6 class="mb-3">Değerlendirme Skalası</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 50%;">Görev Tanımına Uygun</th>
+                            <th style="width: 50%;">Görev Tanımına Uygun Değil</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="text-center" style="color: #28a745;font-weight: bold">✓</td>
+                            <td class="text-center" style="color: #dc3545;font-weight: bold">✗</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Değerlendirme Süreci -->
+                <div class="mt-4">
+                    <h5 class="mb-3 fw-bold">Değerlendirme Süreci</h5>
+                    <textarea class="form-control auto-resize-textarea" id="evaluationProcess" rows="2" placeholder="Değerlendirme süreci açıklaması..."></textarea>
+                </div>
+
+                <!-- Ölçümleme Süreci -->
+                <div class="mt-4">
+                    <h5 class="mb-3 fw-bold">Ölçümleme Süreci</h5>
+                    <textarea class="form-control auto-resize-textarea" id="measurementProcess" rows="2" placeholder="Ölçümleme süreci açıklaması..."></textarea>
+                    <div id="printMeasurementProcess" style="display: none; white-space: pre-wrap;"></div>
+                </div>
+                <!-- Yetkinlik Değerlendirmesi -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4 class="mb-0 fw-bold text-center">YETKİNLİK DEĞERLENDİRMESİ</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- 1. Psikolojik Skala -->
+                        <div class="mt-4">
+                            <h5 class="mb-3 fw-bold">1. Psikolojik Skala</h5>
+
+                            <!-- Stresle Baş Etme Kapasitesi -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Stresle Baş Etme Kapasitesi (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="stress_capacity" id="stress_1_2" value="2">
+                                                <label class="form-check-label" for="stress_1_2">
+                                                    1-2 Kişi stresle başa çıkmada zorluk yaşıyor, kolayca bunalıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_stress_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="stress_capacity" id="stress_3_4" value="4">
+                                                <label class="form-check-label" for="stress_3_4">
+                                                    3-4 Stresli durumlarda bazen etkili başa çıkabiliyor, ancak sık sık zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_stress_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="stress_capacity" id="stress_5_6" value="6">
+                                                <label class="form-check-label" for="stress_5_6">
+                                                    5-6 Stresle ortalama düzeyde başa çıkabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_stress_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="stress_capacity" id="stress_7_8" value="8">
+                                                <label class="form-check-label" for="stress_7_8">
+                                                    7-8 Stresle çoğu zaman etkili bir şekilde başa çıkabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_stress_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="stress_capacity" id="stress_9_10" value="10">
+                                                <label class="form-check-label" for="stress_9_10">
+                                                    9-10 Stresli durumlar karşısında son derece etkili ve sakin kalabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_stress_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('stress_capacity')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Duygusal Esneklik -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Duygusal Esneklik (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="emotional_flexibility" id="emotional_1_2" value="2">
+                                                <label class="form-check-label" for="emotional_1_2">
+                                                    1-2 Duygusal zorluklar karşısında kolayca yıkılıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_emotional_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="emotional_flexibility" id="emotional_3_4" value="4">
+                                                <label class="form-check-label" for="emotional_3_4">
+                                                    3-4 Duygusal olarak bazı durumlarda zorluk yaşayabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_emotional_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="emotional_flexibility" id="emotional_5_6" value="6">
+                                                <label class="form-check-label" for="emotional_5_6">
+                                                    5-6 Duygusal esneklik konusunda ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_emotional_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="emotional_flexibility" id="emotional_7_8" value="8">
+                                                <label class="form-check-label" for="emotional_7_8">
+                                                    7-8 Duygusal esnekliği iyi, çoğu durumda dengeli kalabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_emotional_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="emotional_flexibility" id="emotional_9_10" value="10">
+                                                <label class="form-check-label" for="emotional_9_10">
+                                                    9-10 Duygusal olarak son derece esnek, zorlayıcı durumlarda bile duygusal dengesini koruyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_emotional_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('emotional_flexibility')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Problem Çözme Yeteneği -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Problem Çözme Yeteneği (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="problem_solving" id="problem_solving_1" value="2">
+                                                <label class="form-check-label" for="problem_solving_1">
+                                                    1-2 Problemleri çözmede zorluk yaşıyor, genellikle çözümler üretemiyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_problem_solving_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="problem_solving" id="problem_solving_2" value="4">
+                                                <label class="form-check-label" for="problem_solving_2">
+                                                    3-4 Bazı durumlarda problem çözmede zorlanıyor, sınırlı çözümler üretebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_problem_solving_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="problem_solving" id="problem_solving_3" value="6">
+                                                <label class="form-check-label" for="problem_solving_3">
+                                                    5-6 Problem çözme yeteneği ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_problem_solving_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="problem_solving" id="problem_solving_4" value="8">
+                                                <label class="form-check-label" for="problem_solving_4">
+                                                    7-8 Problemleri genellikle etkili bir şekilde çözebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_problem_solving_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="problem_solving" id="problem_solving_5" value="10">
+                                                <label class="form-check-label" for="problem_solving_5">
+                                                    9-10 Son derece etkili problem çözücü, yaratıcı ve hızlı çözümler üretebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_problem_solving_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('problem_solving')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Özsaygı ve Kendini Kabul -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Özsaygı ve Kendini Kabul (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="self_esteem" id="self_esteem_1" value="2">
+                                                <label class="form-check-label" for="self_esteem_1">
+                                                    1-2 Kendine saygısı düşük, kendini kabul etmekte zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_self_esteem_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="self_esteem" id="self_esteem_2" value="4">
+                                                <label class="form-check-label" for="self_esteem_2">
+                                                    3-4 Özsaygısı dalgalanıyor, kendini kabul etme konusunda zaman zaman zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_self_esteem_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="self_esteem" id="self_esteem_3" value="6">
+                                                <label class="form-check-label" for="self_esteem_3">
+                                                    5-6 Özsaygısı ve kendini kabul düzeyi ortalama.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_self_esteem_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="self_esteem" id="self_esteem_4" value="8">
+                                                <label class="form-check-label" for="self_esteem_4">
+                                                    7-8 Özsaygısı yüksek, kendini genellikle kabul ediyor ve değerli hissediyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_self_esteem_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="self_esteem" id="self_esteem_5" value="10">
+                                                <label class="form-check-label" for="self_esteem_5">
+                                                    9-10 Son derece yüksek özsaygı, kendini tam anlamıyla kabul ediyor ve değer veriyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_self_esteem_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('self_esteem')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Sosyal Destek Ağı -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Sosyal Destek Ağı (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="social_support" id="social_support_1" value="2">
+                                                <label class="form-check-label" for="social_support_1">
+                                                    1-2 Sosyal desteği çok zayıf veya yok.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_social_support_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="social_support" id="social_support_2" value="4">
+                                                <label class="form-check-label" for="social_support_2">
+                                                    3-4 Sınırlı sosyal desteği var, ancak yeterli değil.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_social_support_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="social_support" id="social_support_3" value="6">
+                                                <label class="form-check-label" for="social_support_3">
+                                                    5-6 Sosyal destek ağı ortalama düzeyde, bazı durumlarda yeterli.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_social_support_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="social_support" id="social_support_4" value="8">
+                                                <label class="form-check-label" for="social_support_4">
+                                                    7-8 Güçlü bir sosyal destek ağı var, ihtiyaç duyduğunda destek alabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_social_support_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="social_support" id="social_support_5" value="10">
+                                                <label class="form-check-label" for="social_support_5">
+                                                    9-10 Çok güçlü bir sosyal destek ağı var, her zaman destek görebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_social_support_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('social_support')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Pozitif Düşünme ve İyimserlik -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Pozitif Düşünme ve İyimserlik (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="positive_thinking" id="positive_thinking_1" value="2">
+                                                <label class="form-check-label" for="positive_thinking_1">
+                                                    1-2 Çoğunlukla negatif düşünce yapısına sahip, iyimser değil.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_positive_thinking_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="positive_thinking" id="positive_thinking_2" value="4">
+                                                <label class="form-check-label" for="positive_thinking_2">
+                                                    3-4 Zaman zaman negatif düşünceye kapılıyor, iyimserliği düşük.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_positive_thinking_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="positive_thinking" id="positive_thinking_3" value="6">
+                                                <label class="form-check-label" for="positive_thinking_3">
+                                                    5-6 Pozitif düşünce yapısı ve iyimserliği ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_positive_thinking_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="positive_thinking" id="positive_thinking_4" value="8">
+                                                <label class="form-check-label" for="positive_thinking_4">
+                                                    7-8 Çoğu zaman pozitif düşünüyor, iyimser bir bakış açısına sahip.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_positive_thinking_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="positive_thinking" id="positive_thinking_5" value="10">
+                                                <label class="form-check-label" for="positive_thinking_5">
+                                                    9-10 Son derece pozitif düşünüyor, her zaman iyimser.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_positive_thinking_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('positive_thinking')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Yaşam Memnuniyeti -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Yaşam Memnuniyeti (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="life_satisfaction" id="life_satisfaction_1" value="2">
+                                                <label class="form-check-label" for="life_satisfaction_1">
+                                                    1-2 Hayattan çok az memnun, tatminsiz.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_life_satisfaction_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="life_satisfaction" id="life_satisfaction_2" value="4">
+                                                <label class="form-check-label" for="life_satisfaction_2">
+                                                    3-4 Yaşam memnuniyeti düşük, sık sık tatminsizlik yaşıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_life_satisfaction_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="life_satisfaction" id="life_satisfaction_3" value="6">
+                                                <label class="form-check-label" for="life_satisfaction_3">
+                                                    5-6 Yaşam memnuniyeti ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_life_satisfaction_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="life_satisfaction" id="life_satisfaction_4" value="8">
+                                                <label class="form-check-label" for="life_satisfaction_4">
+                                                    7-8 Genel olarak hayattan memnun, tatmin duygusu yüksek.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_life_satisfaction_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="life_satisfaction" id="life_satisfaction_5" value="10">
+                                                <label class="form-check-label" for="life_satisfaction_5">
+                                                    9-10 Hayattan son derece memnun, yüksek tatmin duygusuna sahip.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_life_satisfaction_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('life_satisfaction')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Adaptasyon Yeteneği -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Adaptasyon Yeteneği (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="adaptation" id="adaptation_1" value="2">
+                                                <label class="form-check-label" for="adaptation_1">
+                                                    1-2 Değişen durumlara uyum sağlamakta çok zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="psych_scale_adaptation_1" min="1" max="2" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="adaptation" id="adaptation_2" value="4">
+                                                <label class="form-check-label" for="adaptation_2">
+                                                    3-4 Adaptasyon yeteneği zayıf, yeni durumlara uyum sağlamakta güçlük çekiyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="psych_scale_adaptation_2" min="3" max="4" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="adaptation" id="adaptation_3" value="6">
+                                                <label class="form-check-label" for="adaptation_3">
+                                                    5-6 Adaptasyon yeteneği ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="psych_scale_adaptation_3" min="5" max="6" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="adaptation" id="adaptation_4" value="8">
+                                                <label class="form-check-label" for="adaptation_4">
+                                                    7-8 Çoğu durumda hızlı uyum sağlayabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="psych_scale_adaptation_4" min="7" max="8" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="adaptation" id="adaptation_5" value="10">
+                                                <label class="form-check-label" for="adaptation_5">
+                                                    9-10 Son derece yüksek adaptasyon yeteneği, değişikliklere kolayca uyum sağlıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="psych_scale_adaptation_5" min="9" max="10" readonly>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('adaptation')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Duygusal ve Mental Sağlık Durumu -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Duygusal ve Mental Sağlık Durumu (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mental_health" id="mental_health_1" value="2">
+                                                <label class="form-check-label" for="mental_health_1">
+                                                    1-2 Duygusal ve mental sağlık durumu ciddi derecede zayıf.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_mental_health_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mental_health" id="mental_health_2" value="4">
+                                                <label class="form-check-label" for="mental_health_2">
+                                                    3-4 Duygusal ve mental sağlık sorunları var, ancak yönetilebilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_mental_health_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mental_health" id="mental_health_3" value="6">
+                                                <label class="form-check-label" for="mental_health_3">
+                                                    5-6 Duygusal ve mental sağlık durumu ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_mental_health_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mental_health" id="mental_health_4" value="8">
+                                                <label class="form-check-label" for="mental_health_4">
+                                                    7-8 Genel olarak iyi duygusal ve mental sağlık durumuna sahip.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_mental_health_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mental_health" id="mental_health_5" value="10">
+                                                <label class="form-check-label" for="mental_health_5">
+                                                    9-10 Duygusal ve mental olarak son derece sağlıklı.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_mental_health_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('mental_health')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Kendini Yeniden Motive Etme Yeteneği -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Kendini Yeniden Motive Etme Yeteneği (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="motivation" id="motivation_1" value="2">
+                                                <label class="form-check-label" for="motivation_1">
+                                                    1-2 Kendini motive etmekte çok zorlanıyor, kolayca pes ediyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="psych_scale_motivation_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="motivation" id="motivation_2" value="4">
+                                                <label class="form-check-label" for="motivation_2">
+                                                    3-4 Zaman zaman motivasyon kaybı yaşıyor, ancak kendini toparlamakta zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="psych_scale_motivation_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="motivation" id="motivation_3" value="6">
+                                                <label class="form-check-label" for="motivation_3">
+                                                    5-6 Motivasyonunu ortalama düzeyde sürdürebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="psych_scale_motivation_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="motivation" id="motivation_4" value="8">
+                                                <label class="form-check-label" for="motivation_4">
+                                                    7-8 Kendini genellikle hızlı bir şekilde motive edebiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="psych_scale_motivation_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="motivation" id="motivation_5" value="10">
+                                                <label class="form-check-label" for="motivation_5">
+                                                    9-10 Son derece motive, her zorluk karşısında kendini hızla toparlayabiliyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="psych_scale_motivation_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('motivation')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. İş Skalası -->
+                        <div class="mt-5">
+                            <h5 class="mb-3 fw-bold">2. İş Skalası</h5>
+
+                            <!-- Performans ve Üretkenlik -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Performans ve Üretkenlik (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="performance" id="performance_1" value="2">
+                                                <label class="form-check-label" for="performance_1">
+                                                    1-2: Performansı ve üretkenliği çok düşük, görevlerini yerine getirmekte zorlanır.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_performance_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="performance" id="performance_2" value="4">
+                                                <label class="form-check-label" for="performance_2">
+                                                    3-4: Performansı düşük, üretkenliği sık sık dalgalanabilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_performance_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="performance" id="performance_3" value="6">
+                                                <label class="form-check-label" for="performance_3">
+                                                    5-6: Performansı ve üretkenliği ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_performance_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="performance" id="performance_4" value="8">
+                                                <label class="form-check-label" for="performance_4">
+                                                    7-8: Performansı genellikle yüksek, üretkenliği iyi.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_performance_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="performance" id="performance_5" value="10">
+                                                <label class="form-check-label" for="performance_5">
+                                                    9-10: Performansı çok yüksek, sürekli olarak yüksek üretkenlik sağlayabilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_performance_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('performance')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İş Güvenliği ve Sağlık Bilinci -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İş Güvenliği ve Sağlık Bilinci (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="safety" id="safety_1" value="2">
+                                                <label class="form-check-label" for="safety_1">
+                                                    1-2: İş güvenliği ve sağlık kurallarına uyma konusunda çok zayıf.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_safety_1" min="1" max="2" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="safety" id="safety_2" value="4">
+                                                <label class="form-check-label" for="safety_2">
+                                                    3-4: İş güvenliği ve sağlık bilinci düşük, kurallara uyma konusunda zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_safety_2" min="3" max="4" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="safety" id="safety_3" value="6">
+                                                <label class="form-check-label" for="safety_3">
+                                                    5-6: İş güvenliği ve sağlık bilinci ortalama düzeyde, genellikle kurallara uyuyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_safety_3" min="5" max="6" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="safety" id="safety_4" value="8">
+                                                <label class="form-check-label" for="safety_4">
+                                                    7-8: İş güvenliği bilinci yüksek, sağlık kurallarına dikkat ediyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_safety_4" min="7" max="8" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="safety" id="safety_5" value="10">
+                                                <label class="form-check-label" for="safety_5">
+                                                    9-10: İş güvenliği ve sağlık bilinci çok yüksek, her zaman dikkatli ve kurallara uygun davranıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_safety_5" min="9" max="10" readonly>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('safety')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İş Kalitesi ve Dikkat -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İş Kalitesi ve Dikkat (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="quality" id="quality_1" value="2">
+                                                <label class="form-check-label" for="quality_1">
+                                                    1-2: Sık sık hatalar yapabilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_quality_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="quality" id="quality_2" value="4">
+                                                <label class="form-check-label" for="quality_2">
+                                                    3-4: Detaylara dikkat etmede sorun yaşıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_quality_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="quality" id="quality_3" value="6">
+                                                <label class="form-check-label" for="quality_3">
+                                                    5-6: Dikkat ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_quality_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="quality" id="quality_4" value="8">
+                                                <label class="form-check-label" for="quality_4">
+                                                    7-8: Üretilen iş kalitesi genellikle yüksek, dikkat seviyesi iyi.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_quality_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="quality" id="quality_5" value="10">
+                                                <label class="form-check-label" for="quality_5">
+                                                    9-10: İş kalitesi çok yüksek, detaylara son derece dikkatli.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_quality_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('quality')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Takım Çalışması ve İş Arkadaşlarıyla Uyum -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Takım Çalışması ve İş Arkadaşlarıyla Uyum (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="teamwork" id="teamwork_1" value="2">
+                                                <label class="form-check-label" for="teamwork_1">
+                                                    1-2: Takım çalışmasında zorlanıyor, iş arkadaşlarıyla uyumu zayıf olabilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_teamwork_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="teamwork" id="teamwork_2" value="4">
+                                                <label class="form-check-label" for="teamwork_2">
+                                                    3-4: Takım çalışması becerisi düşük, iş arkadaşlarıyla sık sık anlaşmazlık yaşayabilir.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_teamwork_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="teamwork" id="teamwork_3" value="6">
+                                                <label class="form-check-label" for="teamwork_3">
+                                                    5-6: Takım çalışması ve iş arkadaşlarıyla uyum ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_teamwork_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="teamwork" id="teamwork_4" value="8">
+                                                <label class="form-check-label" for="teamwork_4">
+                                                    7-8: Takım çalışmasında iyi, iş arkadaşlarıyla uyumu genellikle yüksek.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_teamwork_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="teamwork" id="teamwork_5" value="10">
+                                                <label class="form-check-label" for="teamwork_5">
+                                                    9-10: Mükemmel bir takım oyuncusu, iş arkadaşlarıyla uyumu çok iyi.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_teamwork_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('teamwork')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İş Disiplini ve Zamanında Teslimat -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İş Disiplini ve Zamanında Teslimat (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="discipline" id="discipline_1" value="2">
+                                                <label class="form-check-label" for="discipline_1">
+                                                    1-2: İş disiplini çok zayıf, görevleri zamanında tamamlamıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_discipline_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="discipline" id="discipline_2" value="4">
+                                                <label class="form-check-label" for="discipline_2">
+                                                    3-4: İş disiplini düşük, zamanında teslimat konusunda sık sık sorun yaşıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_discipline_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="discipline" id="discipline_3" value="6">
+                                                <label class="form-check-label" for="discipline_3">
+                                                    5-6: İş disiplini ve zamanında teslimat ortalama düzeyde.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_discipline_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="discipline" id="discipline_4" value="8">
+                                                <label class="form-check-label" for="discipline_4">
+                                                    7-8: İş disiplini yüksek, genellikle zamanında teslimat yapıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_discipline_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="discipline" id="discipline_5" value="10">
+                                                <label class="form-check-label" for="discipline_5">
+                                                    9-10: İş disiplini çok yüksek, her zaman görevleri zamanında ve eksiksiz tamamlıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_discipline_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('discipline')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Temsil Yeteneği ve İmaj Yönetimi -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Temsil Yeteneği ve İmaj Yönetimi (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="representation" id="representation_1" value="2">
+                                                <label class="form-check-label" for="representation_1">
+                                                    1-2: Temsil yeteneği çok zayıf, kurumun imajını etkili bir şekilde yansıtamıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_representation_1" min="1" max="2" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="representation" id="representation_2" value="4">
+                                                <label class="form-check-label" for="representation_2">
+                                                    3-4: Temsil yeteneği düşük, kurumun imajını ve değerlerini aktarmakta zorlanıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_representation_2" min="3" max="4" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="representation" id="representation_3" value="6">
+                                                <label class="form-check-label" for="representation_3">
+                                                    5-6: Temsil yeteneği ortalama düzeyde, kurumun imajını genellikle uygun şekilde yansıtıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_representation_3" min="5" max="6" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="representation" id="representation_4" value="8">
+                                                <label class="form-check-label" for="representation_4">
+                                                    7-8: Temsil yeteneği iyi, kurumun imajını ve değerlerini etkili bir şekilde yansıtıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_representation_4" min="7" max="8" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="representation" id="representation_5" value="10">
+                                                <label class="form-check-label" for="representation_5">
+                                                    9-10: Temsil yeteneği çok yüksek, kurumun imajını mükemmel bir şekilde yönetiyor ve değerleri eksiksiz yansıtıyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                   id="work_scale_representation_5" min="9" max="10" readonly>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('representation')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İnisiyatif Alma ve Sorumluluk Üstlenme -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İnisiyatif Alma ve Sorumluluk Üstlenme (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="initiative" id="initiative_1" value="2">
+                                                <label class="form-check-label" for="initiative_1">
+                                                    1-2: İnisiyatif almaktan kaçınıyor, sorumluluk üstlenmiyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_initiative_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="initiative" id="initiative_2" value="4">
+                                                <label class="form-check-label" for="initiative_2">
+                                                    3-4: İnisiyatif alma konusunda zayıf, sorumluluk almayı tercih etmiyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_initiative_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="initiative" id="initiative_3" value="6">
+                                                <label class="form-check-label" for="initiative_3">
+                                                    5-6: İnisiyatif alma ve sorumluluk üstlenme düzeyi ortalama.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_initiative_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="initiative" id="initiative_4" value="8">
+                                                <label class="form-check-label" for="initiative_4">
+                                                    7-8: Genellikle inisiyatif alıyor ve sorumluluk üstleniyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_initiative_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="initiative" id="initiative_5" value="10">
+                                                <label class="form-check-label" for="initiative_5">
+                                                    9-10: Son derece inisiyatif sahibi, sorumlulukları gönüllü olarak üstleniyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_initiative_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('initiative')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Öğrenme İsteği ve Mesleki Gelişim -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">Öğrenme İsteği ve Mesleki Gelişim (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="learning" id="learning_1" value="2">
+                                                <label class="form-check-label" for="learning_1">
+                                                    1-2: Yeni şeyler öğrenmeye isteksiz, mesleki gelişim konusunda ilgisiz.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_learning_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="learning" id="learning_2" value="4">
+                                                <label class="form-check-label" for="learning_2">
+                                                    3-4: Öğrenme isteği düşük, mesleki gelişim konularına ilgisiz.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_learning_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="learning" id="learning_3" value="6">
+                                                <label class="form-check-label" for="learning_3">
+                                                    5-6: Öğrenme isteği ve mesleki gelişim düzeyi ortalama.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_learning_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="learning" id="learning_4" value="8">
+                                                <label class="form-check-label" for="learning_4">
+                                                    7-8: Mesleki gelişime açık, öğrenmeye istekli.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_learning_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="learning" id="learning_5" value="10">
+                                                <label class="form-check-label" for="learning_5">
+                                                    9-10: Son derece öğrenme hevesli, sürekli kendini geliştiriyor.
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_learning_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('learning')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İş Tatmini ve Motivasyon -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İş Tatmini ve Motivasyon (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="job_satisfaction" value="2" id="job_satisfaction_1" class="form-check-input">
+                                                <label class="form-check-label" for="job_satisfaction_1">1-2: İş tatmini çok düşük, motivasyonu neredeyse yok.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_job_satisfaction_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="job_satisfaction" value="4" id="job_satisfaction_2" class="form-check-input">
+                                                <label class="form-check-label" for="job_satisfaction_2">3-4: İş tatmini düşük, motivasyonu sıklıkla düşüyor.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_job_satisfaction_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="job_satisfaction" value="6" id="job_satisfaction_3" class="form-check-input">
+                                                <label class="form-check-label" for="job_satisfaction_3">5-6: İş tatmini ve motivasyonu ortalama düzeyde.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_job_satisfaction_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="job_satisfaction" value="8" id="job_satisfaction_4" class="form-check-input">
+                                                <label class="form-check-label" for="job_satisfaction_4">7-8: İş tatmini yüksek, motivasyonu genellikle iyi.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_job_satisfaction_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="job_satisfaction" value="10" id="job_satisfaction_5" class="form-check-input">
+                                                <label class="form-check-label" for="job_satisfaction_5">9-10: Son derece memnun, iş motivasyonu çok yüksek.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_job_satisfaction_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('job_satisfaction')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- İşyeri Kurallarına ve Talimatlara Uyma -->
+                            <div class="table-container">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                    <tr class="table-secondary">
+                                        <th class="fw-bold">İşyeri Kurallarına ve Talimatlara Uyma (1-10)</th>
+                                        <th class="text-center" style="width: 80px;">Puan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="workplace_rules" value="2" id="workplace_rules_1" class="form-check-input">
+                                                <label class="form-check-label" for="workplace_rules_1">1-2: İşyeri kurallarına ve talimatlara uymakta çok zorlanıyor.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="1" max="2" id="work_scale_workplace_rules_1" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="workplace_rules" value="4" id="workplace_rules_2" class="form-check-input">
+                                                <label class="form-check-label" for="workplace_rules_2">3-4: İşyeri kurallarına uymada düşük, talimatlara uyma konusunda sorun yaşıyor.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="3" max="4" id="work_scale_workplace_rules_2" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="workplace_rules" value="6" id="workplace_rules_3" class="form-check-input">
+                                                <label class="form-check-label" for="workplace_rules_3">5-6: İşyeri kurallarına ve talimatlara uyma ortalama düzeyde.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="5" max="6" id="work_scale_workplace_rules_3" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="workplace_rules" value="8" id="workplace_rules_4" class="form-check-input">
+                                                <label class="form-check-label" for="workplace_rules_4">7-8: İşyeri kurallarına genellikle uyuyor, talimatları takip ediyor.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="7" max="8" id="work_scale_workplace_rules_4" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="radio" name="workplace_rules" value="10" id="workplace_rules_5" class="form-check-input">
+                                                <label class="form-check-label" for="workplace_rules_5">9-10: İşyeri kurallarına ve talimatlara son derece dikkatli bir şekilde uyuyor.</label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><input type="number" class="form-control form-control-sm text-center" min="9" max="10" id="work_scale_workplace_rules_5" readonly></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-2 no-print">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCompetencySelection('workplace_rules')">
+                                        <i class="fas fa-times"></i> Seçimi Temizle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Toplam Puanlar Tablosu -->
+                        <div class="mt-5">
+                            <h5 class="mb-3 fw-bold text-center">Toplam Puanlar</h5>
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-dark">
+                                <tr>
+                                    <th class="text-center">Psikolojik Skala</th>
+                                    <th class="text-center">İş Skalası</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="text-center"><span id="psychological_total" class="fw-bold fs-4">0</span></td>
+                                    <td class="text-center"><span id="work_total" class="fw-bold fs-4">0</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Açıklama Yazısı -->
+                        <div class="mt-4 mb-4">
+                            <p class="text-center fst-italic">Kişiye yönelik yetkinlik – performans aşağıdaki skala kullanılarak puanlanmıştır.</p>
+                        </div>
+
+                        <!-- Psikolojik Skala ve İş Skalası Değerlendirme Tablosu -->
+                        <div class="mt-4">
+                            <table class="table table-bordered table-striped">
+                                <colgroup>
+                                    <col style="width: 25%;">
+                                    <col style="width: 25%;">
+                                    <col style="width: 25%;">
+                                    <col style="width: 25%;">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th class="text-center table-primary fw-bold" colspan="2">Psikolojik Skala Değerlendirme</th>
+                                    <th class="text-center table-success fw-bold" colspan="2">İş Skalası Değerlendirme</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="fw-bold">Mükemmel Psikolojik Sağlamlık</td>
+                                    <td class="text-center">90-100</td>
+                                    <td class="fw-bold">Mükemmel İş Performansı</td>
+                                    <td class="text-center">90-100</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Yüksek Psikolojik Sağlamlık</td>
+                                    <td class="text-center">80-89</td>
+                                    <td class="fw-bold">Yüksek İş Performansı</td>
+                                    <td class="text-center">80-89</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Orta Psikolojik Sağlamlık</td>
+                                    <td class="text-center">60-79</td>
+                                    <td class="fw-bold">Orta İş Performansı</td>
+                                    <td class="text-center">70-79</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Düşük Psikolojik Sağlamlık</td>
+                                    <td class="text-center">40-59</td>
+                                    <td class="fw-bold">Düşük İş Performansı</td>
+                                    <td class="text-center">60-69</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Çok Düşük Psikolojik Sağlamlık</td>
+                                    <td class="text-center">39 ve altı</td>
+                                    <td class="fw-bold">Çok Düşük İş Performansı</td>
+                                    <td class="text-center">59 ve altı</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seans İhtiyaç Durumu -->
+                <div class="mt-4 mx-3">
+                    <h4 class="mb-4 fw-bold">Seans İhtiyaç Durumu ve Açıklaması</h4>
+                    <textarea class="form-control auto-resize-textarea" id="sessionNeedAssessment" rows="4" placeholder="Seans ihtiyaç durumu ve açıklaması..."></textarea>
+                </div>
+
+                <div class="text-center mb-3 mt-5">
+                    <button class="btn btn-success btn-lg no-print" id="savePsychologistEvaluation" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-radius: 50px; padding: 12px 24px; font-weight: bold;">
+                        <i class="fas fa-save me-2"></i>Tüm Değerlendirmeyi Kaydet
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- Load Supabase and task definitions scripts -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/task-definitions-loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/report.js"></script>
+
+<script>
+    // Textarea otomatik yükseklik ayarlaması
+    function autoResizeTextarea(textarea) {
+        // Önce height'i sıfırla ki scrollHeight doğru hesaplansın
+        textarea.style.height = 'auto';
+        // Min-height'den küçük olmaması için kontrol et
+        const minHeight = 120;
+        const newHeight = Math.max(textarea.scrollHeight, minHeight);
+        textarea.style.height = newHeight + 'px';
+    }
+
+    // Sayfa yüklendiğinde ve textarea değiştiğinde otomatik yükseklik ayarla
+    document.addEventListener('DOMContentLoaded', function () {
+        const textareas = document.querySelectorAll('.auto-resize-textarea');
+
+        textareas.forEach(function (textarea) {
+            // İlk yükleme - içerik varsa hemen ayarla
+            if (textarea.value.trim()) {
+                autoResizeTextarea(textarea);
+            }
+
+            // DOM tam yüklendikten sonra bir kez daha kontrol et
+            setTimeout(() => {
+                if (textarea.value.trim()) {
+                    autoResizeTextarea(textarea);
+                }
+            }, 100);
+
+            // Input event listener
+            textarea.addEventListener('input', function () {
+                autoResizeTextarea(this);
+            });
+
+            // Paste event listener
+            textarea.addEventListener('paste', function () {
+                setTimeout(() => autoResizeTextarea(this), 10);
+            });
+
+            // Focus event listener - içerik varsa yüksekliği ayarla
+            textarea.addEventListener('focus', function () {
+                if (this.value.trim()) {
+                    autoResizeTextarea(this);
+                }
+            });
+        });
+
+        // Psikolojik Skala ve İş Skalası otomatik toplam hesaplama
+        setupScoreCalculation();
+
+        // Input alanlarını sadece ok tuşlarıyla değiştirilebilir yap
+        setupInputRestrictions();
+
+        // Sayfa yüklenirken mevcut değerleri hesapla
+        calculatePsychologicalTotal();
+        calculateWorkTotal();
+    });
+
+    function setupScoreCalculation() {
+        // Tüm number input'ları bul
+        const allInputs = document.querySelectorAll('input[type="number"]');
+
+        // Her input'a event listener ekle
+        allInputs.forEach(input => {
+            input.addEventListener('input', function () {
+                calculatePsychologicalTotal();
+                calculateWorkTotal();
+            });
+        });
+
+        // İlk hesaplamayı yap
+        calculatePsychologicalTotal();
+        calculateWorkTotal();
+    }
+
+    function setupInputRestrictions() {
+        // Psikolojik ve İş Skalası bölümlerindeki tüm number input'ları bul
+        const psychInputs = document.querySelectorAll('input[id^="psych_scale_"]');
+        const workInputs = document.querySelectorAll('input[id^="work_scale_"]');
+        const allScaleInputs = [...psychInputs, ...workInputs];
+
+        allScaleInputs.forEach(input => {
+            // Klavye girişini engelle, sadece ok tuşlarına izin ver
+            input.addEventListener('keydown', function (e) {
+                // İzin verilen tuşlar: ok tuşları (37-40), tab (9), enter (13), escape (27)
+                const allowedKeys = [37, 38, 39, 40, 9, 13, 27];
+
+                if (!allowedKeys.includes(e.keyCode)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Paste işlemini engelle
+            input.addEventListener('paste', function (e) {
+                e.preventDefault();
+                return false;
+            });
+        });
+    }
+
+    function calculatePsychologicalTotal() {
+        // Psikolojik Skala bölümündeki tüm input değerlerini topla
+        const inputs = [];
+
+        // Psikolojik Skala başlığından İş Skalası başlığına kadar olan input'ları bul
+        let foundPsychSection = false;
+        const allElements = document.querySelectorAll('*');
+
+        allElements.forEach(element => {
+            if (element.tagName === 'H5' && element.textContent.includes('Psikolojik Skala')) {
+                foundPsychSection = true;
+            } else if (element.tagName === 'H5' && element.textContent.includes('İş Skalası')) {
+                foundPsychSection = false;
+            }
+
+            if (foundPsychSection && element.tagName === 'INPUT' && element.type === 'number') {
+                inputs.push(element);
+            }
+        });
+
+        let total = 0;
+        inputs.forEach(input => {
+            const value = parseInt(input.value) || 0;
+            total += value;
+        });
+
+        const totalElement = document.getElementById('psychological_total');
+        if (totalElement) {
+            totalElement.textContent = total;
+        }
+    }
+
+    function calculateWorkTotal() {
+        // İş Skalası bölümündeki tüm input değerlerini topla
+        const inputs = [];
+
+        // İş Skalası başlığından Toplam Puanlar başlığına kadar olan input'ları bul
+        let foundWorkSection = false;
+        const allElements = document.querySelectorAll('*');
+
+        allElements.forEach(element => {
+            if (element.tagName === 'H5' && element.textContent.includes('İş Skalası')) {
+                foundWorkSection = true;
+            } else if (element.tagName === 'H4' && element.textContent.includes('Toplam Puanlar')) {
+                foundWorkSection = false;
+            }
+
+            if (foundWorkSection && element.tagName === 'INPUT' && element.type === 'number') {
+                inputs.push(element);
+            }
+        });
+
+        let total = 0;
+        inputs.forEach(input => {
+            const value = parseInt(input.value) || 0;
+            total += value;
+        });
+
+        const totalElement = document.getElementById('work_total');
+        if (totalElement) {
+            totalElement.textContent = total;
+        }
+    }
+
+    // Sayfa tamamen yüklendikten sonra da bir kez daha kontrol et
+    window.addEventListener('load', function () {
+        const textareas = document.querySelectorAll('.auto-resize-textarea');
+        textareas.forEach(function (textarea) {
+            // İçerik varsa yüksekliği ayarla
+            if (textarea.value.trim()) {
+                autoResizeTextarea(textarea);
+            }
+        });
+
+        // Sayfa tamamen yüklendikten sonra toplam puanları hesapla
+        calculatePsychologicalTotal();
+        calculateWorkTotal();
+    });
+
+    // MutationObserver ile dinamik içerik değişikliklerini izle
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                const textareas = document.querySelectorAll('.auto-resize-textarea');
+                textareas.forEach(function (textarea) {
+                    if (textarea.value.trim()) {
+                        autoResizeTextarea(textarea);
+                    }
+                });
+            }
+        });
+    });
+
+    // Observer'ı başlat
+    document.addEventListener('DOMContentLoaded', function () {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    });
+
+    // PDF dosya adını özelleştirerek yazdırma
+    function printWithCustomName() {
+        const participant = reportData.participant || {};
+        const firstName = participant.first_name || '';
+        const lastName = participant.last_name || '';
+        const fullName = `${firstName}_${lastName}`.replace(/\s+/g, '_');
+
+        // Tarih formatını dd_MM_yyyy şeklinde oluştur
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const dateTime = `${year}_${month}_${day}-${hours}${minutes}`;
+
+        // PDF dosya adını oluştur
+        const fileName = `MMPI_Profil_${fullName}_${dateTime}`;
+
+        // Geçici olarak document.title'ı değiştir
+        const originalTitle = document.title;
+        document.title = fileName;
+
+        // Yazdırma işlemini başlat
+        window.print();
+
+        // Title'ı geri yükle
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 1000);
+    }
+
+    // Yazdırmadan önce clinicalScalesResult içeriğini print div'ine kopyala
+    (function () {
+        function syncClinicalResult() {
+            var t = document.getElementById('clinicalScalesResult');
+            var p = document.getElementById('printClinicalScalesResult');
+            if (!t || !p) return;
+            p.textContent = t.value || '';
+        }
+
+        function syncMeasurementProcess() {
+            var t = document.getElementById('measurementProcess');
+            var p = document.getElementById('printMeasurementProcess');
+            if (!t || !p) return;
+            p.textContent = t.value || '';
+        }
+
+        // İlk yüklemede ve input değiştikçe güncelle
+        document.addEventListener('DOMContentLoaded', function () {
+            syncClinicalResult();
+            syncMeasurementProcess();
+            var t = document.getElementById('clinicalScalesResult');
+            if (t) {
+                t.addEventListener('input', syncClinicalResult);
+            }
+
+            var t2 = document.getElementById('measurementProcess');
+            if (t2) {
+                t2.addEventListener('input', syncMeasurementProcess);
+            }
+        });
+        // Yazdırma öncesi tetikleyiciler
+        if (window.matchMedia) {
+            var mediaQueryList = window.matchMedia('print');
+            mediaQueryList.addListener(function (mql) {
+                if (mql.matches) {
+                    syncClinicalResult();
+                    syncMeasurementProcess();
+                }
+            });
+        }
+        window.addEventListener('beforeprint', function () {
+            syncClinicalResult();
+            syncMeasurementProcess();
+        });
+    })();
+</script>
+</body>
+</html>
