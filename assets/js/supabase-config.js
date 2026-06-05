@@ -7,8 +7,10 @@
 // Check if already declared to prevent duplicate declarations
 if (typeof SUPABASE_CONFIG === 'undefined') {
     var SUPABASE_CONFIG = {
-        url: 'https://ibtfasbiaamgzdfbsiud.supabase.co', // Supabase proje URL'nizi buraya ekleyin
-        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlidGZhc2JpYWFtZ3pkZmJzaXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzNTg5NTksImV4cCI6MjA2ODkzNDk1OX0.-pqEWsrbVroA4nXS7ewjjNQO4Q1GyjzlFWdusOGdWS4',
+        url: 'https://nkajfoczhyngyjzwndlq.supabase.co', // Project URL
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYWpmb2N6aHluZ3lqenduZGxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDc2ODUsImV4cCI6MjA5NjIyMzY4NX0.Pra1MDEvha0qmCq_8awIO8PD4s8BfBSeVAsJBWJbzzI', // anon public key
+        // url: 'https://ibtfasbiaamgzdfbsiud.supabase.co', // Supabase proje URL'nizi buraya ekleyin
+        // anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlidGZhc2JpYWFtZ3pkZmJzaXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzNTg5NTksImV4cCI6MjA2ODkzNDk1OX0.-pqEWsrbVroA4nXS7ewjjNQO4Q1GyjzlFWdusOGdWS4',
         // Tablo isimleri
         tables: {
             testResults: 'test_results',
@@ -563,7 +565,7 @@ const OfflineStorageService = {
 
 
 // Network durumu değişikliklerini izle
-window.addEventListener('online', function() {
+window.addEventListener('online', function () {
     console.log('İnternet bağlantısı geri geldi.');
     if (supabase) {
         // Senkronizasyon işlemini başlat
@@ -575,7 +577,7 @@ window.addEventListener('online', function() {
     }
 });
 
-window.addEventListener('offline', function() {
+window.addEventListener('offline', function () {
     console.log('İnternet bağlantısı kesildi. Offline modda çalışılıyor.');
 });
 
