@@ -37,6 +37,7 @@ async function checkAuthentication() {
     try {
         // Önce Supabase session kontrolü
         const session = await AuthService.getSession();
+        console.log('Supabase session object:', session);
         
         if (session && session.user) {
             // Supabase session var, kullanıcı bilgilerini al
@@ -60,6 +61,8 @@ async function checkAuthentication() {
         // Supabase session yok, local storage kontrolü (fallback)
         const sessionLogin = sessionStorage.getItem('adminLogin');
         const localLogin = localStorage.getItem('adminLogin');
+        console.log('sessionLogin storage:', sessionLogin);
+        console.log('localLogin storage:', localLogin);
         
         if (!sessionLogin && !localLogin) {
             console.warn('No session and no stored login, redirecting to login.html');
