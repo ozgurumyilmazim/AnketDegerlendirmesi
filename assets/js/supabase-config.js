@@ -66,6 +66,9 @@ window.AuthService = {
             .single();
         if (error) throw error;
         return data?.role ?? null;
+    } catch(_) {
+        // No row → treat as “no special role”
+        return null;
     }
 };
 
