@@ -56,6 +56,16 @@ window.AuthService = {
     },
     onAuthStateChange(callback) {
         return window.supabase.auth.onAuthStateChange(callback);
+    },
+    // ---- NEW ---------------------------------------------------------
+    async getUserRole() {
+        const { data, error } = await window.supabase
+            .from('users')
+            .select('role')
+            .eq('id', window.supabase.auth.user()?.id)
+            .single();
+        if (error) throw error;
+        return data?.role ?? null;
     }
 };
 
