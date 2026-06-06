@@ -38,6 +38,7 @@ if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'functio
 // Minimal AuthService wrapper
 window.AuthService = {
     async signIn(email, password) {
+        console.log('Attempting signIn with', email, password);
         const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         return data;
@@ -47,9 +48,14 @@ window.AuthService = {
         if (error) throw error;
     },
     async isAdmin() {
-        const { data, error } = await window.supabase.from('users').select('role').eq('id', window.supabase.auth.user()?.id).single();
-        if (error) throw error;
-        return data?.role === 'admin';
+        try {
+            const { data, error } = await window.supabase.from('users').select('role').eq('id', window.supabase.auth.user()?.id).single();
+            if (error) throw error;
+            return data?.role === 'admin';
+        } catch (_) {
+            // If no row or any error, treat as not admin
+            return false;
+        }
     },
     async getSession() {
         return window.supabase.auth.getSession();

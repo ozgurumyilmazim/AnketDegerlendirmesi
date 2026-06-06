@@ -26,6 +26,14 @@ $(document).ready(function() {
 
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
+    console.log('checkAuthentication called');
+    // If debug mode, skip redirects for easier inspection
+    const url = new URL(window.location);
+    if (url.searchParams.has('debug')) {
+        console.log('Debug mode enabled – skipping authentication redirects');
+        return; // skip further auth checks
+    }
+
     try {
         // Önce Supabase session kontrolü
         const session = await AuthService.getSession();
@@ -54,7 +62,8 @@ async function checkAuthentication() {
         const localLogin = localStorage.getItem('adminLogin');
         
         if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
+            console.warn('No session and no stored login, redirecting to login.html');
+            setTimeout(() => { window.location.href = 'login.html'; }, 3000);
             return;
         }
         
@@ -63,13 +72,15 @@ async function checkAuthentication() {
         
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
-        
-        // Hata durumunda local storage kontrolü
+            // Show alert for debugging
+            alert('Authentication error: ' + (error?.message || error));
+            // Hata durumunda local storage kontrolü
         const sessionLogin = sessionStorage.getItem('adminLogin');
         const localLogin = localStorage.getItem('adminLogin');
         
         if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
+            console.warn('Redirecting to login after error handling');
+                setTimeout(() => { window.location.href = 'login.html'; }, 3000);
             return;
         }
         
