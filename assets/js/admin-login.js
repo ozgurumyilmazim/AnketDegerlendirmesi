@@ -49,8 +49,8 @@ function fillTestCredentials() {
     const url = new URL(window.location);
     // Add "?auto_test" to the URL to trigger auto‑fill
     if (url.searchParams.has('auto_test')) {
-        $usernameInput.val('ogukturkselma@gmail.com');
-        $passwordInput.val('SlmOglTrk.10');
+        $usernameInput.val('ozgurumyilmazim@gmail.com');
+        $passwordInput.val('deneme');
         console.log('Test credentials filled via URL flag.');
     }
 }
