@@ -12,7 +12,7 @@
         // In Supabase the `auth.users` table is not directly readable with anon key.
         // Instead we call the admin REST endpoint via `rpc` that returns users – this works only if RLS permits.
         // For quick debugging we use `from('users')` which points to the public.users table we already have.
-        const { data: publicUsers, error: publicErr } = await supabase.from('users').select('id, role');
+        const { data: publicUsers, error: publicErr } = await supabase.from('users').select('id, role, email');
         if (publicErr) throw publicErr;
 
         // Try to fetch auth user emails via the `auth.users` view (requires service role). If not permitted, we fallback to empty.
@@ -28,7 +28,7 @@
         const rows = publicUsers.map(pu => {
             const au = authUsers.find(u => u.id === pu.id) || {};
             return {
-                email: au.email || '(no email)',
+                email: pu.email || au.email || '(no email)',
                 role: pu.role || '(none)',
                 id: pu.id
             };
