@@ -155,11 +155,11 @@ async function handleLogin(e) {
         };
 
         // Session/Local storage'a kaydet
-        if (rememberMe) {
-            localStorage.setItem('adminLogin', JSON.stringify(loginData));
-        } else {
-            sessionStorage.setItem('adminLogin', JSON.stringify(loginData));
-        }
+        // if (rememberMe) {
+        localStorage.setItem('adminLogin', JSON.stringify(loginData));
+        //} else {
+        sessionStorage.setItem('adminLogin', JSON.stringify(loginData));
+        //}
 
         // Başarı mesajı göster
         showAlert(`Hoş geldiniz, ${userInfo.name}!`, 'success');
