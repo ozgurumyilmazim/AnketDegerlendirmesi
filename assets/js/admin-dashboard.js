@@ -66,7 +66,11 @@ async function checkAuthentication() {
         
         if (!sessionLogin && !localLogin) {
             console.warn('No session and no stored login, redirecting to login.html');
-            setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+            if (!new URL(window.location).searchParams.has('debug')) {
+                setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+            } else {
+                console.log('Debug mode – skipping redirect to login.html');
+            }
             return;
         }
         
@@ -83,8 +87,12 @@ async function checkAuthentication() {
         
         if (!sessionLogin && !localLogin) {
             console.warn('Redirecting to login after error handling');
-                setTimeout(() => { window.location.href = 'login.html'; }, 3000);
-            return;
+                if (!new URL(window.location).searchParams.has('debug')) {
+                    setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+                } else {
+                    console.log('Debug mode – skipping redirect to login.html');
+                }
+                return;
         }
         
         currentUser = JSON.parse(sessionLogin || localLogin);
