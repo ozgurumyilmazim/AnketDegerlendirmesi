@@ -59,16 +59,18 @@ window.AuthService = {
     },
     // ---- NEW ---------------------------------------------------------
     async getUserRole() {
-        const { data, error } = await window.supabase
-            .from('users')
-            .select('role')
-            .eq('id', window.supabase.auth.user()?.id)
-            .single();
-        if (error) throw error;
-        return data?.role ?? null;
-    } catch(_) {
-        // No row → treat as “no special role”
-        return null;
+        try {
+            const { data, error } = await window.supabase
+                .from('users')
+                .select('role')
+                .eq('id', window.supabase.auth.user()?.id)
+                .single();
+            if (error) throw error;
+            return data?.role ?? null;
+        } catch (_) {
+            // No row → treat as "no special role"
+            return null;
+        }
     }
 };
 
