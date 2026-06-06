@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug – Users Overview</title>
+    <meta name="description" content="Temporary debug page showing Supabase auth.users and public.users tables with role information.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #27273c);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #ffdd57;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        th {
+            background: rgba(255,255,255,0.12);
+            color: #ffdd57;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: rgba(255,255,255,0.03);
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.07);
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        .status {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid #ffdd57;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Supabase Users Overview (Debug)</h1>
+    <div id="status" class="status">Loading data…</div>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>E‑posta</th>
+                <th>Rol (public.users)</th>
+                <th>Supabase UID</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Load Supabase client configuration first -->
+<script src="../js/supabase-config.js"></script>
+<script src="debug.js"></script>
+</body>
+</html>
