@@ -39,9 +39,7 @@ if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'functio
 window.AuthService = {
     async signIn(email, password) {
         console.log('Attempting signIn with', email, password);
-        const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        return data;
+        return await window.supabase.auth.signInWithPassword({ email, password });
     },
     async signOut() {
         const { error } = await window.supabase.auth.signOut();
@@ -49,7 +47,10 @@ window.AuthService = {
     },
     async isAdmin() {
         try {
-            const { data, error } = await window.supabase.from('users').select('role').eq('id', window.supabase.auth.user()?.id).single();
+            const { data: { session } } = await window.supabase.auth.getSession();
+            const userId = session?.user?.id;
+            if (!userId) return false;
+            const { data, error } = await window.supabase.from('users').select('role').eq('id', userId).single();
             if (error) throw error;
             return data?.role === 'admin';
         } catch (_) {
@@ -58,7 +59,12 @@ window.AuthService = {
         }
     },
     async getSession() {
-        return window.supabase.auth.getSession();
+        try {
+            const { data: { session } } = await window.supabase.auth.getSession();
+            return session;
+        } catch (_) {
+            return null;
+        }
     },
     onAuthStateChange(callback) {
         return window.supabase.auth.onAuthStateChange(callback);
@@ -66,10 +72,13 @@ window.AuthService = {
     // ---- NEW ---------------------------------------------------------
     async getUserRole() {
         try {
+            const { data: { session } } = await window.supabase.auth.getSession();
+            const userId = session?.user?.id;
+            if (!userId) return null;
             const { data, error } = await window.supabase
                 .from('users')
                 .select('role')
-                .eq('id', window.supabase.auth.user()?.id)
+                .eq('id', userId)
                 .single();
             if (error) throw error;
             return data?.role ?? null;
