@@ -329,15 +329,15 @@
             if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
                 console.log('Supabase library loaded successfully');
                 
-                // Load supabase config
+                // Load supabase config with cache buster
                 const configScript = document.createElement('script');
-                configScript.src = '../assets/js/supabase-config.js';
+                configScript.src = '../assets/js/supabase-config.js?v=' + Date.now();
                 configScript.onload = function() {
                     console.log('Supabase config loaded');
                     
-                    // Load task definitions script
+                    // Load task definitions script with cache buster
                     const taskScript = document.createElement('script');
-                    taskScript.src = 'js/task-definitions.js';
+                    taskScript.src = 'js/task-definitions.js?v=' + Date.now();
                     taskScript.onload = function() {
                         console.log('Task definitions script loaded');
                         // Initialize task manager after all scripts are loaded
