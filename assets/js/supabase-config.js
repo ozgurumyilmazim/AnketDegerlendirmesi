@@ -34,6 +34,13 @@ if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'functio
     window.supabase = null; // fallback
 }
 
+// Compatibility wrapper for task definitions scripts expecting window.supabaseClient.supabaseClient
+window.supabaseClient = {
+    get supabaseClient() {
+        return window.supabase;
+    }
+};
+
 // --------------------------------------------------------------------
 // Minimal AuthService wrapper
 window.AuthService = {
