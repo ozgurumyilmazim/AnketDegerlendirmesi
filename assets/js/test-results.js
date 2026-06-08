@@ -1132,10 +1132,9 @@ async function getInterpretationFromDatabase(scale, tScore, gender = null) {
             query = query.eq('gender', gender);
         }
         
-        const { data, error } = await query.single();
+        const { data } = await query.maybeSingle();
         
-        if (error) {
-            console.error(`${scale} ölçeği için değerlendirme bulunamadı:`, error);
+        if (!data) {
             return null;
         }
         

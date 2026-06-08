@@ -55,7 +55,7 @@ Kişi kendine odaklanmış olabilir. Kendilerini olduğundan farklı ve mükemme
 
 -- Pd (Psikopatik Sapma) Alt Testi
 INSERT INTO mmpi_interpretations (scale_name, min_t_score, max_t_score, description, category) VALUES
---('Pd', 70, 100, 'Kişi antisosyal davranışlar sergileyebilir. Kişi kurallara uymakta zorlanabilir. Kişi dürtü kontrolü sorunları yaşayabilir.', 'clinical'),
+('Pd', 70, 100, 'Kişi antisosyal davranışlar sergileyebilir. Kişi kurallara uymakta zorlanabilir. Kişi dürtü kontrolü sorunları yaşayabilir.', 'clinical'),
 ('Pd', 60, 69, 'Pozitif: Kişi risk alabilen, enerjik, sosyal, maceraperest ve atılgan olan biri olabilir. Kişi engellendiğinde özellikle huzursuzluk, saldırganlık ve sosyal olarak uyumlu olmayan davranış biçimi sergileyebilir.', 'clinical'),
 ('Pd', 45, 59, 'Kişide aşırı kontrol koyma ve kısıtlama genellikle az olabilir. Sosyal kurallara kısmen uyum gözükebilir.', 'clinical'),
 ('Pd', 20, 44, 'Kişi durağan, pasif ve atılgan olmayan bir yapıya sahip olabilir. Maceraperest olmayabilirler ve genellikle sosyal geleneklere uyma konusunda bağımlı ve hatta katı bir tutum sergileyebilirler. Danışma durumunda başkalarının onlara karşı olan düşünceleri konusunda güvence arayabilirler. Çok sevgi dolu olsalar da, sıklıkla cinsel ilişkiye girme konusunda girişken olmayabilirler.', 'clinical'),
@@ -64,7 +64,7 @@ INSERT INTO mmpi_interpretations (scale_name, min_t_score, max_t_score, descript
 -- Mf (Kadınlık-Erkeklik) Alt Testi - Erkekler
 INSERT INTO mmpi_interpretations (scale_name, min_t_score, max_t_score, description, category, gender) VALUES
 ('Mf', 80, 100, 'Lise eğitimi olan erkeklerde ya da kültürel baskı altındakilerde kültürün verdiği erkeksi rolle özdeşim olmadığını göstermektedir. Yüksek puanlar göreceli olarak pasif erkeklere (eğer 4 alt testi de düşükse) hatta bazı durumlarda kadınsı özelliklere sahip olanlara işaret etmektedir.', 'clinical', 'male'),
---('Mf', 41, 79, 'Erkeklerde orta düzey feminen özellikler gösterebilir. Kişi sanatsal ve estetik ilgilere sahip olabilir.', 'clinical', 'male'),
+('Mf', 41, 79, 'Erkeklerde orta düzey feminen özellikler gösterebilir. Kişi sanatsal ve estetik ilgilere sahip olabilir.', 'clinical', 'male'),
 ('Mf', 26, 40, 'Kişide  maskülen görünmek için kompulsif bir uğraş olabilir ve bu abartılmış bir boyutta olabilir. Narsistik bir biçimde kendi güçlerini abartabilirler. Bireyin kendi erkekliğini yoğun bir biçimde ortaya koyması, altta yatan kendine güvensizlik ile ilgili olabilir.', 'clinical', 'male'),
 --('Mf', 0, 25, 'Kişi aşırı maskülen özellikler gösterebilir. Kişi geleneksel erkek rolüne aşırı bağlı olabilir.', 'clinical', 'male');
 
@@ -78,7 +78,7 @@ INSERT INTO mmpi_interpretations (scale_name, min_t_score, max_t_score, descript
 
 -- Pa (Paranoya) Alt Testi
 INSERT INTO mmpi_interpretations (scale_name, min_t_score, max_t_score, description, category) VALUES
---('Pa', 70, 100, 'Kişi paranoid düşünceler geliştirebilir. Kişi diğerlerine karşı aşırı şüpheci olabilir. Kişi kendini sürekli tehdit altında hissedebilir.', 'clinical'),
+('Pa', 70, 100, 'Kişi paranoid düşünceler geliştirebilir. Kişi diğerlerine karşı aşırı şüpheci olabilir. Kişi kendini sürekli tehdit altında hissedebilir.', 'clinical'),
 ('Pa', 60, 69, 'Kişi duyarlı bir yapıya sahip olabilir. Diğerlerinin duygularının kolaylıkla incinebileceği türünde düşünceleri olabilir. Bu sıklıkla depresyon ile ilgili olabilir. Diğer insanlardan gelen eleştiri ve önerileri çok ciddiye alabilirler ve kendilerinin söyledikleri her şeyin eleştiri gibi alındığı fikri olabilir. Kişilerarası ilişkilerinde savunu ve diğer insanlara güvensiz olabilirler. Diğer insanların kendilerinden yararlanacağını düşünebilirler. Kırgın küskün olmaya hazır olabilirler, en ufak bir olumsuzluğu üstlerine alınabilirler. İşte ve evde kendilerinden beklentiler konusunda kontrollü olabilecekleri düşünülebilir. ', 'clinical'),
 ('Pa', 55, 59, '55–59 T puanı arasında olan bireyler anlayışlı, duyarlı kişilerdir.', 'clinical'),
 ('Pa', 45, 59, 'Kişi diğerlerini değerlendirmede esnek olabilir. Onlara karşı duyarlı ve diğerlerinin kendilerinden beklentilerini doğru anlayarak olumlu yanıtlar verebilirler.', 'clinical'),
