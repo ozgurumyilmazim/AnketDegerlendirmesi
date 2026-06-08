@@ -1,18 +1,442 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="tr">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGULTURK A.Ş. — MMPI Psikolojik Test Sistemi</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .navbar-custom {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .navbar-custom .nav-link {
+            color: #2c3e50;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+            color: #667eea;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 120px 0 80px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+        .hero-cta {
+            padding: 16px 40px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-radius: 50px;
+            background: white;
+            color: #667eea;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .hero-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            color: #764ba2;
+        }
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+        .feature-card {
+            border: none;
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102,126,234,0.15);
+        }
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .step-card {
+            border: none;
+            border-radius: 15px;
+            padding: 2rem;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            height: 100%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .kvkk-banner {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        .footer-custom {
+            background: #2c3e50;
+            color: rgba(255,255,255,0.85);
+            padding: 3rem 0;
+        }
+        .footer-custom a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-custom a:hover {
+            color: white;
+        }
+        .footer-custom h5 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+        .footer-custom .list-unstyled li {
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-section {
+                padding: 100px 0 60px;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    Bu basit bir başlangıç sayfası.
-    <p>Biz kimiz</p>
-    <p> <a href=kvkk-consent.html>Kvkk</a> </p>
-    <p> <a href=gizlilik.html>Gizlilik Politikası</a> </p>
-    <p> <a href=kullanim.html>Kullanım Koşulları</a> </p>
 
-    Testi başlatmak için <a href=testebasla.html>tıklayınız</a>.
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html" style="color:#667eea;">
+                <i class="fas fa-brain me-2"></i>OGULTURK
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="hakkimizda.html">Hakkımızda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gizlilik.html">Gizlilik</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="kullanim.html">Kullanım Koşulları</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-primary px-4 py-2" href="testebasla.html">
+                            <i class="fas fa-play me-2"></i>Teste Başla
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero-section">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="hero-title mb-4">MMPI Psikolojik<br>Değerlendirme Sistemi</h1>
+                    <p class="hero-subtitle mb-4">
+                        Minnesota Çok Yönlü Kişilik Envanteri (MMPI-2) ile bireyin kişisel
+                        ve toplumsal uyumunu objektif olarak değerlendirin. Bilimsel temelli
+                        psikolojik test hizmetimizi güvenle kullanın.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="testebasla.html" class="hero-cta">
+                            <i class="fas fa-play me-2"></i>Teste Başla
+                        </a>
+                        <a href="hakkimizda.html" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                            <i class="fas fa-info-circle me-2"></i>Daha Fazla Bilgi
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block">
+                    <i class="fas fa-clipboard-check" style="font-size:12rem; opacity:0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Neden MMPI -->
+    <section class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="text-center">
+                <h2 class="section-title">MMPI-2 Testi Nedir?</h2>
+                <p class="section-subtitle">
+                    MMPI (Minnesota Çok Yönlü Kişilik Envanteri), dünya genelinde en yaygın
+                    kullanılan objektif kişilik değerlendirme araçlarından biridir.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
+                        <p class="text-muted mb-0">
+                            567 sorudan oluşan MMPI-2 envanteri, onlarca yıllık araştırma
+                            ve klinik deneyime dayanmaktadır.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Güvenilir Sonuçlar</h4>
+                        <p class="text-muted mb-0">
+                            Yerleşik doğruluk ölçekleri (VRIN, TRIN, L, K) ile geçersiz
+                            yanıtlar tespit edilir, güvenilir profil elde edilir.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Veri Gizliliği</h4>
+                        <p class="text-muted mb-0">
+                            Kişisel verileriniz KVKK kapsamında korunur, yalnızca yetkili
+                            psikologlar tarafından görüntülenir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nasıl Çalışır -->
+    <section class="py-5">
+        <div class="container py-4">
+            <div class="text-center">
+                <h2 class="section-title">Test Nasıl Uygulanır?</h2>
+                <p class="section-subtitle">
+                    Dört basit adımda MMPI-2 testinizi tamamlayın.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="step-card text-center">
+                        <div class="step-number mx-auto">1</div>
+                        <h5 class="fw-bold mb-2">Kişisel Bilgiler</h5>
+                        <p class="text-muted mb-0 small">
+                            Ad, soyad, yaş ve diğer temel bilgilerinizi girerek teste başlayın.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card text-center">
+                        <div class="step-number mx-auto">2</div>
+                        <h5 class="fw-bold mb-2">KVKK Onayı</h5>
+                        <p class="text-muted mb-0 small">
+                            Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okuyup onaylayın.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card text-center">
+                        <div class="step-number mx-auto">3</div>
+                        <h5 class="fw-bold mb-2">Testi Yanıtlayın</h5>
+                        <p class="text-muted mb-0 small">
+                            567 soruyu "Doğru", "Yanlış" ya da "Bilmiyorum" olarak işaretleyin.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card text-center">
+                        <div class="step-number mx-auto">4</div>
+                        <h5 class="fw-bold mb-2">Raporu Görüntüleyin</h5>
+                        <p class="text-muted mb-0 small">
+                            Test tamamlandığında detaylı kişilik profili raporunuz hazır olur.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KVKK Bilgilendirme (onay gerektirmez) -->
+    <section class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="text-center">
+                <h2 class="section-title">Kişisel Verilerin Korunması</h2>
+                <p class="section-subtitle">
+                    6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında
+                    verileriniz güvendedir.
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="kvkk-banner">
+                        <div class="row align-items-center">
+                            <div class="col-lg-3 text-center mb-3 mb-lg-0">
+                                <i class="fas fa-shield-halved" style="font-size:4rem; color:#667eea;"></i>
+                            </div>
+                            <div class="col-lg-9">
+                                <h5 class="fw-bold">Veri Sorumlusu: OGULTURK A.Ş.</h5>
+                                <p class="text-muted mb-2">
+                                    Kişisel verileriniz, 6698 sayılı Kanun uyarınca veri sorumlusu
+                                    sıfatına sahip OGULTURK A.Ş. tarafından toplanmakta, işlenmekte
+                                    ve ilgili birim sorumlusu ile paylaşılmaktadır.
+                                </p>
+                                <p class="text-muted mb-0">
+                                    Verileriniz yalnızca psikolojik değerlendirme amacıyla kullanılır,
+                                    2 yıl süreyle muhafaza edilir ve üçüncü kişilerle paylaşılmaz.
+                                    Detaylı bilgi için <a href="gizlilik.html">Gizlilik Politikası</a>
+                                    sayfamızı ziyaret edebilirsiniz.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container py-4 text-center text-white">
+            <h2 class="fw-bold mb-3" style="font-size:2rem;">Teste Başlamaya Hazır mısınız?</h2>
+            <p class="mb-4" style="font-size:1.1rem; opacity:0.95;">
+                Yaklaşık 60-90 dakika süren MMPI-2 testini hemen uygulamaya başlayın.
+            </p>
+            <a href="testebasla.html" class="hero-cta">
+                <i class="fas fa-play me-2"></i>Teste Başla
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-brain me-2"></i>OGULTURK A.Ş.</h5>
+                    <p class="small mb-0">
+                        MMPI-2 psikolojik değerlendirme sistemi ile bireylerin kişisel
+                        ve toplumsal uyumlarını objektif olarak değerlendiriyoruz.
+                    </p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Menü</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="index.html">Ana Sayfa</a></li>
+                        <li><a href="hakkimizda.html">Hakkımızda</a></li>
+                        <li><a href="testebasla.html">Teste Başla</a></li>
+                        <li><a href="admin/login.html">Psikolog Girişi</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Yasal</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="gizlilik.html">Gizlilik Politikası</a></li>
+                        <li><a href="kullanim.html">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk-consent.html">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>İletişim</h5>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-envelope me-2"></i>ogulturkselma@gmail.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i>İstanbul, Türkiye</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color:rgba(255,255,255,0.15);">
+            <div class="text-center small">
+                &copy; 2026 OGULTURK A.Ş. Tüm hakları saklıdır.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
