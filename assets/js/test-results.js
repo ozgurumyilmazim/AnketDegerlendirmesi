@@ -804,39 +804,61 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         });
     }
     
-    // T-skorlarını hesapla (veritabanından parametreler kullanarak)
+    // T-skorlarını hesapla (veritabanından normları kullanarak)
     const tScores = {};
     
     try {
-        // T-skor parametrelerini veritabanından al
-        const { data: tScoreParams, error: paramsError } = await supabase
-            .from('t_score_params')
-            .select('scale_name, gender, mean_m, sd, k_correction')
+        // T-skor normlarını veritabanından al
+        const { data: tScoreNorms, error: normsError } = await supabase
+            .from('t_score_norms')
+            .select('scale_name, raw_score, t_score')
             .eq('gender', isMale ? 'male' : 'female');
             
-        if (paramsError) {
-            console.error('T-skor parametreleri alınırken hata:', paramsError);
-        } else {
-            // Parametreleri ölçeğe göre organize et
-            const paramsByScale = {};
-            tScoreParams.forEach(param => {
-                paramsByScale[param.scale_name] = param;
+        if (normsError) {
+            console.error('T-skor normları alınırken hata:', normsError);
+            // Hata durumunda basit fallback
+            Object.keys(kCorrectedScores).forEach(scale => {
+                tScores[scale] = 50; 
+            });
+        } else if (tScoreNorms && tScoreNorms.length > 0) {
+            // Normları organize et: normsMap[scale][rawScore] = tScore
+            const normsMap = {};
+            tScoreNorms.forEach(norm => {
+                if (!normsMap[norm.scale_name]) normsMap[norm.scale_name] = {};
+                normsMap[norm.scale_name][norm.raw_score] = norm.t_score;
             });
             
             // Her ölçek için T-skor hesapla
             Object.keys(kCorrectedScores).forEach(scale => {
-                const param = paramsByScale[scale];
-                if (param && param.sd && Number(param.sd) !== 0) {
-                    const rawScore = kCorrectedScores[scale];
-                    const mean = Number(param.mean_m);
-                    const sd = Number(param.sd);
-                    const tScore = 50 + (10 * (rawScore - mean)) / sd;
-                    tScores[scale] = Math.round(tScore);
+                const rawScore = kCorrectedScores[scale];
+                if (normsMap[scale] && normsMap[scale][rawScore] !== undefined) {
+                    tScores[scale] = normsMap[scale][rawScore];
                 } else {
-                    // Parametre bulunamazsa basit hesaplama
-                    console.error('Parametre bulunamadı', 'parametre-yok');
-
+                    // Tam eşleşme yoksa en yakın raw_score'u bul
+                    let closestRaw = -1;
+                    let minDiff = 999;
+                    if (normsMap[scale]) {
+                        Object.keys(normsMap[scale]).forEach(r => {
+                            const diff = Math.abs(Number(r) - rawScore);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closestRaw = r;
+                            }
+                        });
+                    }
+                    if (closestRaw !== -1) {
+                        tScores[scale] = normsMap[scale][closestRaw];
+                    } else {
+                        console.error(`${scale} için T-skor normu bulunamadı, raw: ${rawScore}`);
+                        tScores[scale] = 50; // Fallback
+                    }
                 }
+            });
+        } else {
+            console.warn('t_score_norms tablosu boş veya veri bulunamadı.');
+            // Tablo boşsa geçici fallback
+            Object.keys(kCorrectedScores).forEach(scale => {
+                tScores[scale] = 50;
             });
         }
     } catch (error) {
