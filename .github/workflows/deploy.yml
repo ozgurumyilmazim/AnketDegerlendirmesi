@@ -21,9 +21,10 @@ jobs:
       #- name: Sunucuyu Bilinen Ağlara Ekle (Known Hosts)
       #  run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      #- name: Dosyaları Rsync ile Sunucuya Aktar
-      #  run: |
-      #    rsync -avz --delete \
-      #    --exclude='.git/' \
-      #    --exclude='.github/' \
+      - name: Dosyaları Rsync ile Sunucuya Aktar
+        run: |
+          rsync -avz --delete \
+          --exclude='.git/' \
+          --exclude='.github/' \
+          ./ ${{ secrets.TARGET_DIR }}
       #    ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.TARGET_DIR }}
