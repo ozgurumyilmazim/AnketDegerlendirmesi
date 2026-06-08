@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Tanımları - MMPI Test Sistemi</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #f5576c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover { text-decoration: underline; }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        /* Panel kartı */
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* Form */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #f5576c;
+            box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.15);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(245, 87, 108, 0.35);
+            color: white;
+        }
+
+        /* Kullanıcı tablosu */
+        .users-table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+        .users-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .users-table tbody tr:last-child td { border-bottom: none; }
+
+        .users-table tbody tr:hover { background: #fdf2f4; }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #fde8ec;
+            color: #c2185b;
+        }
+
+        .role-psychologist {
+            background: #e8eaf6;
+            color: #3949ab;
+        }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            flex-shrink: 0;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-edit {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .btn-icon-edit:hover {
+            background: #ffc107;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon-delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-icon-delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #fde8ec, #fce4ec);
+            border-left: 4px solid #f5576c;
+            border-radius: 0 10px 10px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #6b2737;
+        }
+
+        .info-banner i {
+            color: #f5576c;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Yönetici Tanımları</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-user-shield me-2" style="color:#f5576c;"></i>Yönetici Tanımları</h1>
+                <p class="page-subtitle">Sisteme erişim yetkisi olan kullanıcıları yönetin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Bilgi Notu -->
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            Bu bölümdeki değişiklikler Supabase Auth sistemini kullanır. Yeni kullanıcı eklemek için geçerli bir e-posta adresi gereklidir.
+        </div>
+
+        <!-- Yeni Yönetici Ekle -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-user-plus me-2"></i>Yeni Yönetici Ekle</h5>
+            </div>
+            <div class="panel-body">
+                <form id="addAdminForm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="adminName">Ad Soyad</label>
+                            <input type="text" class="form-control" id="adminName" placeholder="Ad Soyad">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="adminEmail">E-posta Adresi</label>
+                            <input type="email" class="form-control" id="adminEmail" placeholder="ornek@kurum.com">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="adminRole">Rol</label>
+                            <select class="form-select" id="adminRole">
+                                <option value="admin">Admin</option>
+                                <option value="psychologist">Psikolog</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-add w-100" id="addAdminBtn">
+                                <i class="fas fa-plus me-1"></i>Ekle
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Yönetici Listesi -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-users me-2"></i>Mevcut Yöneticiler</h5>
+                <span id="adminCountBadge" class="badge bg-white text-dark">Yükleniyor...</span>
+            </div>
+            <div class="panel-body p-0">
+                <div id="loadingSpinner" class="empty-state">
+                    <div class="spinner-border text-secondary" style="width: 2rem; height: 2rem;"></div>
+                    <p class="mt-2 mb-0">Yöneticiler yükleniyor...</p>
+                </div>
+                <div id="adminTableWrapper" class="d-none">
+                    <div class="table-responsive">
+                        <table class="table users-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>E-posta</th>
+                                    <th>Rol</th>
+                                    <th>Son Giriş</th>
+                                    <th class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="emptyState" class="empty-state d-none">
+                    <i class="fas fa-users"></i>
+                    <p>Henüz yönetici tanımlanmamış.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">İşlem başarıyla tamamlandı!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <!-- Admin Users JS -->
+    <script>
+        // Yardımcı: Toast göster
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        // İsmin baş harflerini al
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        }
+
+        // Tarih formatla
+        function formatDate(iso) {
+            if (!iso) return '—';
+            return new Date(iso).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Kullanıcıları yükle (Supabase users tablosundan)
+        async function loadAdmins() {
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('adminTableWrapper').classList.add('d-none');
+            document.getElementById('emptyState').classList.add('d-none');
+
+            try {
+                // Supabase bağlantısı hazır mı kontrol et
+                if (typeof window.supabase === 'undefined' && typeof window.supabaseClient === 'undefined') {
+                    throw new Error('Supabase bağlantısı bulunamadı.');
+                }
+
+                const client = window.supabaseClient || window.supabase;
+                const { data, error } = await client.from('users').select('*').order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                renderAdmins(data || []);
+            } catch (err) {
+                console.warn('Yöneticiler yüklenirken hata:', err);
+                // Offline demo verisi
+                renderAdmins([
+                    { id: 1, full_name: 'Demo Admin', email: 'admin@demo.com', role: 'admin', last_sign_in_at: new Date().toISOString() }
+                ]);
+            }
+        }
+
+        function renderAdmins(admins) {
+            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('adminCountBadge').textContent = admins.length + ' kullanıcı';
+
+            if (admins.length === 0) {
+                document.getElementById('emptyState').classList.remove('d-none');
+                return;
+            }
+
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            admins.forEach(u => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar-small">${getInitials(u.full_name || u.email)}</div>
+                            <span>${u.full_name || '—'}</span>
+                        </div>
+                    </td>
+                    <td>${u.email || '—'}</td>
+                    <td>
+                        <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-psychologist'}">
+                            <i class="fas ${u.role === 'admin' ? 'fa-crown' : 'fa-user-md'}"></i>
+                            ${u.role === 'admin' ? 'Admin' : 'Psikolog'}
+                        </span>
+                    </td>
+                    <td>${formatDate(u.last_sign_in_at)}</td>
+                    <td class="text-end">
+                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editAdmin('${u.id}', '${u.full_name || ''}', '${u.role || 'admin'}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteAdmin('${u.id}', '${u.full_name || u.email}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('adminTableWrapper').classList.remove('d-none');
+        }
+
+        // Yönetici ekle
+        document.getElementById('addAdminBtn').addEventListener('click', async () => {
+            const name  = document.getElementById('adminName').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
+            const role  = document.getElementById('adminRole').value;
+
+            if (!name || !email) {
+                showToast('error', 'Ad Soyad ve E-posta alanları zorunludur.');
+                return;
+            }
+
+            try {
+                const client = window.supabaseClient || window.supabase;
+                if (!client) throw new Error('Supabase bağlantısı yok');
+
+                const { error } = await client.from('users').insert([{ full_name: name, email, role }]);
+                if (error) throw error;
+
+                showToast('success', `${name} başarıyla eklendi.`);
+                document.getElementById('addAdminForm').reset();
+                loadAdmins();
+            } catch (err) {
+                showToast('error', 'Kullanıcı eklenirken hata: ' + err.message);
+            }
+        });
+
+        function editAdmin(id, name, role) {
+            document.getElementById('adminName').value  = name;
+            document.getElementById('adminRole').value  = role;
+            document.getElementById('adminEmail').focus();
+            showToast('success', 'Düzenleme için bilgileri güncelleyip tekrar ekleyin.');
+        }
+
+        async function deleteAdmin(id, label) {
+            if (!confirm(`"${label}" kullanıcısını silmek istediğinizden emin misiniz?`)) return;
+            try {
+                const client = window.supabaseClient || window.supabase;
+                if (!client) throw new Error('Supabase bağlantısı yok');
+
+                const { error } = await client.from('users').delete().eq('id', id);
+                if (error) throw error;
+
+                showToast('success', `${label} silindi.`);
+                loadAdmins();
+            } catch (err) {
+                showToast('error', 'Silme işlemi başarısız: ' + err.message);
+            }
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(loadAdmins, 600); // Supabase client'ın yüklenmesini bekle
+        });
+    </script>
+</body>
+</html>

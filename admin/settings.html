@@ -3,283 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KVKK Ayarları - MMPI Test Sistemi</title>
+    <title>Ayarlar - MMPI Test Sistemi</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
     
     <style>
-        .settings-section {
+        body {
+            background: #f0f2f8;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 0;
+            min-height: 100vh;
+            background: #f0f2f8;
+        }
+
+        .page-header {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            overflow: hidden;
+            padding: 2rem 2.5rem 1.5rem;
+            border-bottom: 1px solid #e8eaf0;
+            margin-bottom: 2.5rem;
         }
-        
-        .settings-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.35rem;
+        }
+
+        .page-header p {
+            color: #6b7280;
             margin: 0;
+            font-size: 0.95rem;
         }
-        
-        .settings-body {
-            padding: 2rem;
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.75rem;
+            padding: 0 2.5rem 2.5rem;
         }
-        
-        .setting-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
+
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.8);
+            position: relative;
         }
-        
-        .setting-item:last-child {
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.13);
+            text-decoration: none;
+        }
+
+        .settings-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .settings-card:hover::after {
+            opacity: 1;
+        }
+
+        .card-kvkk::after  { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .card-admins::after { background: linear-gradient(90deg, #f093fb, #f5576c); }
+        .card-letters::after { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+
+        .card-icon-wrap {
+            padding: 2rem 2rem 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .icon-kvkk   { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .icon-admins  { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .icon-letters { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-info p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .card-body-content {
+            padding: 0 2rem 1.5rem;
+            flex: 1;
+        }
+
+        .card-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.5rem;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: #4b5563;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .card-features li:last-child {
             border-bottom: none;
         }
-        
-        .setting-label {
+
+        .card-features li i {
+            font-size: 0.75rem;
+            width: 16px;
+            text-align: center;
+        }
+
+        .feat-kvkk   { color: #667eea; }
+        .feat-admins  { color: #f5576c; }
+        .feat-letters { color: #4facfe; }
+
+        .card-footer-link {
+            padding: 1rem 2rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
         }
-        
-        .setting-description {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+
+        .link-kvkk   { color: #667eea; }
+        .link-admins  { color: #f5576c; }
+        .link-letters { color: #4facfe; }
+
+        .card-footer-link i {
+            transition: transform 0.25s ease;
         }
-        
-        .form-switch .form-check-input {
-            width: 3rem;
-            height: 1.5rem;
+
+        .settings-card:hover .card-footer-link i {
+            transform: translateX(5px);
         }
-        
-        .form-switch .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
-        }
-        
-        .btn-save {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-        
-        .btn-reset {
-            background: #6c757d;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-reset:hover {
-            background: #5a6268;
-            color: white;
-        }
-        
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
-        
-        /* Ana container */
-        .container-fluid {
-            padding: 0;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
-        
-        .sidebar-header {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-        
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 0;
-        }
-        
-        .sidebar .nav-link:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.2);
-        }
-        
-        /* Main content */
-        .main-content {
-            margin-left: 25%; /* Sidebar genişliği için */
-            padding: 2rem;
-        }
-        
+
         @media (max-width: 768px) {
-            .sidebar {
-                position: relative;
-                min-height: auto;
-            }
             .main-content {
                 margin-left: 0;
             }
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            .settings-grid {
+                grid-template-columns: 1fr;
+                padding: 0 1rem 1.5rem;
+            }
+            .page-header {
+                padding: 1.5rem 1rem 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div id="sidebar-container"></div>
-            
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Header -->
-                <div class="header-section">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h1 class="page-title">KVKK Ayarları</h1>
-                            <p class="page-subtitle">Kişisel Verilerin Korunması Kanunu ayarlarını yönetin</p>
-                        </div>
-                        <div class="header-actions">
-                            <button class="btn btn-outline-secondary me-2">
-                                <i class="fas fa-question-circle me-2"></i>Yardım
-                            </button>
-                            <button class="btn btn-primary">
-                                <i class="fas fa-user me-2"></i>Admin
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Alert Container -->
-                <div id="alertContainer"></div>
-                
-                <form id="settingsForm">
-                    <!-- KVKK Ayarları -->
-                    <div class="settings-section">
-                        <h5 class="settings-header">
-                            <i class="fas fa-shield-alt me-2"></i>KVKK ve Gizlilik Ayarları
-                        </h5>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div class="setting-label">KVKK Başlığı</div>
-                                <div class="setting-description">KVKK sayfasında gösterilecek başlık</div>
-                                <input type="text" class="form-control" id="kvkkTitle" placeholder="KVKK başlığını buraya yazın...">
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div class="setting-label">KVKK Metni</div>
-                                <div class="setting-description">Kullanıcılara gösterilecek KVKK ve gizlilik metni</div>
-                                <textarea class="form-control" id="kvkkText" rows="15" placeholder="KVKK metnini buraya yazın..."></textarea>
-                            </div>
-                            
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
 
-                            
-                            <div class="setting-item">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <button class="btn btn-outline-primary" id="previewKvkkBtn">
-                                        <i class="fas fa-eye me-1"></i>Önizleme
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-cog me-2" style="color:#667eea;"></i>Sistem Ayarları</h1>
+            <p>Uygulamanın tüm yapılandırma seçeneklerini buradan yönetin.</p>
+        </div>
+
+        <!-- Settings Cards Grid -->
+        <div class="settings-grid">
+
+            <!-- KVKK Ayarları -->
+            <a href="settings-kvkk.html" class="settings-card card-kvkk">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-kvkk">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                </form>
-                
-                <!-- Kaydet/Sıfırla Butonları -->
-                <div class="d-flex justify-content-end gap-3 mb-4">
-                    <button class="btn btn-reset" id="resetKvkkBtn">
-                        <i class="fas fa-undo me-2"></i>Varsayılana Sıfırla
-                    </button>
-                    <button class="btn btn-save" id="saveKvkkBtn">
-                        <i class="fas fa-save me-2"></i>KVKK Ayarlarını Kaydet
-                    </button>
+                    <div class="card-info">
+                        <h3>KVKK Ayarları</h3>
+                        <p>Kişisel verilerin korunması metni ve gizlilik politikasını düzenleyin.</p>
+                    </div>
                 </div>
-             </div>
-         </div>
-     </div>
-     
-     <!-- Toast Container -->
-     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-         <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-             <div class="toast-header bg-success text-white">
-                 <i class="fas fa-check-circle me-2"></i>
-                 <strong class="me-auto">Başarılı</strong>
-                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-             </div>
-             <div class="toast-body" id="successToastBody">
-                 İşlem başarıyla tamamlandı!
-             </div>
-         </div>
-         
-         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-             <div class="toast-header bg-danger text-white">
-                 <i class="fas fa-exclamation-circle me-2"></i>
-                 <strong class="me-auto">Hata</strong>
-                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-             </div>
-             <div class="toast-body" id="errorToastBody">
-                 İşlem sırasında bir hata oluştu!
-             </div>
-         </div>
-     </div>
-     
-     <!-- Bootstrap JS -->
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-     <!-- Supabase -->
-     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-     <script src="../assets/js/supabase-config.js"></script>
-     <!-- Settings JS -->
-     <script src="js/settings.js"></script>
-     
-     <!-- Load Sidebar -->
-     <script>
-         fetch('sidebar.html')
-             .then(response => response.text())
-             .then(data => {
-                 document.getElementById('sidebar-container').innerHTML = data;
-             })
-             .catch(error => console.error('Error loading sidebar:', error));
-     </script>
- </body>
- </html>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check feat-kvkk"></i> KVKK başlığını özelleştir</li>
+                        <li><i class="fas fa-check feat-kvkk"></i> Onay metnini düzenle</li>
+                        <li><i class="fas fa-check feat-kvkk"></i> Katılımcılara gösterilen formu yönet</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-kvkk">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Yönetici Tanımları -->
+            <a href="settings-admins.html" class="settings-card card-admins">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-admins">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Yönetici Tanımları</h3>
+                        <p>Admin ve psikolog kullanıcılarını ekleyin, düzenleyin veya silin.</p>
+                    </div>
+                </div>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check feat-admins"></i> Yeni yönetici ekle</li>
+                        <li><i class="fas fa-check feat-admins"></i> Rol ata (Admin / Psikolog)</li>
+                        <li><i class="fas fa-check feat-admins"></i> Kullanıcı erişimlerini yönet</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-admins">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Mektup Şablonları -->
+            <a href="settings-letters.html" class="settings-card card-letters">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-letters">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Mektup Şablonları</h3>
+                        <p>Katılımcılara gönderilen otomatik e-posta ve mektup şablonlarını düzenleyin.</p>
+                    </div>
+                </div>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check feat-letters"></i> Davet mektubu şablonu</li>
+                        <li><i class="fas fa-check feat-letters"></i> Sonuç bildirim mektubu</li>
+                        <li><i class="fas fa-check feat-letters"></i> Değişken etiketlerle kişiselleştir</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-letters">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading sidebar:', error));
+    </script>
+</body>
+</html>

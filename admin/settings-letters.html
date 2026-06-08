@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mektup Şablonları - MMPI Test Sistemi</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #4facfe;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover { text-decoration: underline; }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        /* Şablon sekmeleri */
+        .template-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .template-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .template-tab:hover {
+            border-color: #4facfe;
+            color: #0369a1;
+            background: #f0f9ff;
+            text-decoration: none;
+        }
+
+        .template-tab.active {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.35);
+        }
+
+        .template-tab i {
+            font-size: 1rem;
+        }
+
+        /* Editor paneli */
+        .editor-panel {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .editor-header h5 {
+            margin: 0;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .editor-header .badge {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #e5e7eb;
+            margin: 0 4px;
+        }
+
+        .editor-body {
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.15);
+        }
+
+        textarea.form-control {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            resize: vertical;
+        }
+
+        /* Değişken etiketleri */
+        .variables-panel {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .variables-panel h6 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .var-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .var-tag {
+            background: white;
+            border: 1px solid #7dd3fc;
+            border-radius: 6px;
+            padding: 0.25rem 0.65rem;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: #0369a1;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .var-tag:hover {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .var-tag:active {
+            transform: scale(0.95);
+        }
+
+        /* Aksiyon butonları */
+        .editor-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .btn-preview {
+            border: 2px solid #4facfe;
+            background: white;
+            color: #0369a1;
+            border-radius: 10px;
+            padding: 0.6rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.25s;
+        }
+
+        .btn-preview:hover {
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+
+        .btn-save-template {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save-template:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 172, 254, 0.4);
+            color: white;
+        }
+
+        /* Önizleme modal */
+        .preview-box {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 2rem;
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            color: #1f2937;
+            min-height: 200px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+            .template-tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Mektup Şablonları</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-envelope-open-text me-2" style="color:#4facfe;"></i>Mektup Şablonları</h1>
+                <p class="page-subtitle">Katılımcılara ve ilgililere gönderilen mektup şablonlarını düzenleyin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Şablon Sekmeleri -->
+        <div class="template-tabs">
+            <a href="#" class="template-tab active" id="tab-invite" onclick="switchTemplate('invite', event)">
+                <i class="fas fa-paper-plane"></i>Davet Mektubu
+            </a>
+            <a href="#" class="template-tab" id="tab-result" onclick="switchTemplate('result', event)">
+                <i class="fas fa-clipboard-check"></i>Sonuç Bildirimi
+            </a>
+            <a href="#" class="template-tab" id="tab-reminder" onclick="switchTemplate('reminder', event)">
+                <i class="fas fa-bell"></i>Hatırlatma Mektubu
+            </a>
+        </div>
+
+        <!-- Editör Paneli -->
+        <div class="editor-panel">
+            <div class="editor-header">
+                <h5 id="editorTitle"><i class="fas fa-paper-plane me-2"></i>Davet Mektubu Şablonu</h5>
+                <span class="badge" id="editorBadge">Kişisel davet</span>
+            </div>
+
+            <div class="editor-toolbar">
+                <button class="toolbar-btn" title="Kalın" onclick="applyFormat('bold')"><i class="fas fa-bold"></i></button>
+                <button class="toolbar-btn" title="İtalik" onclick="applyFormat('italic')"><i class="fas fa-italic"></i></button>
+                <button class="toolbar-btn" title="Altı Çizili" onclick="applyFormat('underline')"><i class="fas fa-underline"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Üst Sola Hizala" onclick="applyFormat('left')"><i class="fas fa-align-left"></i></button>
+                <button class="toolbar-btn" title="Ortala" onclick="applyFormat('center')"><i class="fas fa-align-center"></i></button>
+                <button class="toolbar-btn" title="Sağa Hizala" onclick="applyFormat('right')"><i class="fas fa-align-right"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Varsayılana Sıfırla" onclick="resetTemplate()"><i class="fas fa-undo"></i></button>
+            </div>
+
+            <div class="editor-body">
+                <div class="mb-3">
+                    <label class="form-label" for="templateSubject">Mektup Başlığı / Konu</label>
+                    <input type="text" class="form-control" id="templateSubject" placeholder="Örn: MMPI-2 Psikolojik Değerlendirme Daveti">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label" for="templateBody">Mektup İçeriği</label>
+                    <textarea class="form-control" id="templateBody" rows="14" placeholder="Mektup içeriğini buraya yazın..."></textarea>
+                </div>
+
+                <!-- Değişken Etiketleri -->
+                <div class="variables-panel">
+                    <h6><i class="fas fa-code me-1"></i>Otomatik Doldurulacak Alanlar — Tıklayarak ekleyin</h6>
+                    <div class="var-tags" id="varTagsContainer">
+                        <span class="var-tag" onclick="insertVar('{{AD_SOYAD}}')" title="Katılımcının tam adı">{{AD_SOYAD}}</span>
+                        <span class="var-tag" onclick="insertVar('{{TCKN}}')" title="TC Kimlik Numarası">{{TCKN}}</span>
+                        <span class="var-tag" onclick="insertVar('{{TEST_TARIHI}}')" title="Test tarihi">{{TEST_TARIHI}}</span>
+                        <span class="var-tag" onclick="insertVar('{{KURUM_ADI}}')" title="Kurum adı">{{KURUM_ADI}}</span>
+                        <span class="var-tag" onclick="insertVar('{{SINAV_LINKI}}')" title="Test erişim bağlantısı">{{SINAV_LINKI}}</span>
+                        <span class="var-tag" onclick="insertVar('{{SONUC_TARIHI}}')" title="Sonuç tarihi">{{SONUC_TARIHI}}</span>
+                        <span class="var-tag" onclick="insertVar('{{PSIKOLOG_ADI}}')" title="Sorumlu psikolog adı">{{PSIKOLOG_ADI}}</span>
+                        <span class="var-tag" onclick="insertVar('{{ILETISIM_BILGISI}}')" title="İletişim bilgisi">{{ILETISIM_BILGISI}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-footer">
+                <button class="btn btn-preview" id="previewBtn" onclick="previewTemplate()">
+                    <i class="fas fa-eye me-2"></i>Önizleme
+                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary" onclick="resetTemplate()">
+                        <i class="fas fa-undo me-1"></i>Sıfırla
+                    </button>
+                    <button class="btn btn-save-template" id="saveTemplateBtn" onclick="saveTemplate()">
+                        <i class="fas fa-save me-2"></i>Şablonu Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Önizleme Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Mektup Önizlemesi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <small class="text-muted fw-semibold">KONU:</small>
+                        <p id="previewSubject" class="mb-1 fw-semibold text-dark"></p>
+                    </div>
+                    <hr>
+                    <div class="preview-box" id="previewBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">Şablon başarıyla kaydedildi!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <!-- Template Logic -->
+    <script>
+        // Varsayılan şablonlar
+        const defaultTemplates = {
+            invite: {
+                title: '<i class="fas fa-paper-plane me-2"></i>Davet Mektubu Şablonu',
+                badge: 'Kişisel davet',
+                subject: 'MMPI-2 Psikolojik Değerlendirme Daveti',
+                body: `Sayın {{AD_SOYAD}},
+
+Kurumumuzun psikolojik değerlendirme sürecinin bir parçası olarak MMPI-2 testini tamamlamanız gerekmektedir.
+
+Test Bilgileri:
+• Tarih      : {{TEST_TARIHI}}
+• Erişim     : {{SINAV_LINKI}}
+• Süre       : Yaklaşık 90 dakika
+
+Teste başlamadan önce kimlik doğrulaması için TC Kimlik Numaranız ({{TCKN}}) gerekecektir.
+
+Test sırasında herhangi bir sorunla karşılaşırsanız lütfen aşağıdaki bilgilerden bize ulaşın:
+{{ILETISIM_BILGISI}}
+
+Saygılarımızla,
+{{PSIKOLOG_ADI}}
+{{KURUM_ADI}}`
+            },
+            result: {
+                title: '<i class="fas fa-clipboard-check me-2"></i>Sonuç Bildirimi Şablonu',
+                badge: 'Test sonucu',
+                subject: 'MMPI-2 Test Sonuçlarınız Hazır',
+                body: `Sayın {{AD_SOYAD}},
+
+{{TEST_TARIHI}} tarihinde tamamlamış olduğunuz MMPI-2 psikolojik değerlendirme testi sonuçlarınız hazırlanmıştır.
+
+Sonuçlarınızı değerlendiren psikolog: {{PSIKOLOG_ADI}}
+Sonuç tarihi: {{SONUC_TARIHI}}
+
+Sonuçlarınız hakkında görüşmek ve detaylı bilgi almak için bizimle iletişime geçebilirsiniz:
+{{ILETISIM_BILGISI}}
+
+Değerlendirme sürecine katılımınız için teşekkür ederiz.
+
+Saygılarımızla,
+{{KURUM_ADI}}`
+            },
+            reminder: {
+                title: '<i class="fas fa-bell me-2"></i>Hatırlatma Mektubu Şablonu',
+                badge: 'Hatırlatma',
+                subject: 'Hatırlatma: MMPI-2 Testinizi Henüz Tamamlamadınız',
+                body: `Sayın {{AD_SOYAD}},
+
+Size daha önce ilettiğimiz MMPI-2 psikolojik değerlendirme testini henüz tamamlamadığınızı fark ettik.
+
+Teste erişmek için: {{SINAV_LINKI}}
+
+Son katılım tarihi: {{TEST_TARIHI}}
+
+Herhangi bir sorunuz veya teknik bir sorun yaşıyorsanız lütfen bizimle iletişime geçin:
+{{ILETISIM_BILGISI}}
+
+Saygılarımızla,
+{{PSIKOLOG_ADI}}
+{{KURUM_ADI}}`
+            }
+        };
+
+        let currentTemplate = 'invite';
+
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        function switchTemplate(key, event) {
+            event.preventDefault();
+            // Mevcut şablonu kaydet
+            saveToLocalStorage(currentTemplate);
+            // Sekmeleri güncelle
+            document.querySelectorAll('.template-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + key).classList.add('active');
+            // İçeriği yükle
+            currentTemplate = key;
+            loadTemplate(key);
+        }
+
+        function loadTemplate(key) {
+            const saved = getSavedTemplate(key);
+            const tpl = saved || defaultTemplates[key];
+            document.getElementById('editorTitle').innerHTML   = defaultTemplates[key].title;
+            document.getElementById('editorBadge').textContent = defaultTemplates[key].badge;
+            document.getElementById('templateSubject').value   = tpl.subject;
+            document.getElementById('templateBody').value      = tpl.body;
+        }
+
+        function saveToLocalStorage(key) {
+            const data = {
+                subject: document.getElementById('templateSubject').value,
+                body: document.getElementById('templateBody').value
+            };
+            localStorage.setItem('mmpi_letter_' + key, JSON.stringify(data));
+        }
+
+        function getSavedTemplate(key) {
+            try {
+                const raw = localStorage.getItem('mmpi_letter_' + key);
+                return raw ? JSON.parse(raw) : null;
+            } catch { return null; }
+        }
+
+        function saveTemplate() {
+            saveToLocalStorage(currentTemplate);
+            showToast('success', 'Şablon başarıyla kaydedildi.');
+        }
+
+        function resetTemplate() {
+            if (!confirm('Bu şablonu varsayılan haline döndürmek istediğinizden emin misiniz?')) return;
+            localStorage.removeItem('mmpi_letter_' + currentTemplate);
+            loadTemplate(currentTemplate);
+            showToast('success', 'Şablon varsayılan haline döndürüldü.');
+        }
+
+        function insertVar(varName) {
+            const textarea = document.getElementById('templateBody');
+            const start = textarea.selectionStart;
+            const end   = textarea.selectionEnd;
+            const text  = textarea.value;
+            textarea.value = text.substring(0, start) + varName + text.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + varName.length;
+            textarea.focus();
+        }
+
+        function applyFormat(format) {
+            // Textarea için basit format uygulama (görsel ipucu)
+            const textarea = document.getElementById('templateBody');
+            textarea.focus();
+        }
+
+        function previewTemplate() {
+            const subject = document.getElementById('templateSubject').value;
+            const body    = document.getElementById('templateBody').value;
+            // Demo verilerle değişkenleri doldur
+            const demoData = {
+                '{{AD_SOYAD}}':        'Ahmet Yılmaz',
+                '{{TCKN}}':            '12345678901',
+                '{{TEST_TARIHI}}':     new Date().toLocaleDateString('tr-TR'),
+                '{{KURUM_ADI}}':       'Örnek Kurum A.Ş.',
+                '{{SINAV_LINKI}}':     'https://selma.ozguryilmaz.com.tr',
+                '{{SONUC_TARIHI}}':    new Date().toLocaleDateString('tr-TR'),
+                '{{PSIKOLOG_ADI}}':    'Dr. Ayşe Demir',
+                '{{ILETISIM_BILGISI}}':'psikoloji@kurum.com | 0212 000 00 00'
+            };
+
+            let previewBody = body;
+            Object.entries(demoData).forEach(([key, val]) => {
+                previewBody = previewBody.replaceAll(key, val);
+            });
+
+            document.getElementById('previewSubject').textContent = subject;
+            document.getElementById('previewBody').textContent    = previewBody;
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTemplate('invite');
+        });
+    </script>
+</body>
+</html>
