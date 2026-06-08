@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
     <style>
         .navbar-custom {
             background: rgba(255,255,255,0.95);
@@ -215,184 +217,137 @@
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero-section">
-        <div class="container position-relative">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <h1 class="hero-title mb-4">MMPI Psikolojik<br>Değerlendirme Sistemi</h1>
-                    <p class="hero-subtitle mb-4">
-                        Minnesota Çok Yönlü Kişilik Envanteri (MMPI-2) ile bireyin kişisel
-                        ve toplumsal uyumunu objektif olarak değerlendirin. Bilimsel temelli
-                        psikolojik test hizmetimizi güvenle kullanın.
+    <!-- Ana Sayfa İçeriği -->
+    <main id="pageContent">
+        <section class="hero-section">
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h1 class="hero-title mb-4">MMPI Psikolojik<br>Değerlendirme Sistemi</h1>
+                        <p class="hero-subtitle mb-4">
+                            Minnesota Çok Yönlü Kişilik Envanteri (MMPI-2) ile bireyin kişisel
+                            ve toplumsal uyumunu objektif olarak değerlendirin. Bilimsel temelli
+                            psikolojik test hizmetimizi güvenle kullanın.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="testebasla.html" class="hero-cta">
+                                <i class="fas fa-play me-2"></i>Teste Başla
+                            </a>
+                            <a href="hakkimizda.html" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                                <i class="fas fa-info-circle me-2"></i>Daha Fazla Bilgi
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 text-center d-none d-lg-block">
+                        <i class="fas fa-clipboard-check" style="font-size:12rem; opacity:0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-5 bg-light">
+            <div class="container py-4">
+                <div class="text-center">
+                    <h2 class="section-title">MMPI-2 Testi Nedir?</h2>
+                    <p class="section-subtitle">
+                        MMPI (Minnesota Çok Yönlü Kişilik Envanteri), dünya genelinde en yaygın
+                        kullanılan objektif kişilik değerlendirme araçlarından biridir.
                     </p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="testebasla.html" class="hero-cta">
-                            <i class="fas fa-play me-2"></i>Teste Başla
-                        </a>
-                        <a href="hakkimizda.html" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
-                            <i class="fas fa-info-circle me-2"></i>Daha Fazla Bilgi
-                        </a>
-                    </div>
                 </div>
-                <div class="col-lg-5 text-center d-none d-lg-block">
-                    <i class="fas fa-clipboard-check" style="font-size:12rem; opacity:0.3;"></i>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Neden MMPI -->
-    <section class="py-5 bg-light">
-        <div class="container py-4">
-            <div class="text-center">
-                <h2 class="section-title">MMPI-2 Testi Nedir?</h2>
-                <p class="section-subtitle">
-                    MMPI (Minnesota Çok Yönlü Kişilik Envanteri), dünya genelinde en yaygın
-                    kullanılan objektif kişilik değerlendirme araçlarından biridir.
-                </p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-flask"></i>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                            <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
+                            <p class="text-muted mb-0">567 sorudan oluşan MMPI-2 envanteri, onlarca yıllık araştırma ve klinik deneyime dayanmaktadır.</p>
                         </div>
-                        <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
-                        <p class="text-muted mb-0">
-                            567 sorudan oluşan MMPI-2 envanteri, onlarca yıllık araştırma
-                            ve klinik deneyime dayanmaktadır.
-                        </p>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                            <h4 class="fw-bold mb-3">Güvenilir Sonuçlar</h4>
+                            <p class="text-muted mb-0">Yerleşik doğruluk ölçekleri (VRIN, TRIN, L, K) ile geçersiz yanıtlar tespit edilir, güvenilir profil elde edilir.</p>
                         </div>
-                        <h4 class="fw-bold mb-3">Güvenilir Sonuçlar</h4>
-                        <p class="text-muted mb-0">
-                            Yerleşik doğruluk ölçekleri (VRIN, TRIN, L, K) ile geçersiz
-                            yanıtlar tespit edilir, güvenilir profil elde edilir.
-                        </p>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-lock"></i>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                            <h4 class="fw-bold mb-3">Veri Gizliliği</h4>
+                            <p class="text-muted mb-0">Kişisel verileriniz KVKK kapsamında korunur, yalnızca yetkili psikologlar tarafından görüntülenir.</p>
                         </div>
-                        <h4 class="fw-bold mb-3">Veri Gizliliği</h4>
-                        <p class="text-muted mb-0">
-                            Kişisel verileriniz KVKK kapsamında korunur, yalnızca yetkili
-                            psikologlar tarafından görüntülenir.
-                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Nasıl Çalışır -->
-    <section class="py-5">
-        <div class="container py-4">
-            <div class="text-center">
-                <h2 class="section-title">Test Nasıl Uygulanır?</h2>
-                <p class="section-subtitle">
-                    Dört basit adımda MMPI-2 testinizi tamamlayın.
-                </p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="step-card text-center">
-                        <div class="step-number mx-auto">1</div>
-                        <h5 class="fw-bold mb-2">Kişisel Bilgiler</h5>
-                        <p class="text-muted mb-0 small">
-                            Ad, soyad, yaş ve diğer temel bilgilerinizi girerek teste başlayın.
-                        </p>
-                    </div>
+        </section>
+        <section class="py-5">
+            <div class="container py-4">
+                <div class="text-center">
+                    <h2 class="section-title">Test Nasıl Uygulanır?</h2>
+                    <p class="section-subtitle">Dört basit adımda MMPI-2 testinizi tamamlayın.</p>
                 </div>
-                <div class="col-md-3">
-                    <div class="step-card text-center">
-                        <div class="step-number mx-auto">2</div>
-                        <h5 class="fw-bold mb-2">KVKK Onayı</h5>
-                        <p class="text-muted mb-0 small">
-                            Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okuyup onaylayın.
-                        </p>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="step-card text-center">
+                            <div class="step-number mx-auto">1</div>
+                            <h5 class="fw-bold mb-2">Kişisel Bilgiler</h5>
+                            <p class="text-muted mb-0 small">Ad, soyad, yaş ve diğer temel bilgilerinizi girerek teste başlayın.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="step-card text-center">
-                        <div class="step-number mx-auto">3</div>
-                        <h5 class="fw-bold mb-2">Testi Yanıtlayın</h5>
-                        <p class="text-muted mb-0 small">
-                            567 soruyu "Doğru", "Yanlış" ya da "Bilmiyorum" olarak işaretleyin.
-                        </p>
+                    <div class="col-md-3">
+                        <div class="step-card text-center">
+                            <div class="step-number mx-auto">2</div>
+                            <h5 class="fw-bold mb-2">KVKK Onayı</h5>
+                            <p class="text-muted mb-0 small">Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okuyup onaylayın.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="step-card text-center">
-                        <div class="step-number mx-auto">4</div>
-                        <h5 class="fw-bold mb-2">Raporu Görüntüleyin</h5>
-                        <p class="text-muted mb-0 small">
-                            Test tamamlandığında detaylı kişilik profili raporunuz hazır olur.
-                        </p>
+                    <div class="col-md-3">
+                        <div class="step-card text-center">
+                            <div class="step-number mx-auto">3</div>
+                            <h5 class="fw-bold mb-2">Testi Yanıtlayın</h5>
+                            <p class="text-muted mb-0 small">567 soruyu "Doğru", "Yanlış" ya da "Bilmiyorum" olarak işaretleyin.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-card text-center">
+                            <div class="step-number mx-auto">4</div>
+                            <h5 class="fw-bold mb-2">Raporu Görüntüleyin</h5>
+                            <p class="text-muted mb-0 small">Test tamamlandığında detaylı kişilik profili raporunuz hazır olur.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- KVKK Bilgilendirme (onay gerektirmez) -->
-    <section class="py-5 bg-light">
-        <div class="container py-4">
-            <div class="text-center">
-                <h2 class="section-title">Kişisel Verilerin Korunması</h2>
-                <p class="section-subtitle">
-                    6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında
-                    verileriniz güvendedir.
-                </p>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="kvkk-banner">
-                        <div class="row align-items-center">
-                            <div class="col-lg-3 text-center mb-3 mb-lg-0">
-                                <i class="fas fa-shield-halved" style="font-size:4rem; color:#667eea;"></i>
-                            </div>
-                            <div class="col-lg-9">
-                                <h5 class="fw-bold">Veri Sorumlusu: OGULTURK A.Ş.</h5>
-                                <p class="text-muted mb-2">
-                                    Kişisel verileriniz, 6698 sayılı Kanun uyarınca veri sorumlusu
-                                    sıfatına sahip OGULTURK A.Ş. tarafından toplanmakta, işlenmekte
-                                    ve ilgili birim sorumlusu ile paylaşılmaktadır.
-                                </p>
-                                <p class="text-muted mb-0">
-                                    Verileriniz yalnızca psikolojik değerlendirme amacıyla kullanılır,
-                                    2 yıl süreyle muhafaza edilir ve üçüncü kişilerle paylaşılmaz.
-                                    Detaylı bilgi için <a href="gizlilik.html">Gizlilik Politikası</a>
-                                    sayfamızı ziyaret edebilirsiniz.
-                                </p>
+        </section>
+        <section class="py-5 bg-light">
+            <div class="container py-4">
+                <div class="text-center">
+                    <h2 class="section-title">Kişisel Verilerin Korunması</h2>
+                    <p class="section-subtitle">6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında verileriniz güvendedir.</p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="kvkk-banner">
+                            <div class="row align-items-center">
+                                <div class="col-lg-3 text-center mb-3 mb-lg-0">
+                                    <i class="fas fa-shield-halved" style="font-size:4rem; color:#667eea;"></i>
+                                </div>
+                                <div class="col-lg-9">
+                                    <h5 class="fw-bold">Veri Sorumlusu: OGULTURK A.Ş.</h5>
+                                    <p class="text-muted mb-2">Kişisel verileriniz, 6698 sayılı Kanun uyarınca veri sorumlusu sıfatına sahip OGULTURK A.Ş. tarafından toplanmakta, işlenmekte ve ilgili birim sorumlusu ile paylaşılmaktadır.</p>
+                                    <p class="text-muted mb-0">Verileriniz yalnızca psikolojik değerlendirme amacıyla kullanılır, 2 yıl süreyle muhafaza edilir ve üçüncü kişilerle paylaşılmaz. Detaylı bilgi için <a href="gizlilik.html">Gizlilik Politikası</a> sayfamızı ziyaret edebilirsiniz.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-        <div class="container py-4 text-center text-white">
-            <h2 class="fw-bold mb-3" style="font-size:2rem;">Teste Başlamaya Hazır mısınız?</h2>
-            <p class="mb-4" style="font-size:1.1rem; opacity:0.95;">
-                Yaklaşık 60-90 dakika süren MMPI-2 testini hemen uygulamaya başlayın.
-            </p>
-            <a href="testebasla.html" class="hero-cta">
-                <i class="fas fa-play me-2"></i>Teste Başla
-            </a>
-        </div>
-    </section>
+        </section>
+        <section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="container py-4 text-center text-white">
+                <h2 class="fw-bold mb-3" style="font-size:2rem;">Teste Başlamaya Hazır mısınız?</h2>
+                <p class="mb-4" style="font-size:1.1rem; opacity:0.95;">Yaklaşık 60-90 dakika süren MMPI-2 testini hemen uygulamaya başlayın.</p>
+                <a href="testebasla.html" class="hero-cta"><i class="fas fa-play me-2"></i>Teste Başla</a>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer-custom">
@@ -438,5 +393,21 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function loadPageContent() {
+            try {
+                const { data, error } = await supabase
+                    .from('page_content')
+                    .select('*')
+                    .eq('page_key', 'ana-sayfa')
+                    .single();
+                if (error) throw error;
+                if (data && data.page_body) {
+                    document.getElementById('pageContent').innerHTML = data.page_body;
+                }
+            } catch (e) { console.warn('Dinamik içerik yüklenemedi, statik HTML gösteriliyor.'); }
+        }
+        document.addEventListener('DOMContentLoaded', loadPageContent);
+    </script>
 </body>
 </html>

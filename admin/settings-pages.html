@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayfa Yönetimi - MMPI Test Sistemi</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover { text-decoration: underline; }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        /* Sekmeler */
+        .template-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .template-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .template-tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: #f0f0ff;
+            text-decoration: none;
+        }
+
+        .template-tab.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+        }
+
+        .template-tab i { font-size: 1rem; }
+
+        /* Editor paneli */
+        .editor-panel {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .editor-header h5 {
+            margin: 0;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .editor-header .badge {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.65rem 1rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .toolbar-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 22px;
+            background: #e5e7eb;
+            margin: 0 4px;
+        }
+
+        .editor-body {
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        }
+
+        .editor-wrapper {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .editor-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        }
+
+        .editor-content {
+            min-height: 400px;
+            max-height: 550px;
+            overflow-y: auto;
+            padding: 1.25rem;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.92rem;
+            line-height: 1.75;
+            color: #1f2937;
+            background: white;
+            outline: none;
+        }
+
+        .editor-content h4 { font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+        .editor-content h5 { font-size: 1.05rem; font-weight: 700; margin: 0.9rem 0 0.4rem; }
+        .editor-content h6 { font-size: 0.95rem; font-weight: 700; margin: 0.8rem 0 0.35rem; }
+        .editor-content p { margin-bottom: 0.6rem; }
+        .editor-content ul, .editor-content ol { margin-bottom: 0.6rem; padding-left: 1.5rem; }
+        .editor-content li { margin-bottom: 0.25rem; }
+
+        .source-textarea {
+            width: 100%;
+            min-height: 400px;
+            border: none;
+            padding: 1.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            color: #1f2937;
+        }
+
+        .source-textarea:focus { outline: none; }
+
+        .editor-footer-bar {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background: #fafafa;
+        }
+
+        .editor-footer-bar small { color: #9ca3af; font-size: 0.75rem; }
+
+        /* Önizleme */
+        .preview-box {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 2rem;
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.75;
+            font-size: 0.9rem;
+            color: #1f2937;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .preview-box h4 { font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+        .preview-box h5 { font-size: 1.05rem; font-weight: 700; margin: 0.9rem 0 0.4rem; }
+        .preview-box h6 { font-size: 0.95rem; font-weight: 700; margin: 0.8rem 0 0.35rem; }
+        .preview-box p { margin-bottom: 0.6rem; }
+        .preview-box ul, .preview-box ol { margin-bottom: 0.6rem; padding-left: 1.5rem; }
+
+        .editor-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .btn-preview {
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            padding: 0.6rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.25s;
+        }
+
+        .btn-preview:hover {
+            background: #f0f0ff;
+            color: #667eea;
+        }
+
+        .btn-save-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save-page:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+            .template-tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Sayfa Yönetimi</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-edit me-2" style="color:#667eea;"></i>Sayfa Yönetimi</h1>
+                <p class="page-subtitle">Web sitesi sayfalarının içeriğini görsel düzenleyici ile güncelleyin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Sayfa Sekmeleri -->
+        <div class="template-tabs">
+            <a href="#" class="template-tab active" id="tab-ana-sayfa" onclick="switchPage('ana-sayfa', event)">
+                <i class="fas fa-home"></i>Ana Sayfa
+            </a>
+            <a href="#" class="template-tab" id="tab-hakkimizda" onclick="switchPage('hakkimizda', event)">
+                <i class="fas fa-info-circle"></i>Hakkımızda
+            </a>
+            <a href="#" class="template-tab" id="tab-gizlilik" onclick="switchPage('gizlilik', event)">
+                <i class="fas fa-shield-alt"></i>Gizlilik
+            </a>
+            <a href="#" class="template-tab" id="tab-kullanim" onclick="switchPage('kullanim', event)">
+                <i class="fas fa-file-contract"></i>Kullanım Koşulları
+            </a>
+        </div>
+
+        <!-- Editör Paneli -->
+        <div class="editor-panel">
+            <div class="editor-header">
+                <h5 id="editorTitle"><i class="fas fa-home me-2"></i>Ana Sayfa İçeriği</h5>
+                <span class="badge" id="editorBadge">Site ana sayfası</span>
+            </div>
+
+            <div class="editor-toolbar">
+                <button class="toolbar-btn" title="Kalın" onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
+                <button class="toolbar-btn" title="İtalik" onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
+                <button class="toolbar-btn" title="Altı Çizili" onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Başlık 4" onclick="execCmd('formatBlock', 'h4')"><b>H4</b></button>
+                <button class="toolbar-btn" title="Başlık 5" onclick="execCmd('formatBlock', 'h5')"><b>H5</b></button>
+                <button class="toolbar-btn" title="Başlık 6" onclick="execCmd('formatBlock', 'h6')"><b>H6</b></button>
+                <button class="toolbar-btn" title="Paragraf" onclick="execCmd('formatBlock', 'p')"><b>P</b></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Sırasız Liste" onclick="execCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                <button class="toolbar-btn" title="Sıralı Liste" onclick="execCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Sola Hizala" onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
+                <button class="toolbar-btn" title="Ortala" onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
+                <button class="toolbar-btn" title="Sağa Hizala" onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="Geri Al" onclick="execCmd('undo')"><i class="fas fa-undo"></i></button>
+                <button class="toolbar-btn" title="Yinele" onclick="execCmd('redo')"><i class="fas fa-redo"></i></button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" title="HTML Kaynağı" onclick="toggleSource()"><i class="fas fa-code"></i></button>
+            </div>
+
+            <div class="editor-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label" for="pageTitle">Sayfa Başlığı</label>
+                        <input type="text" class="form-control" id="pageTitle" placeholder="Sayfa başlığı">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pageSubtitle">Sayfa Alt Başlığı</label>
+                        <input type="text" class="form-control" id="pageSubtitle" placeholder="Sayfa alt başlığı">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label" for="pageEditor">Sayfa İçeriği</label>
+                    <div class="editor-wrapper" id="editorWrapper">
+                        <div class="editor-content" id="pageEditor" contenteditable="true"></div>
+                        <div class="editor-footer-bar">
+                            <button class="btn btn-sm btn-outline-primary" id="previewBtn">
+                                <i class="fas fa-eye me-1"></i>Önizleme
+                            </button>
+                            <small><i class="far fa-keyboard me-1"></i>HTML desteği ile zengin metin düzenleyici</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-footer">
+                <button class="btn btn-preview" id="previewFooterBtn" onclick="previewPage()">
+                    <i class="fas fa-eye me-2"></i>Önizleme
+                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary" onclick="resetPage()">
+                        <i class="fas fa-undo me-1"></i>Sıfırla
+                    </button>
+                    <button class="btn btn-save-page" id="savePageBtn" onclick="savePage()">
+                        <i class="fas fa-save me-2"></i>Sayfayı Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Önizleme Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Sayfa Önizlemesi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <small class="text-muted fw-semibold">BAŞLIK:</small>
+                        <p id="previewTitle" class="mb-1 fw-semibold text-dark"></p>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted fw-semibold">ALT BAŞLIK:</small>
+                        <p id="previewSubtitle" class="mb-1 text-muted"></p>
+                    </div>
+                    <hr>
+                    <div class="preview-box" id="previewBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">Sayfa başarıyla kaydedildi!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <!-- Page Editor Logic -->
+    <script>
+        // ---------- Page Config ----------
+        const pageConfig = {
+            'ana-sayfa':  { title: '<i class="fas fa-home me-2"></i>Ana Sayfa İçeriği', badge: 'Site ana sayfası', file: 'index.html' },
+            'hakkimizda': { title: '<i class="fas fa-info-circle me-2"></i>Hakkımızda İçeriği', badge: 'Hakkımızda sayfası', file: 'hakkimizda.html' },
+            'gizlilik':   { title: '<i class="fas fa-shield-alt me-2"></i>Gizlilik Politikası İçeriği', badge: 'Gizlilik sayfası', file: 'gizlilik.html' },
+            'kullanim':   { title: '<i class="fas fa-file-contract me-2"></i>Kullanım Koşulları İçeriği', badge: 'Kullanım koşulları sayfası', file: 'kullanim.html' }
+        };
+
+        const pageKeys = ['ana-sayfa', 'hakkimizda', 'gizlilik', 'kullanim'];
+
+        // ---------- Default Content ----------
+        // These are embedded from the existing HTML pages (extracted body content).
+        // They serve as fallback when Supabase has no saved data.
+        const defaultPages = {};
+
+        // Will be populated from Supabase or inline fallback
+        let currentPage = 'ana-sayfa';
+        let sourceMode = false;
+
+        // ---------- Toast ----------
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        // ---------- Editor Commands ----------
+        function execCmd(command, value) {
+            const editor = document.getElementById('pageEditor');
+            if (sourceMode) return;
+            editor.focus();
+            document.execCommand(command, false, value || null);
+            updateToolbarState();
+        }
+
+        function updateToolbarState() {
+            document.querySelectorAll('.toolbar-btn').forEach(btn => {
+                const onclick = btn.getAttribute('onclick');
+                if (onclick && onclick.startsWith("execCmd('")) {
+                    const m = onclick.match(/execCmd\('(\w+)'/);
+                    if (m) {
+                        try {
+                            if (document.queryCommandState(m[1])) btn.classList.add('active');
+                            else btn.classList.remove('active');
+                        } catch(e) {}
+                    }
+                }
+            });
+        }
+
+        function toggleSource() {
+            const editor = document.getElementById('pageEditor');
+            sourceMode = !sourceMode;
+            if (sourceMode) {
+                const ta = document.createElement('textarea');
+                ta.className = 'source-textarea';
+                ta.id = 'pageSource';
+                ta.value = editor.innerHTML;
+                editor.style.display = 'none';
+                editor.parentNode.insertBefore(ta, editor.nextSibling);
+                document.querySelector('.toolbar-btn .fa-code').className = 'fas fa-pencil-alt';
+            } else {
+                const ta = document.getElementById('pageSource');
+                if (ta) { editor.innerHTML = ta.value; ta.remove(); }
+                editor.style.display = '';
+                document.querySelector('.toolbar-btn .fa-pencil-alt').className = 'fas fa-code';
+            }
+        }
+
+        // ---------- Data Helpers ----------
+        function getEditorHtml() {
+            const editor = document.getElementById('pageEditor');
+            const source = document.getElementById('pageSource');
+            return source ? source.value : editor.innerHTML;
+        }
+
+        function setEditorHtml(html) {
+            const editor = document.getElementById('pageEditor');
+            const source = document.getElementById('pageSource');
+            if (source) { source.value = html; }
+            else { editor.innerHTML = html; }
+        }
+
+        // ---------- Switch Page ----------
+        function switchPage(key, event) {
+            if (event) event.preventDefault();
+            // Save current state to memory
+            saveToMemory(currentPage);
+            // Update tabs
+            document.querySelectorAll('.template-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + key).classList.add('active');
+            currentPage = key;
+            loadPage(key);
+        }
+
+        // ---------- Memory Cache ----------
+        const pageMemory = {};
+
+        function saveToMemory(key) {
+            pageMemory[key] = {
+                title: document.getElementById('pageTitle').value,
+                subtitle: document.getElementById('pageSubtitle').value,
+                body: getEditorHtml()
+            };
+        }
+
+        // ---------- Load Page ----------
+        function loadPage(key) {
+            const cfg = pageConfig[key];
+            document.getElementById('editorTitle').innerHTML = cfg.title;
+            document.getElementById('editorBadge').textContent = cfg.badge;
+
+            // Check memory first
+            if (pageMemory[key]) {
+                document.getElementById('pageTitle').value = pageMemory[key].title || '';
+                document.getElementById('pageSubtitle').value = pageMemory[key].subtitle || '';
+                setEditorHtml(pageMemory[key].body || '');
+                return;
+            }
+
+            // If source mode is on, turn it off
+            if (sourceMode) toggleSource();
+
+            // Try Supabase
+            loadFromSupabase(key);
+        }
+
+        async function loadFromSupabase(key) {
+            try {
+                const { data, error } = await supabase
+                    .from('page_content')
+                    .select('*')
+                    .eq('page_key', key)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    document.getElementById('pageTitle').value = data.page_title || '';
+                    document.getElementById('pageSubtitle').value = data.page_subtitle || '';
+                    setEditorHtml(data.page_body || '');
+                } else {
+                    loadDefault(key);
+                }
+            } catch (err) {
+                console.warn('Supabase yüklenemedi, varsayılan içerik kullanılıyor:', err);
+                loadDefault(key);
+            }
+        }
+
+        function loadDefault(key) {
+            document.getElementById('pageTitle').value = defaultPages[key]?.title || '';
+            document.getElementById('pageSubtitle').value = defaultPages[key]?.subtitle || '';
+            setEditorHtml(defaultPages[key]?.body || '');
+        }
+
+        // ---------- Save Page ----------
+        async function savePage() {
+            const title = document.getElementById('pageTitle').value;
+            const subtitle = document.getElementById('pageSubtitle').value;
+            const body = getEditorHtml();
+
+            try {
+                const { error } = await supabase
+                    .from('page_content')
+                    .upsert({
+                        page_key: currentPage,
+                        page_title: title,
+                        page_subtitle: subtitle,
+                        page_body: body
+                    }, { onConflict: 'page_key' });
+
+                if (error) throw error;
+
+                // Update memory
+                pageMemory[currentPage] = { title, subtitle, body };
+                showToast('success', pageConfig[currentPage].file + ' başarıyla kaydedildi.');
+            } catch (err) {
+                console.error('Kaydetme hatası:', err);
+                showToast('error', 'Sayfa kaydedilirken hata oluştu: ' + err.message);
+            }
+        }
+
+        // ---------- Reset Page ----------
+        function resetPage() {
+            if (!confirm('Bu sayfayı varsayılan haline döndürmek istediğinizden emin misiniz?')) return;
+            // Remove saved data from Supabase
+            supabase
+                .from('page_content')
+                .delete()
+                .eq('page_key', currentPage)
+                .then(() => {
+                    delete pageMemory[currentPage];
+                    loadDefault(currentPage);
+                    showToast('success', pageConfig[currentPage].file + ' varsayılan haline döndürüldü.');
+                })
+                .catch(() => {
+                    // Offline fallback: just reset locally
+                    delete pageMemory[currentPage];
+                    loadDefault(currentPage);
+                    showToast('success', pageConfig[currentPage].file + ' varsayılan haline döndürüldü.');
+                });
+        }
+
+        // ---------- Preview ----------
+        function previewPage() {
+            const title = document.getElementById('pageTitle').value || '(başlık yok)';
+            const subtitle = document.getElementById('pageSubtitle').value || '(alt başlık yok)';
+            const body = getEditorHtml();
+
+            if (!body || !body.trim()) {
+                showToast('error', 'Önizleme için sayfa içeriği boş olamaz.');
+                return;
+            }
+
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewSubtitle').textContent = subtitle;
+            document.getElementById('previewBody').innerHTML = body;
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        }
+
+        // ---------- Editor Events ----------
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('pageEditor');
+            editor.addEventListener('keyup', updateToolbarState);
+            editor.addEventListener('mouseup', updateToolbarState);
+
+            // Preview button override
+            document.getElementById('previewBtn').onclick = function(e) {
+                e.preventDefault();
+                previewPage();
+            };
+            document.getElementById('previewFooterBtn').onclick = function(e) {
+                e.preventDefault();
+                previewPage();
+            };
+
+            // Load first page
+            loadPage('ana-sayfa');
+        });
+
+        // ---------- Default Content (offline fallback) ----------
+        defaultPages['gizlilik'] = {
+            title: 'Gizlilik Politikası',
+            subtitle: 'Kişisel verilerinizin nasıl toplandığı, işlendiği ve korunduğu hakkında bilgi',
+            body: `<h4>1. Veri Sorumlusu</h4>
+<p>6698 say\u0131l\u0131 Ki\u015fisel Verilerin Korunmas\u0131 Kanunu ("KVKK") uyar\u0131nca, ki\u015fisel verileriniz; veri sorumlusu olarak <strong>OGULTURK A.\u015e.</strong> ("\u015eirket") taraf\u0131ndan a\u015fa\u011f\u0131da a\u00e7\u0131klanan kapsamda toplanacak, i\u015flenecek ve ilgili birim sorumlusu ile payla\u015f\u0131lacakt\u0131r.</p>
+<h4>2. Toplanan Veriler</h4>
+<p>MMPI-2 test s\u00fcrecinde a\u015fa\u011f\u0131daki ki\u015fisel verileriniz toplanmaktad\u0131r:</p>
+<ul><li>Ad ve soyad</li><li>TC Kimlik No</li><li>Cinsiyet</li><li>Ya\u015f</li><li>E\u011fitim seviyesi</li><li>Medeni durum</li><li>Meslek ve kurum bilgisi</li><li>MMPI-2 test yan\u0131tlar\u0131</li></ul>
+<h4>3. Verilerin \u0130\u015flenme Amac\u0131</h4>
+<p>Ki\u015fisel verileriniz a\u015fa\u011f\u0131daki ama\u00e7larla i\u015flenmektedir:</p>
+<ul><li>MMPI-2 psikolojik de\u011ferlendirme testinin uygulanmas\u0131</li><li>Test sonu\u00e7lar\u0131n\u0131n hesaplanmas\u0131 ve raporlanmas\u0131</li><li>Psikolojik de\u011ferlendirme hizmetinin sunulmas\u0131</li><li>Yasal y\u00fck\u00fcml\u00fcl\u00fcklerin yerine getirilmesi</li><li>Hizmet kalitesinin art\u0131r\u0131lmas\u0131</li></ul>
+<h4>4. Verilerin Saklanma S\u00fcresi</h4>
+<p>Ki\u015fisel verileriniz, ilgili mevzuat ve test hizmetinin gerektirdi\u011fi s\u00fcre boyunca (2 y\u0131l) saklanmakta, bu s\u00fcrenin sonunda anonim hale getirilmekte veya silinmektedir.</p>
+<h4>5. Verilerin Aktar\u0131lmas\u0131</h4>
+<p>Ki\u015fisel verileriniz, yaln\u0131zca yetkili psikologlar ve ilgili birim sorumlular\u0131 taraf\u0131ndan g\u00f6r\u00fcnt\u00fclenebilir. \u00dc\u00e7\u00fcnc\u00fc ki\u015filerle yasal zorunluluk olmad\u0131k\u00e7a payla\u015f\u0131lmaz.</p>
+<h4>6. KVKK Kapsam\u0131ndaki Haklar\u0131n\u0131z</h4>
+<p>6698 say\u0131l\u0131 Kanun''un 11. maddesi uyar\u0131nca a\u015fa\u011f\u0131daki haklara sahipsiniz:</p>
+<ul><li>Ki\u015fisel verinizin i\u015flenip i\u015flenmedi\u011fini \u00f6\u011frenme</li><li>Ki\u015fisel verileriniz i\u015flenmi\u015fse buna ili\u015fkin bilgi talep etme</li><li>Ki\u015fisel verilerinizin i\u015flenme amac\u0131n\u0131 ve amac\u0131na uygun kullan\u0131l\u0131p kullan\u0131lmad\u0131\u011f\u0131n\u0131 \u00f6\u011frenme</li><li>Yurt i\u00e7inde veya yurt d\u0131\u015f\u0131nda ki\u015fisel verilerin aktar\u0131ld\u0131\u011f\u0131 \u00fc\u00e7\u00fcnc\u00fc ki\u015fileri bilme</li><li>Ki\u015fisel verilerin eksik veya yanl\u0131\u015f i\u015flenmi\u015f olmas\u0131 halinde bunlar\u0131n d\u00fczeltilmesini isteme</li><li>Ki\u015fisel verilerin silinmesini veya yok edilmesini isteme</li></ul>
+<h4>7. \u0130leti\u015fim</h4>
+<p>KVKK kapsam\u0131ndaki haklar\u0131n\u0131z\u0131 kullanmak veya sorular\u0131n\u0131z\u0131 iletmek i\u00e7in <strong>ogulturkselma@gmail.com</strong> adresine e-posta g\u00f6nderebilirsiniz.</p>`
+        };
+
+        defaultPages['kullanim'] = {
+            title: 'Kullan\u0131m Ko\u015fullar\u0131',
+            subtitle: 'MMPI psikolojik test sistemini kullan\u0131rken uyman\u0131z gereken kurallar',
+            body: `<h4>1. Hizmetin Kapsam\u0131</h4>
+<p>OGULTURK A.\u015e. taraf\u0131ndan sunulan MMPI (Minnesota \u00c7ok Y\u00f6nl\u00fc Ki\u015filik Envanteri) psikolojik test sistemi, bireylerin ki\u015fisel ve toplumsal uyumlar\u0131n\u0131 objektif olarak de\u011ferlendirmeyi ama\u00e7layan bir dijital uygulamad\u0131r. Bu hizmet yaln\u0131zca psikolojik de\u011ferlendirme amac\u0131yla kullan\u0131lmal\u0131d\u0131r.</p>
+<h4>2. Kullan\u0131c\u0131 Sorumluluklar\u0131</h4>
+<p>Kullan\u0131c\u0131lar a\u015fa\u011f\u0131daki kurallara uymakla y\u00fck\u00fcml\u00fcd\u00fcr:</p>
+<ul><li>Ki\u015fisel bilgilerini do\u011fru ve eksiksiz doldurmak</li><li>Test sorular\u0131n\u0131 d\u00fcr\u00fcst ve i\u00e7ten yan\u0131tlamak</li><li>Ba\u015fka bir ki\u015fi ad\u0131na testi yan\u0131tlamamak</li><li>Test s\u00fcrecinde \u00fc\u00e7\u00fcnc\u00fc ki\u015filerden yard\u0131m almamak</li><li>18 ya\u015f\u0131ndan b\u00fcy\u00fck oldu\u011funu beyan etmek</li></ul>
+<h4>3. Fikri M\u00fclkiyet</h4>
+<p>MMPI-2 envanterinin t\u00fcm haklar\u0131 ilgili yay\u0131nevlerine aittir. Web sitesinde yer alan t\u00fcm yaz\u0131l\u0131m, tasar\u0131m ve i\u00e7erik OGULTURK A.\u015e. m\u00fclkiyetindedir. \u0130zinsiz kopyalama, da\u011f\u0131tma veya ticari ama\u00e7la kullanma yasakt\u0131r.</p>
+<h4>4. Sorumlulu\u011fun S\u0131n\u0131rlanmas\u0131</h4>
+<p>OGULTURK A.\u015e., test sonu\u00e7lar\u0131n\u0131n yorumlanmas\u0131ndan do\u011fabilecek do\u011frudan veya dolayl\u0131 zararlardan sorumlu de\u011fildir. Test sonu\u00e7lar\u0131 yaln\u0131zca yetkili psikologlar taraf\u0131ndan yorumlanmal\u0131d\u0131r.</p>
+<h4>5. Hizmet Kesintisi</h4>
+<p>OGULTURK A.\u015e., teknik bak\u0131m, g\u00fcncelleme veya m\u00fccbir sebepler nedeniyle hizmeti ge\u00e7ici olarak durdurma hakk\u0131n\u0131 sakl\u0131 tutar. Bu durumlarda kullan\u0131c\u0131lara \u00f6nceden bildirim yap\u0131lmaya \u00e7al\u0131\u015f\u0131l\u0131r.</p>
+<h4>6. De\u011fi\u015fiklikler</h4>
+<p>Bu kullan\u0131m ko\u015fullar\u0131 \u00f6nceden haber verilmeksizin de\u011fi\u015ftirilebilir. De\u011fi\u015fiklikler, web sitesinde yay\u0131nland\u0131\u011f\u0131 tarihte y\u00fcr\u00fcrl\u00fc\u011fe girer. Kullan\u0131c\u0131lar\u0131n g\u00fcncel ko\u015fullar\u0131 takip etmesi \u00f6nerilir.</p>
+<h4>7. \u0130leti\u015fim</h4>
+<p>Kullan\u0131m ko\u015fullar\u0131 ile ilgili sorular\u0131n\u0131z i\u00e7in <strong>ogulturkselma@gmail.com</strong> adresine e-posta g\u00f6nderebilirsiniz.</p>`
+        };
+
+        defaultPages['hakkimizda'] = {
+            title: 'Hakk\u0131m\u0131zda',
+            subtitle: 'OGULTURK A.\u015e. ve MMPI Psikolojik De\u011ferlendirme Sistemi',
+            body: `<div class="row justify-content-center mb-5">
+    <div class="col-lg-8 text-center">
+        <h2 class="section-title">Biz Kimiz?</h2>
+        <p class="text-muted" style="font-size:1.1rem; line-height:1.8;">
+            OGULTURK A.\u015e. olarak, bireylerin ki\u015fisel ve toplumsal uyumlar\u0131n\u0131
+            objektif bir \u015fekilde de\u011ferlendirmek amac\u0131yla MMPI-2 (Minnesota \u00c7ok
+            Y\u00f6nl\u00fc Ki\u015filik Envanteri) test hizmeti sunuyoruz. Bilimsel temelli
+            bu de\u011ferlendirme arac\u0131n\u0131, modern teknoloji ile birle\u015ftirerek
+            g\u00fcvenilir ve h\u0131zl\u0131 sonu\u00e7lar elde etmenizi sa\u011fl\u0131yoruz.
+        </p>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="about-card">
+            <div class="about-icon"><i class="fas fa-bullseye"></i></div>
+            <h4 class="fw-bold mb-3">Misyonumuz</h4>
+            <p class="text-muted mb-0">MMPI-2 envanterini en g\u00fcvenilir ve eri\u015filebilir \u015fekilde sunarak, psikologlar ve uzmanlar i\u00e7in objektif ki\u015filik de\u011ferlendirme s\u00fcrecini dijital ortama ta\u015f\u0131mak. Bireylerin kendilerini daha iyi tan\u0131malar\u0131na yard\u0131mc\u0131 olmak.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="about-card">
+            <div class="about-icon"><i class="fas fa-eye"></i></div>
+            <h4 class="fw-bold mb-3">Vizyonumuz</h4>
+            <p class="text-muted mb-0">T\u00fcrkiye''de psikolojik de\u011ferlendirme alan\u0131nda dijital d\u00f6n\u00fc\u015f\u00fcm \u00f6nc\u00fcl\u00fck etmek. Bilimsel standartlara uygun, g\u00fcvenli ve kullan\u0131c\u0131 dostu bir platform ile psikoloji alan\u0131nda kaliteyi art\u0131rmak.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="about-card">
+            <div class="about-icon"><i class="fas fa-handshake"></i></div>
+            <h4 class="fw-bold mb-3">De\u011ferlerimiz</h4>
+            <p class="text-muted mb-0">Gizlilik, g\u00fcvenilirlik ve bilimsellik temel de\u011ferlerimizdir. Ki\u015fisel verilerin korunmas\u0131na azami \u00f6zen g\u00f6sterir, her bireyin mahremiyetine sayg\u0131 duyar\u0131z. T\u00fcm s\u00fcre\u00e7lerimiz KVKK ve etik kurallar \u00e7er\u00e7evesinde y\u00fcr\u00fct\u00fcl\u00fcr.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="about-card">
+            <div class="about-icon"><i class="fas fa-flask"></i></div>
+            <h4 class="fw-bold mb-3">MMPI-2 Hakk\u0131nda</h4>
+            <p class="text-muted mb-0">567 maddeden olu\u015fan MMPI-2, d\u00fcnya genelinde en yayg\u0131n kullan\u0131lan objektif ki\u015filik testidir. 10 temel klinik \u00f6l\u00e7ek ve \u00e7e\u015fitli ge\u00e7erlilik \u00f6l\u00e7ekleri ile kapsaml\u0131 bir profil sunar.</p>
+        </div>
+    </div>
+</div>`
+        };
+
+        defaultPages['ana-sayfa'] = {
+            title: 'Ana Sayfa',
+            subtitle: 'MMPI-2 Psikolojik De\u011ferlendirme Sistemi',
+            body: `<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="hero-title mb-4">MMPI Psikolojik<br>De\u011ferlendirme Sistemi</h1>
+                <p class="hero-subtitle mb-4">Minnesota \u00c7ok Y\u00f6nl\u00fc Ki\u015filik Envanteri (MMPI-2) ile bireyin ki\u015fisel ve toplumsal uyumunu objektif olarak de\u011ferlendirin. Bilimsel temelli psikolojik test hizmetimizi g\u00fcvenle kullan\u0131n.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="testebasla.html" class="hero-cta"><i class="fas fa-play me-2"></i>Teste Ba\u015fla</a>
+                    <a href="hakkimizda.html" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill"><i class="fas fa-info-circle me-2"></i>Daha Fazla Bilgi</a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center d-none d-lg-block">
+                <i class="fas fa-clipboard-check" style="font-size:12rem; opacity:0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center">
+            <h2 class="section-title">MMPI-2 Testi Nedir?</h2>
+            <p class="section-subtitle">MMPI (Minnesota \u00c7ok Y\u00f6nl\u00fc Ki\u015filik Envanteri), d\u00fcnya genelinde en yayg\u0131n kullan\u0131lan objektif ki\u015filik de\u011ferlendirme ara\u00e7lar\u0131ndan biridir.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                    <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
+                    <p class="text-muted mb-0">567 sorudan olu\u015fan MMPI-2 envanteri, onlarca y\u0131ll\u0131k ara\u015ft\u0131rma ve klinik deneyime dayanmaktad\u0131r.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4 class="fw-bold mb-3">G\u00fcvenilir Sonu\u00e7lar</h4>
+                    <p class="text-muted mb-0">Yerle\u015fik do\u011fruluk \u00f6l\u00e7ekleri (VRIN, TRIN, L, K) ile ge\u00e7ersiz yan\u0131tlar tespit edilir, g\u00fcvenilir profil elde edilir.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                    <h4 class="fw-bold mb-3">Veri Gizlili\u011fi</h4>
+                    <p class="text-muted mb-0">Ki\u015fisel verileriniz KVKK kapsam\u0131nda korunur, yaln\u0131zca yetkili psikologlar taraf\u0131ndan g\u00f6r\u00fcnt\u00fclenir.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5">
+    <div class="container py-4">
+        <div class="text-center">
+            <h2 class="section-title">Test Nas\u0131l Uygulan\u0131r?</h2>
+            <p class="section-subtitle">D\u00f6rt basit ad\u0131mda MMPI-2 testinizi tamamlay\u0131n.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="step-card text-center">
+                    <div class="step-number mx-auto">1</div>
+                    <h5 class="fw-bold mb-2">Ki\u015fisel Bilgiler</h5>
+                    <p class="text-muted mb-0 small">Ad, soyad, ya\u015f ve di\u011fer temel bilgilerinizi girerek teste ba\u015flay\u0131n.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card text-center">
+                    <div class="step-number mx-auto">2</div>
+                    <h5 class="fw-bold mb-2">KVKK Onay\u0131</h5>
+                    <p class="text-muted mb-0 small">Ki\u015fisel verilerin i\u015flenmesine ili\u015fkin ayd\u0131nlatma metnini okuyup onaylay\u0131n.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card text-center">
+                    <div class="step-number mx-auto">3</div>
+                    <h5 class="fw-bold mb-2">Testi Yan\u0131tlay\u0131n</h5>
+                    <p class="text-muted mb-0 small">567 soruyu "Do\u011fru", "Yanl\u0131\u015f" ya da "Bilmiyorum" olarak i\u015faretleyin.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card text-center">
+                    <div class="step-number mx-auto">4</div>
+                    <h5 class="fw-bold mb-2">Raporu G\u00f6r\u00fcnt\u00fcleyin</h5>
+                    <p class="text-muted mb-0 small">Test tamamland\u0131\u011f\u0131nda detayl\u0131 ki\u015filik profili raporunuz haz\u0131r olur.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center">
+            <h2 class="section-title">Ki\u015fisel Verilerin Korunmas\u0131</h2>
+            <p class="section-subtitle">6698 say\u0131l\u0131 Ki\u015fisel Verilerin Korunmas\u0131 Kanunu (KVKK) kapsam\u0131nda verileriniz g\u00fcvendedir.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="kvkk-banner">
+                    <div class="row align-items-center">
+                        <div class="col-lg-3 text-center mb-3 mb-lg-0">
+                            <i class="fas fa-shield-halved" style="font-size:4rem; color:#667eea;"></i>
+                        </div>
+                        <div class="col-lg-9">
+                            <h5 class="fw-bold">Veri Sorumlusu: OGULTURK A.\u015e.</h5>
+                            <p class="text-muted mb-2">Ki\u015fisel verileriniz, 6698 say\u0131l\u0131 Kanun uyar\u0131nca veri sorumlusu s\u0131fat\u0131na sahip OGULTURK A.\u015e. taraf\u0131ndan toplanmakta, i\u015flenmekte ve ilgili birim sorumlusu ile payla\u015f\u0131lmaktad\u0131r.</p>
+                            <p class="text-muted mb-0">Verileriniz yaln\u0131zca psikolojik de\u011ferlendirme amac\u0131yla kullan\u0131l\u0131r, 2 y\u0131l s\u00fcreyle muhafaza edilir ve \u00fc\u00e7\u00fcnc\u00fc ki\u015filerle payla\u015f\u0131lmaz. Detayl\u0131 bilgi i\u00e7in <a href="gizlilik.html">Gizlilik Politikas\u0131</a> sayfam\u0131z\u0131 ziyaret edebilirsiniz.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container py-4 text-center text-white">
+        <h2 class="fw-bold mb-3" style="font-size:2rem;">Teste Ba\u015flamaya Haz\u0131r m\u0131s\u0131n\u0131z?</h2>
+        <p class="mb-4" style="font-size:1.1rem; opacity:0.95;">Yakla\u015f\u0131k 60-90 dakika s\u00fcren MMPI-2 testini hemen uygulamaya ba\u015flay\u0131n.</p>
+        <a href="testebasla.html" class="hero-cta"><i class="fas fa-play me-2"></i>Teste Ba\u015fla</a>
+    </div>
+</section>`
+        };
+    </script>
+</body>
+</html>
