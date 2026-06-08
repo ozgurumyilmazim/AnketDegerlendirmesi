@@ -804,65 +804,108 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         });
     }
     
-    // T-skorlarını hesapla (veritabanından normları kullanarak)
+    // T-skorlarını hesapla
     const tScores = {};
-    
-    try {
-        // T-skor normlarını veritabanından al
-        const { data: tScoreNorms, error: normsError } = await supabase
-            .from('t_score_norms')
-            .select('scale_name, raw_score, t_score')
-            .eq('gender', isMale ? 'male' : 'female');
-            
-        if (normsError) {
-            console.error('T-skor normları alınırken hata:', normsError);
-            // Hata durumunda basit fallback
-            Object.keys(kCorrectedScores).forEach(scale => {
-                tScores[scale] = 50; 
-            });
-        } else if (tScoreNorms && tScoreNorms.length > 0) {
-            // Normları organize et: normsMap[scale][rawScore] = tScore
-            const normsMap = {};
-            tScoreNorms.forEach(norm => {
-                if (!normsMap[norm.scale_name]) normsMap[norm.scale_name] = {};
-                normsMap[norm.scale_name][norm.raw_score] = norm.t_score;
-            });
-            
-            // Her ölçek için T-skor hesapla
-            Object.keys(kCorrectedScores).forEach(scale => {
-                const rawScore = kCorrectedScores[scale];
-                if (normsMap[scale] && normsMap[scale][rawScore] !== undefined) {
-                    tScores[scale] = normsMap[scale][rawScore];
+    const genderKey = isMale ? 'male' : 'female';
+
+    // Sabit T-skor parametreleri (t_score_params tablosu yoksa kullanılır)
+    const FALLBACK_T_PARAMS = {
+        'male': {
+            'L':  { mean: 6.45, sd: 2.74 }, 'F':  { mean: 8.30, sd: 4.62 },
+            'K':  { mean: 13.98, sd: 4.65 }, 'Hs': { mean: 13.19, sd: 4.07 },
+            'D':  { mean: 20.63, sd: 4.76 }, 'Hy': { mean: 19.31, sd: 4.71 },
+            'Pd': { mean: 22.22, sd: 4.45 }, 'Mf': { mean: 29.21, sd: 3.82 },
+            'Pa': { mean: 11.12, sd: 4.03 }, 'Pt': { mean: 27.90, sd: 6.30 },
+            'Sc': { mean: 29.82, sd: 9.05 }, 'Ma': { mean: 19.96, sd: 4.40 },
+            'Si': { mean: 25.86, sd: 7.97 }
+        },
+        'female': {
+            'L':  { mean: 6.00, sd: 2.25 }, 'F':  { mean: 9.38, sd: 5.16 },
+            'K':  { mean: 11.82, sd: 3.80 }, 'Hs': { mean: 15.89, sd: 4.88 },
+            'D':  { mean: 23.86, sd: 5.08 }, 'Hy': { mean: 18.12, sd: 5.31 },
+            'Pd': { mean: 22.84, sd: 4.51 }, 'Mf': { mean: 32.98, sd: 3.67 },
+            'Pa': { mean: 11.93, sd: 4.17 }, 'Pt': { mean: 29.20, sd: 6.59 },
+            'Sc': { mean: 31.06, sd: 8.20 }, 'Ma': { mean: 19.72, sd: 4.36 },
+            'Si': { mean: 29.88, sd: 7.52 }
+        }
+    };
+
+    function calcTScore(raw, mean, sd) {
+        if (!sd || Number(sd) === 0) return 50;
+        return Math.round(50 + 10 * (raw - mean) / sd);
+    }
+
+    function applyParamsToTScores(paramsByScale) {
+        Object.keys(kCorrectedScores).forEach(scale => {
+            const raw = kCorrectedScores[scale];
+            const p = paramsByScale && paramsByScale[scale];
+            if (p && p.sd && Number(p.sd) !== 0) {
+                tScores[scale] = calcTScore(raw, Number(p.mean_m), Number(p.sd));
+            } else {
+                const fallback = FALLBACK_T_PARAMS[genderKey] && FALLBACK_T_PARAMS[genderKey][scale];
+                if (fallback) {
+                    tScores[scale] = calcTScore(raw, fallback.mean, fallback.sd);
                 } else {
-                    // Tam eşleşme yoksa en yakın raw_score'u bul
-                    let closestRaw = -1;
-                    let minDiff = 999;
-                    if (normsMap[scale]) {
-                        Object.keys(normsMap[scale]).forEach(r => {
-                            const diff = Math.abs(Number(r) - rawScore);
-                            if (diff < minDiff) {
-                                minDiff = diff;
-                                closestRaw = r;
-                            }
-                        });
-                    }
-                    if (closestRaw !== -1) {
-                        tScores[scale] = normsMap[scale][closestRaw];
-                    } else {
-                        console.error(`${scale} için T-skor normu bulunamadı, raw: ${rawScore}`);
-                        tScores[scale] = 50; // Fallback
-                    }
+                    console.warn(`${scale} için T-skor parametresi bulunamadı, raw: ${raw}`);
+                    tScores[scale] = 50;
                 }
-            });
+            }
+        });
+    }
+
+    try {
+        // Önce t_score_params tablosunu dene (formül bazlı)
+        const { data: tScoreParams, error: paramsError } = await supabase
+            .from('t_score_params')
+            .select('scale_name, mean_m, sd')
+            .eq('gender', genderKey);
+
+        if (!paramsError && tScoreParams && tScoreParams.length > 0) {
+            const paramsByScale = {};
+            tScoreParams.forEach(p => { paramsByScale[p.scale_name] = p; });
+            applyParamsToTScores(paramsByScale);
         } else {
-            console.warn('t_score_norms tablosu boş veya veri bulunamadı.');
-            // Tablo boşsa geçici fallback
-            Object.keys(kCorrectedScores).forEach(scale => {
-                tScores[scale] = 50;
-            });
+            // t_score_params başarısız → t_score_norms tablosunu dene (lookup bazlı)
+            if (paramsError) console.warn('t_score_params alınamadı:', paramsError);
+            const { data: tScoreNorms, error: normsError } = await supabase
+                .from('t_score_norms')
+                .select('scale_name, raw_score, t_score')
+                .eq('gender', genderKey);
+
+            if (!normsError && tScoreNorms && tScoreNorms.length > 0) {
+                const normsMap = {};
+                tScoreNorms.forEach(n => {
+                    if (!normsMap[n.scale_name]) normsMap[n.scale_name] = {};
+                    normsMap[n.scale_name][n.raw_score] = n.t_score;
+                });
+                Object.keys(kCorrectedScores).forEach(scale => {
+                    const raw = kCorrectedScores[scale];
+                    if (normsMap[scale] && normsMap[scale][raw] !== undefined) {
+                        tScores[scale] = normsMap[scale][raw];
+                    } else if (normsMap[scale]) {
+                        const keys = Object.keys(normsMap[scale]);
+                        let closest = keys[0];
+                        let minDiff = Math.abs(Number(closest) - raw);
+                        keys.forEach(r => {
+                            const d = Math.abs(Number(r) - raw);
+                            if (d < minDiff) { minDiff = d; closest = r; }
+                        });
+                        tScores[scale] = normsMap[scale][closest];
+                    } else {
+                        const fb = FALLBACK_T_PARAMS[genderKey] && FALLBACK_T_PARAMS[genderKey][scale];
+                        tScores[scale] = fb ? calcTScore(raw, fb.mean, fb.sd) : 50;
+                    }
+                });
+            } else {
+                // Her iki tablo da yok/boş → hardcoded fallback kullan
+                if (normsError) console.warn('t_score_norms alınamadı:', normsError);
+                applyParamsToTScores(null);
+            }
         }
     } catch (error) {
         console.error('T-skor hesaplamasında hata:', error);
+        // Hata durumunda hardcoded fallback
+        applyParamsToTScores(null);
     }
     
     // Yorumları oluştur
@@ -1174,18 +1217,25 @@ async function generateReport(testId) {
             showNotification('Puanlama anahtarları alınırken hata oluştu.', 'error');
             return;
         }
+
+        if (!scoringKeys || scoringKeys.length === 0) {
+            console.error('Puanlama anahtarları tablosu boş.');
+            showNotification('Veritabanında puanlama anahtarları bulunamadı. Lütfen sistem yöneticinize başvurun.', 'error');
+            return;
+        }
         
         // MMPI puanlarını hesapla
         const scores = await calculateMMPIScores(testAnswers, scoringKeys, gender);
         
+        if (Object.keys(scores.tScores).length === 0) {
+            console.error('T-skor hesaplanamadı. Raw skorlar:', scores.rawScores);
+            showNotification('Skor hesaplamada bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'error');
+            return;
+        }
+
         // Özet ve rapor hesaplamalarını yap
         const summaryData = await generateSummaryData(scores.tScores, gender);
         const resultData = await generateResultData(scores.tScores, scores.interpretations, gender);
-
-        if(Object.keys(scores.tScores).length === 0){
-            showNotification('Skor hesaplamada bir hata oluştur. Lütfen tekrar deneyiniz', 'error');
-            return;
-        }
         // Raporu veritabanına kaydet (mevcut reports tablosunu kullan)
         const reportContent = {
             raw_scores: scores.rawScores,
