@@ -129,11 +129,17 @@ async function checkAuthentication() {
             
             if (data && data.length > 0) {
                 document.getElementById('kvkkTitle').value = data[0].kvkk_title || defaultSettings.kvkkTitle;
-                document.getElementById('kvkkText').value = data[0].kvkk_text || defaultSettings.kvkkText;
+                const editor = document.getElementById('kvkkEditor');
+                if (editor) {
+                    editor.innerHTML = data[0].kvkk_text || defaultSettings.kvkkText;
+                }
             } else {
                 // Varsayılan KVKK ayarlarını yükle
                 document.getElementById('kvkkTitle').value = defaultSettings.kvkkTitle;
-                document.getElementById('kvkkText').value = defaultSettings.kvkkText;
+                const editor = document.getElementById('kvkkEditor');
+                if (editor) {
+                    editor.innerHTML = defaultSettings.kvkkText;
+                }
             }
             
         } catch (error) {
@@ -146,7 +152,9 @@ async function checkAuthentication() {
     async function saveKvkkSettings() {
         try {
             const kvkkTitle = document.getElementById('kvkkTitle').value;
-            const kvkkText = document.getElementById('kvkkText').value;
+            const editor = document.getElementById('kvkkEditor');
+            const sourceTa = document.getElementById('kvkkSource');
+            const kvkkText = sourceTa ? sourceTa.value : (editor ? editor.innerHTML : '');
             
             const { error } = await supabase
                 .from('kvkk')
@@ -172,7 +180,13 @@ async function checkAuthentication() {
     function resetKvkkSettings() {
         if (confirm('KVKK ayarlarını varsayılan değerlere sıfırlamak istediğinizden emin misiniz?')) {
             document.getElementById('kvkkTitle').value = defaultSettings.kvkkTitle;
-            document.getElementById('kvkkText').value = defaultSettings.kvkkText;
+            const editor = document.getElementById('kvkkEditor');
+            const sourceTa = document.getElementById('kvkkSource');
+            if (sourceTa) {
+                sourceTa.value = defaultSettings.kvkkText;
+            } else if (editor) {
+                editor.innerHTML = defaultSettings.kvkkText;
+            }
             showToast('KVKK ayarları varsayılan değerlere sıfırlandı!', 'success');
         }
     }
@@ -181,12 +195,6 @@ async function checkAuthentication() {
 
 // KVKK butonlarının olay dinleyicilerini ayarla
 function setupKvkkEventListeners() {
-    // KVKK önizleme butonu
-    document.getElementById('previewKvkkBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        previewKvkk();
-    });
-    
     // KVKK kaydet butonu
     document.getElementById('saveKvkkBtn').addEventListener('click', function(e) {
         e.preventDefault();
@@ -197,47 +205,6 @@ function setupKvkkEventListeners() {
     document.getElementById('resetKvkkBtn').addEventListener('click', function(e) {
         e.preventDefault();
         resetKvkkSettings();
-    });
-}
-
-
-
-// KVKK önizleme
-function previewKvkk() {
-    const kvkkText = document.getElementById('kvkkText').value;
-    if (!kvkkText.trim()) {
-        showAlert('Önizleme için KVKK metni boş olamaz.', 'warning');
-        return;
-    }
-    
-    // Modal oluştur ve göster
-    const modalHtml = `
-        <div class="modal fade" id="kvkkPreviewModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">KVKK Metni Önizleme</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
-                        ${kvkkText}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = document.getElementById('kvkkPreviewModal');
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-    
-    // Modal kapandığında DOM'dan kaldır
-    modal.addEventListener('hidden.bs.modal', function() {
-        modal.remove();
     });
 }
 
