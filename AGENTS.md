@@ -15,16 +15,35 @@ In every HTML page, scripts are loaded in this specific order:
 1. Bootstrap + jQuery (CDN)
 2. `test-config.js` — global config object
 3. `mmpi-scoring.js` — scoring engine
-4. `supabase-config.js` — initialized last (reads `window.SUPABASE_CONFIG`)
-5. Page-specific JS (e.g. `mmpi-test.js`, `personal-info.js`)
+4. **`pg-config.js`** — PostgreSQL API client (replaces Supabase JS CDN)
+5. `supabase-config.js` — now a **compat wrapper** delegating to `pg-config.js` (will be removed eventually)
+6. Page-specific JS (e.g. `mmpi-test.js`, `personal-info.js`)
 
 **DO NOT change this order** — scripts depend on globals set by earlier ones.
 
-## Supabase
-- Loaded via CDN: `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>`
-- The real keys are **committed** in `assets/js/supabase-config.js` — treat them as public anon keys, but do not commit service_role keys
-- Falls back to **offline/localStorage-only mode** if Supabase is unreachable or misconfigured — all core features work without a backend
-- Expected tables: `participants`, `test_results`, `questions`, `reports`, `scoring_keys`, `t_score_norms`, `kvkk` (see SQL in `dokumanlar/`)
+## Backend (PostgreSQL + Express API)
+- Supabase has been **replaced** with a direct PostgreSQL + Node.js/Express backend
+- `pg-config.js` provides `window.PG_API` (generic CRUD via `fetch`) and `window.AuthService` (JWT auth via bcrypt)
+- `window.supabase = window.PG_API` for backward compat — all existing `supabase.from()` calls work unchanged
+- **Supabase CDN is removed** from all HTML files; no external API dependency
+
+### Database
+- Schema: `database/01_schema.sql` — all tables + indexes + triggers
+- Data: `database/02_data.sql` — imports questions (1–100), scoring keys, T-score params, interpretations, KVKK, page content, settings
+- Admin setup: `database/03_setup_admin.sql` — instructions for password hashing
+- Run: `psql -U postgres -d mmpi_db -f database/01_schema.sql` (then 02, then 03)
+
+### API Server
+- `api/server.js` — Express on port 3001 (configurable via `PORT`)
+- `api/db.js` — pg Pool, reads `DATABASE_URL` env var
+- `api/middleware/auth.js` — JWT generation/verification, `authenticate` + `requireRole` middleware
+- Endpoints: `/api/auth/login`, `/api/auth/logout`, `/api/auth/session`, plus CRUD for all tables
+- Start: `cd api && npm install && node server.js`
+
+### Key changes in HTML
+- Removed `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">` from all 22 pages
+- Added `<script src="assets/js/pg-config.js"></script>` before supabase-config.js
+- **Note**: `assets/js/debug.js` and `admin/js/settings.js` were updated to remove `supabase.auth` calls
 
 ## Running the app
 ```sh
@@ -48,7 +67,7 @@ php -S localhost:8000
 
 ## Admin panel
 - Path: `/admin/login.html`
-- Uses Supabase Auth (email/password via `AuthService` in `supabase-config.js`)
+- Uses JWT auth (email/password via `AuthService` in `pg-config.js`)
 - Users table with `role` column (`admin` / `psychologist`)
 - After login redirects to `/admin/dashboard.html`, session via `localStorage` (`adminSession` key)
 

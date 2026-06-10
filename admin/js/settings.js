@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await AuthService.getUser();
     if (!user) {
         window.location.href = 'login.html';
         return;
