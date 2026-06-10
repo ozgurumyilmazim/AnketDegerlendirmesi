@@ -27,7 +27,7 @@ In every HTML page, scripts are loaded in this specific order:
 |---|---|---|---|
 | **PostgreSQL** | `postgres_db` | 5432 | — |
 | **PostgREST** (internal) | `postgrest` | 3000 | `https://selma-api.ozguryilmaz.com.tr` |
-| **Web App** (static files) | served via nginx + Cloudflare Tunnel | 80/443 | `https://selma-psikoloji.ozguryilmaz.com.tr` |
+| **Web App** (static files) | served via nginx + Cloudflare Tunnel | 80/443 | `https://selma.ozguryilmaz.com.tr` |
 
 - Browser calls PostgREST directly at `https://selma-api.ozguryilmaz.com.tr` (no nginx proxy)
 - `pg-config.js` switches URL based on hostname: dev → `http://postgrest:3000`, prod → `https://selma-api.ozguryilmaz.com.tr`
@@ -102,6 +102,58 @@ php -S localhost:8000
 - Real Supabase anon keys are in the repo — OK for public anon keys, but be mindful
 - No CI/CD, no test framework, no linter/formatter config found
 - Commit messages are in English (short descriptive style)
+
+## Security & Production Readiness
+
+### ⚠️ `postgrest.conf` — Production'e geçmeden önce yapılması gerekenler
+
+`postgrest.conf` hâlen **development placeholder** değerleri içerir:
+- `db-uri` → şifre `postgres` (düz metin)
+- `jwt-secret` → `super-secret-jwt-key-change-this-in-production`
+- `db-pre-request` → aynı placeholder secret
+- `cors-origin = "*"` (çok permissif)
+
+**Bu dosya git'te tutulduğu için şifreleri doğrudan yazmak güvenli değil.** Bunun yerine PostgREST'in **ortam değişkeni substitution** özelliği kullanılmalı:
+
+```ini
+# postgrest.conf (git'e commit edilecek hali)
+db-uri = "postgres://postgres:$(DB_PASSWORD)@postgres_db:5432/mmpi_db"
+jwt-secret = "$(JWT_SECRET)"
+db-pre-request = "SET app.jwt_secret = '$(JWT_SECRET)'"
+cors-origin = "https://selma.ozguryilmaz.com.tr"
+```
+
+Ortam değişkenleri ise **`.env` dosyasında** tutulur ve bu dosya `.gitignore`'a eklenir:
+
+```bash
+# .env (git IGNORE edilecek)
+DB_PASSWORD=Mmpi_Db_2024!
+JWT_SECRET=fH3kL9sA...
+```
+
+PostgREST çalıştırılırken `.env` dosyası ortama yüklenir:
+```bash
+export $(grep -v '^#' .env | xargs) && postgrest postgrest.conf
+# veya Docker ile:
+docker run -e DB_PASSWORD=... -e JWT_SECRET=... postgrest ...
+```
+
+### Secret üretme komutları
+```bash
+# PostgreSQL şifresi
+openssl rand -base64 12
+
+# JWT secret (64 bayt, base64)
+openssl rand -base64 48
+```
+
+### Production checklist
+- [ ] `cors-origin` daralt (`"*"` → `"https://selma.ozguryilmaz.com.tr"`)
+- [ ] `db-uri` environment variable'a çevir
+- [ ] `jwt-secret` environment variable'a çevir
+- [ ] `.env` oluştur ve `.gitignore`'a ekle
+- [ ] PostgREST container'ı `.env` ile başlat
+- [ ] `tests/index.html` üzerinden tüm kontrolleri doğrula
 
 ## Architecture notes
 - All state flows: `localStorage` → optional Supabase sync (not the other way)
