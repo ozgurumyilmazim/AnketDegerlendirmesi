@@ -21,24 +21,27 @@ In every HTML page, scripts are loaded in this specific order:
 
 **DO NOT change this order** — scripts depend on globals set by earlier ones.
 
-## Backend (PostgreSQL + Express API)
-- Supabase has been **replaced** with a direct PostgreSQL + Node.js/Express backend
-- `pg-config.js` provides `window.PG_API` (generic CRUD via `fetch`) and `window.AuthService` (JWT auth via bcrypt)
+## Backend (PostgreSQL + PostgREST)
+- Supabase has been **replaced** with direct PostgreSQL via **PostgREST** (a standalone REST API server that turns PostgreSQL into a REST API — no custom backend code)
+- `pg-config.js` provides `window.PG_API` (generic CRUD via `fetch` to PostgREST) and `window.AuthService` (JWT auth via `/rpc/login` database function)
 - `window.supabase = window.PG_API` for backward compat — all existing `supabase.from()` calls work unchanged
-- **Supabase CDN is removed** from all HTML files; no external API dependency
+- **No custom API server** — PostgREST is a single binary, no Node.js required
 
-### Database
-- Schema: `database/01_schema.sql` — all tables + indexes + triggers
+### Database (hostname: `postgres_db`)
+- Schema: `database/01_schema.sql` — all tables + indexes + triggers + `pgcrypto` extension
 - Data: `database/02_data.sql` — imports questions (1–100), scoring keys, T-score params, interpretations, KVKK, page content, settings
 - Admin setup: `database/03_setup_admin.sql` — instructions for password hashing
-- Run: `psql -U postgres -d mmpi_db -f database/01_schema.sql` (then 02, then 03)
+- PostgREST setup: `database/05_postgrest_setup.sql` — database roles (`anon`/`authenticated`), `api.login()` function (JWT signing via pgcrypto hmac), `api.me()` function, grants
+- Run order: `01_schema.sql` → `02_data.sql` → (generate bcrypt hashes, update users) → `05_postgrest_setup.sql`
 
-### API Server
-- `api/server.js` — Express on port 3001 (configurable via `PORT`)
-- `api/db.js` — pg Pool, reads `DATABASE_URL` env var
-- `api/middleware/auth.js` — JWT generation/verification, `authenticate` + `requireRole` middleware
-- Endpoints: `/api/auth/login`, `/api/auth/logout`, `/api/auth/session`, plus CRUD for all tables
-- Start: `cd api && npm install && node server.js`
+### PostgREST
+- Binary at `postgrest.conf` — connects to `postgres_db:5432`, exposes `public` + `api` schemas
+- Listens on port 3000, `db-anon-role = anon`, `jwt-secret` configured
+- Login flow: `POST /rpc/login {email, password}` → JWT string (verified by `api.login()` DB function)
+- All data CRUD: `GET/POST/PATCH/DELETE /table_name?col=eq.value`
+- Auth: JWT `role` claim tells PostgREST which DB role to use (anon vs authenticated)
+- Start: `postgrest postgrest.conf`
+- Production: nginx proxies `/api/*` → `http://localhost:3000/*`
 
 ### Key changes in HTML
 - Removed `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">` from all 22 pages
@@ -69,7 +72,7 @@ php -S localhost:8000
 - Path: `/admin/login.html`
 - Uses JWT auth (email/password via `AuthService` in `pg-config.js`)
 - Users table with `role` column (`admin` / `psychologist`)
-- After login redirects to `/admin/dashboard.html`, session via `localStorage` (`adminSession` key)
+- After login redirects to `/admin/dashboard.html`, session via `localStorage` (`adminLogin` key)
 
 ## Scoring
 - `assets/js/mmpi-scoring.js` — `MMPIScoring` class with scale definitions, K-correction, T-score conversion
@@ -91,6 +94,6 @@ php -S localhost:8000
 ## Architecture notes
 - All state flows: `localStorage` → optional Supabase sync (not the other way)
 - Navigation: not a SPA — each page is a separate `.html` file, state passed via `localStorage`
-- Duplicate test detection: checks both `localStorage` (`mmpiCompletedTests`) and Supabase (`participants` + `test_results`)
+- Duplicate test detection: checks both `localStorage` (`mmpiCompletedTests`) and PostgREST (`participants` + `test_results`)
 - Debug helpers available in console: `window.mmpiDebug` (in test mode)
 - Report page (`report.html`) uses Chart.js for profile graph and jsPDF/html2canvas for PDF export

@@ -1,11 +1,13 @@
 // ====================================================================
-// PostgreSQL API CONFIGURATION
-// Replaces supabase-config.js for direct PostgreSQL backend
+// PostgreSQL API CONFIGURATION (via PostgREST)
+// Replaces Supabase and the Express API layer
 // ====================================================================
 
 window.PG_CONFIG = {
+    // Dev: PostgREST at postgrest:3000
+    // Prod: nginx proxies /api/* to PostgREST :3000 (same origin)
     apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3001/api'
+        ? 'http://postgrest:3000'
         : '/api',
     tables: {
         testResults: 'test_results',
@@ -16,7 +18,7 @@ window.PG_CONFIG = {
 };
 
 // ====================================================================
-// AuthService — uses JWT tokens via backend API (replaces Supabase Auth)
+// AuthService — JWT-based auth via PostgREST /rpc/login
 // ====================================================================
 window.AuthService = {
     _token: localStorage.getItem('mmpi_token'),
@@ -34,45 +36,63 @@ window.AuthService = {
         }
     },
 
-    async _fetch(path, options = {}) {
-        const headers = { 'Content-Type': 'application/json' };
-        if (this._token) {
-            headers['Authorization'] = 'Bearer ' + this._token;
+    _decodeJWT(token) {
+        try {
+            const payload = token.split('.')[1];
+            return JSON.parse(atob(payload));
+        } catch (_) {
+            return null;
         }
-        const res = await fetch(window.PG_CONFIG.apiUrl + path, {
-            ...options,
-            headers: { ...headers, ...options.headers },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'API request failed');
-        return data;
     },
 
     async signIn(email, password) {
-        const result = await this._fetch('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-        });
-        this.setToken(result.session.access_token);
-        return { data: { user: result.user, session: result.session } };
+        try {
+            const res = await fetch(window.PG_CONFIG.apiUrl + '/rpc/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Login failed');
+            const token = body;
+            this.setToken(token);
+            const claims = this._decodeJWT(token);
+            const user = {
+                id: claims.user_id,
+                email: claims.email,
+                name: claims.name,
+                role: claims.role_name,
+                user_metadata: { name: claims.name, full_name: claims.name }
+            };
+            return { data: { user, session: { access_token: token } } };
+        } catch (err) {
+            return { data: null, error: err };
+        }
     },
 
     async signOut() {
-        try {
-            await this._fetch('/auth/logout', { method: 'POST' });
-        } catch (_) {}
         this.setToken(null);
     },
 
     async getSession() {
         if (!this._token) return { data: { session: null } };
-        try {
-            const result = await this._fetch('/auth/session');
-            return { data: { session: { user: result.user } } };
-        } catch (_) {
+        const claims = this._decodeJWT(this._token);
+        if (!claims || claims.exp * 1000 < Date.now()) {
             this.setToken(null);
             return { data: { session: null } };
         }
+        return {
+            data: {
+                session: {
+                    user: {
+                        id: claims.user_id,
+                        email: claims.email,
+                        name: claims.name,
+                        role: claims.role_name
+                    }
+                }
+            }
+        };
     },
 
     async getUser() {
@@ -81,12 +101,8 @@ window.AuthService = {
     },
 
     async getUserRole() {
-        try {
-            const { data: { session } } = await this.getSession();
-            return session?.user?.role || null;
-        } catch (_) {
-            return null;
-        }
+        const { data: { session } } = await this.getSession();
+        return session?.user?.role || null;
     },
 
     async isAdmin() {
@@ -95,27 +111,22 @@ window.AuthService = {
     },
 
     onAuthStateChange(callback) {
-        // Polling-based auth state detection
-        const check = async () => {
-            const { data: { session } } = await this.getSession();
-            callback('SIGNED_IN', session);
-        };
-        check();
+        const { data: { session } } = this._decodeJWT(this._token)
+            ? { data: { session: true } }
+            : { data: { session: null } };
+        callback(session ? 'SIGNED_IN' : 'SIGNED_OUT', session);
         return { data: { subscription: { unsubscribe: () => {} } } };
     }
 };
 
 // ====================================================================
-// API Helper — generic CRUD via fetch (replaces supabase.from().*)
+// PG_API — generic CRUD via PostgREST (mimics supabase.from())
 // ====================================================================
 window.PG_API = {
-    _token: localStorage.getItem('mmpi_token'),
-
     _getHeaders() {
         const headers = { 'Content-Type': 'application/json' };
-        if (this._token) {
-            headers['Authorization'] = 'Bearer ' + this._token;
-        }
+        const token = localStorage.getItem('mmpi_token');
+        if (token) headers['Authorization'] = 'Bearer ' + token;
         return headers;
     },
 
@@ -125,45 +136,39 @@ window.PG_API = {
                 ...options,
                 headers: { ...this._getHeaders(), ...options.headers },
             });
-            return await res.json();
+            // PostgREST returns 204 No Content for some operations
+            if (res.status === 204) return { data: null, error: null };
+            const body = await res.json();
+            if (!res.ok) return { data: null, error: body.message || 'Request failed' };
+            return { data: body, error: null };
         } catch (err) {
-            console.error('PG_API error:', path, err);
-            return { error: err.message, data: null };
+            return { data: null, error: err.message };
         }
     },
 
-    // CRUD helpers matching Supabase-like return { data, error }
     async get(path) {
-        const result = await this._fetch(path);
-        if (result.error) return { data: null, error: result.error };
-        return { data: result.data, error: null };
+        return this._fetch(path);
     },
 
     async post(path, body) {
-        const result = await this._fetch(path, {
+        return this._fetch(path, {
             method: 'POST',
             body: JSON.stringify(body),
         });
-        if (result.error) return { data: null, error: result.error };
-        return { data: result.data, error: null };
     },
 
     async put(path, body) {
-        const result = await this._fetch(path, {
+        return this._fetch(path, {
             method: 'PUT',
             body: JSON.stringify(body),
         });
-        if (result.error) return { data: null, error: result.error };
-        return { data: result.data, error: null };
     },
 
     async del(path) {
-        const result = await this._fetch(path, { method: 'DELETE' });
-        if (result.error) return { data: null, error: result.error };
-        return { data: result, error: null };
+        return this._fetch(path, { method: 'DELETE' });
     },
 
-    // CRUD helpers that mimic Supabase query builder
+    // Chainable query builder matching Supabase API
     from(table) {
         const self = this;
         let _select = '*';
@@ -176,11 +181,11 @@ window.PG_API = {
         const _buildQuery = () => {
             const params = new URLSearchParams();
             if (_select !== '*') params.set('select', _select);
-            _filters.forEach(f => params.set(f.field, f.value));
-            if (_orderBy) params.set('order', `${_orderBy}:${_orderDir}`);
+            _filters.forEach(f => params.set(f.field, 'eq.' + f.value));
+            if (_orderBy) params.set('order', _orderBy + '.' + (_orderDir === 'asc' ? 'asc' : 'desc'));
             if (_limit) params.set('limit', _limit);
             const qs = params.toString();
-            return qs ? `?${qs}` : '';
+            return qs ? '?' + qs : '';
         };
 
         return {
@@ -205,20 +210,25 @@ window.PG_API = {
                 _single = true;
                 return this;
             },
+            maybeSingle() {
+                _single = true;
+                return this;
+            },
             async then(resolve, reject) {
-                const result = await self._fetch(`/${table}${_buildQuery()}`);
+                const result = await self._fetch('/' + table + _buildQuery());
                 if (result.error) {
                     reject?.({ message: result.error });
                     return resolve?.({ data: null, error: result.error });
                 }
                 let data = result.data || [];
+                if (!Array.isArray(data)) data = [data];
                 if (_single) data = data[0] || null;
                 resolve?.({ data, error: null });
                 return { data, error: null };
             },
             async insert(items) {
                 const arr = Array.isArray(items) ? items : [items];
-                const result = await self._fetch(`/${table}`, {
+                const result = await self._fetch('/' + table, {
                     method: 'POST',
                     body: JSON.stringify(arr[0]),
                 });
@@ -227,37 +237,38 @@ window.PG_API = {
                 return { data, error: null };
             },
             async update(values) {
-                // Requires an eq filter for the WHERE clause
-                const idFilter = _filters.find(f => f.field === 'id');
-                if (!idFilter) return { data: null, error: 'Update requires .eq(\'id\', value)' };
-                const result = await self._fetch(`/${table}/${idFilter.value}`, {
-                    method: 'PUT',
+                const qs = _buildQuery();
+                if (!qs) return { data: null, error: 'Update requires .eq() filter' };
+                const result = await self._fetch('/' + table + qs, {
+                    method: 'PATCH',
                     body: JSON.stringify(values),
                 });
                 if (result.error) return { data: null, error: result.error };
                 return { data: result.data, error: null };
             },
             async delete() {
-                const idFilter = _filters.find(f => f.field === 'id');
-                if (!idFilter) return { data: null, error: 'Delete requires .eq(\'id\', value)' };
-                const result = await self._fetch(`/${table}/${idFilter.value}`, { method: 'DELETE' });
+                const qs = _buildQuery();
+                if (!qs) return { data: null, error: 'Delete requires .eq() filter' };
+                const result = await self._fetch('/' + table + qs, { method: 'DELETE' });
                 if (result.error) return { data: null, error: result.error };
-                return { data: result, error: null };
-            },
-            maybeSingle() {
-                _single = true;
-                return this;
+                return { data: result.data || null, error: null };
             },
             async upsert(items) {
-                // Upsert = try insert, on conflict update
-                return this.insert(items);
+                const arr = Array.isArray(items) ? items : [items];
+                const result = await self._fetch('/' + table + '?on_conflict=id', {
+                    method: 'POST',
+                    body: JSON.stringify(arr[0]),
+                    headers: { 'Prefer': 'resolution=merge-duplicates' },
+                });
+                if (result.error) return { data: null, error: result.error };
+                return { data: result.data, error: null };
             },
         };
     }
 };
 
 // ====================================================================
-// Compatibility — aliases for scripts expecting window.supabase
+// Compatibility aliases
 // ====================================================================
 window.supabase = window.PG_API;
 
@@ -267,9 +278,6 @@ window.supabaseClient = {
     }
 };
 
-// ====================================================================
-// Initialize on page load
-// ====================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('PG API config loaded. Server:', window.PG_CONFIG.apiUrl);
+    console.log('PG API (PostgREST) config loaded. Server:', window.PG_CONFIG.apiUrl);
 });
