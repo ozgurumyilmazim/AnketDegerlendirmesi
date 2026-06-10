@@ -21,6 +21,18 @@ In every HTML page, scripts are loaded in this specific order:
 
 **DO NOT change this order** — scripts depend on globals set by earlier ones.
 
+## Environment & Server Details
+
+| Service | Hostname | Port | Public URL |
+|---|---|---|---|
+| **PostgreSQL** | `postgres_db` | 5432 | — |
+| **PostgREST** (internal) | `postgrest` | 3000 | `https://selma-api.ozguryilmaz.com.tr` |
+| **Web App** (static files) | served via nginx + Cloudflare Tunnel | 80/443 | `https://selma-psikoloji.ozguryilmaz.com.tr` |
+
+- Browser calls PostgREST directly at `https://selma-api.ozguryilmaz.com.tr` (no nginx proxy)
+- `pg-config.js` switches URL based on hostname: dev → `http://postgrest:3000`, prod → `https://selma-api.ozguryilmaz.com.tr`
+- `postgrest.conf` has `cors-origin = "*"` to allow cross-origin requests from the web app
+
 ## Backend (PostgreSQL + PostgREST)
 - Supabase has been **replaced** with direct PostgreSQL via **PostgREST** (a standalone REST API server that turns PostgreSQL into a REST API — no custom backend code)
 - `pg-config.js` provides `window.PG_API` (generic CRUD via `fetch` to PostgREST) and `window.AuthService` (JWT auth via `/rpc/login` database function)
@@ -35,13 +47,13 @@ In every HTML page, scripts are loaded in this specific order:
 - Run order: `01_schema.sql` → `02_data.sql` → (generate bcrypt hashes, update users) → `05_postgrest_setup.sql`
 
 ### PostgREST
-- Binary at `postgrest.conf` — connects to `postgres_db:5432`, exposes `public` + `api` schemas
+- Config: `postgrest.conf` — connects to `postgres_db:5432`, exposes `public` + `api` schemas
 - Listens on port 3000, `db-anon-role = anon`, `jwt-secret` configured
+- Public URL: `https://selma-api.ozguryilmaz.com.tr`
 - Login flow: `POST /rpc/login {email, password}` → JWT string (verified by `api.login()` DB function)
 - All data CRUD: `GET/POST/PATCH/DELETE /table_name?col=eq.value`
 - Auth: JWT `role` claim tells PostgREST which DB role to use (anon vs authenticated)
 - Start: `postgrest postgrest.conf`
-- Production: nginx proxies `/api/*` → `http://localhost:3000/*`
 
 ### Key changes in HTML
 - Removed `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">` from all 22 pages
@@ -59,9 +71,9 @@ php -S localhost:8000
 ```
 
 ## Production deployment
-- **nginx** on port 80 serves the app directly from this directory
+- **nginx** on port 80 serves the static files from this directory
 - **Cloudflare Tunnel** (`cloudflared`) handles HTTPS externally — no local TLS config needed
-- Port 443 is open but traffic arrives via tunnel, not direct TLS termination
+- PostgREST is NOT proxied through nginx; browser calls `https://selma-api.ozguryilmaz.com.tr` directly
 
 ## Local dev
 - On `localhost` or `127.0.0.1`, `personal-info.html` auto-fills test data (TCKN: `12345678921`)
