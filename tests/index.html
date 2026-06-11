@@ -51,6 +51,18 @@
         .icon.running { background: #cce5ff; color: #004085; }
 
         .check-title { flex: 1; font-weight: 600; font-size: 1rem; }
+        .check-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #495057;
+            font-size: .78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
         .check-badge {
             font-size: .75rem;
             padding: .2rem .65rem;
@@ -392,9 +404,10 @@ define('dnsResolution', 'DNS Çözümleme', async () => {
 
 function render() {
     const container = document.getElementById('checksContainer');
-    container.innerHTML = CHECKS.map(c => `
+    container.innerHTML = CHECKS.map((c, i) => `
         <div class="check-card" data-check-id="${c.id}">
             <div class="check-header" onclick="toggleBody('${c.id}')">
+                <span class="check-number">${i + 1}</span>
                 <div class="icon pending" id="icon-${c.id}"><i class="fas fa-clock"></i></div>
                 <span class="check-title">${c.title}</span>
                 <span class="check-badge bg-secondary" id="badge-${c.id}">Bekliyor</span>
@@ -466,6 +479,21 @@ function updateCheck(id, { status, message, detail }) {
     icon.innerHTML = iconMap[status] || iconMap.pending;
 
     badge.className = 'check-badge ' + (badgeMap[status] || 'bg-secondary');
+    badge.textContent = labelMap[status] || 'Bekliyor';
+
+    msgEl.textContent = message || '';
+    detailEl.textContent = detail ? JSON.stringify(detail, null, 2) : '';
+
+    updateSummary();
+}
+
+async function runCheck(id) {
+    const c = CHECKS.find(x => x.id === id);
+    if (!c) return;
+
+    // Check dependency
+    if (c.dependsOn) {
+        const dep = CHECKS.find(x => x.id === c.dep 'check-badge ' + (badgeMap[status] || 'bg-secondary');
     badge.textContent = labelMap[status] || 'Bekliyor';
 
     msgEl.textContent = message || '';
