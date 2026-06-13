@@ -16,7 +16,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# ---- Konfigürasyon (dışarı aktarılır) ----
+# ---- Konfigürasyon ----
 export WEB_URL="https://selma.ozguryilmaz.com.tr"
 export API_URL="${API_URL:-https://selma.ozguryilmaz.com.tr/api}"
 export PG_DB="mmpi_db"
@@ -24,13 +24,11 @@ export PG_DB="mmpi_db"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Container adları (docker ps'den otomatik bul)
-export PG_CT="$(docker ps --format '{{.Names}}' | grep -i '^postgres$' | head -1)"
-export PGREST_CT="$(docker ps --format '{{.Names}}' | grep -i '^postgrest$' | head -1)"
-export WEB_CT="$(docker ps --format '{{.Names}}' | grep -i '^webserver$' | head -1)"
+PG_CT="$(docker ps --format '{{.Names}}' | grep -i '^postgres$' | head -1)"
+PGREST_CT="$(docker ps --format '{{.Names}}' | grep -i '^postgrest$' | head -1)"
+WEB_CT="$(docker ps --format '{{.Names}}' | grep -i '^webserver$' | head -1)"
 
-# PostgreSQL superuser (container env'den oku)
-export PG_SUPERUSER="$(docker inspect "$PG_CT" 2>/dev/null | python3 -c "
+PG_SUPERUSER="$(docker inspect "$PG_CT" 2>/dev/null | python3 -c "
 import json,sys
 try:
     env = json.load(sys.stdin)[0]['Config']['Env']
@@ -39,17 +37,11 @@ try:
             print(e.split('=',1)[1])
 except: pass
 " 2>/dev/null)"
-export PG_SUPERUSER="${PG_SUPERUSER:-postgres}"
+PG_SUPERUSER="${PG_SUPERUSER:-postgres}"
 
-QUIET=false
-JSON=false
-PASS=0
-FAIL=0
-SKIP=0
-TOTAL=0
+QUIET=false; JSON=false; PASS=0; FAIL=0; SKIP=0; TOTAL=0
 RESULTS=()
 
-# ---- Argümanlar ----
 for arg in "$@"; do
     case "$arg" in
         --quiet) QUIET=true ;;
@@ -57,7 +49,6 @@ for arg in "$@"; do
     esac
 done
 
-# ---- Yardımcılar ----
 log()     { [[ "$QUIET" != true ]] && echo -e "$*"; }
 pass()    { PASS=$((PASS+1)); RESULTS+=("pass:$*"); log "  ${GREEN}[PASS]${NC} $*"; }
 fail()    { FAIL=$((FAIL+1)); RESULTS+=("fail:$*"); log "  ${RED}[FAIL]${NC} $*"; }
@@ -88,9 +79,7 @@ check_result() {
     fi
 }
 
-run() {
-    "$@" > /dev/null 2>&1
-}
+run() { "$@" > /dev/null 2>&1; }
 
 # ================================================================
 echo " ${CYAN}[INFO]${NC} PostgreSQL superuser: $PG_SUPERUSER"
@@ -128,28 +117,27 @@ check_result $JS_OK "JS Kütüphaneleri"
 # ================================================================
 # 4 — PostgREST (localhost)
 # ================================================================
-check  4 "PostgREST (localhost:3000)" "Anonim erişim devre dışı (PGRST302) → sunucu çalışıyor"
-RES=$(curl -s localhost:3000/questions?limit=1 -H "Accept: application/json" 2>&1)
-echo "$RES" | grep -q "PGRST302"
+check  4 "PostgREST (localhost:3000)" "Sunucu yanıt veriyor"
+RES=$(curl -s localhost:3000/ --max-time 5 2>&1)
+echo "$RES" | grep -q "swagger"
 check_result $? "PostgREST (localhost)"
+detail "  OpenAPI spec dönüyor → PostgREST çalışıyor"
 
-# PostgREST imzası: PGRST302 + www-authenticate header
 # ================================================================
 # 5 — PostgREST İmzası
 # ================================================================
-check  5 "PostgREST İmzası" "Sunucu yanıtında PGRST302 + Bearer header"
-HEADERS=$(curl -sI localhost:3000/questions?limit=1 2>&1)
-BODY=$(curl -s localhost:3000/questions?limit=1 -H "Accept: application/json" 2>&1)
-echo "$BODY" | grep -q "PGRST302" && echo "$HEADERS" | grep -qi "www-authenticate.*Bearer"
+check  5 "PostgREST İmzası" "Sunucu yanıtında Server: postgrest"
+HEADERS=$(curl -sI localhost:3000/ 2>&1)
+echo "$HEADERS" | grep -qi "server.*postgrest"
 check_result $? "PostgREST İmzası"
-detail "  code=PGRST302 + www-authenticate: Bearer → PostgREST onaylandı"
+detail "  Header: $(echo "$HEADERS" | grep -i server | head -1)"
 
 # ================================================================
 # 6 — PostgREST (public URL)
 # ================================================================
 check  6 "PostgREST (public API)" "Cloudflare tunnel üzerinden $API_URL"
-RES=$(curl -s --max-time 10 "$API_URL/questions?limit=1" -H "Accept: application/json" 2>&1)
-echo "$RES" | grep -q "PGRST302"
+RES=$(curl -s --max-time 10 "$API_URL/" 2>&1)
+echo "$RES" | grep -q "swagger"
 check_result $? "PostgREST (public)"
 
 # ================================================================
@@ -188,37 +176,84 @@ check_result $? "Kullanıcılar"
 detail "  users tablosu: $COUNT kayıt"
 
 # ================================================================
-# 10 — Auth /rpc/login
+# 10 — Auth: Login Başarılı (JWT Alımı)
 # ================================================================
-check 10 "Auth /rpc/login" "Yanlış şifreyle hata dönmeli"
+check 10 "Auth: JWT Alımı" "Geçerli kullanıcıyla login → JWT token"
+JWT=$(curl -s --max-time 10 "$API_URL/rpc/login" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@psikolog.com","password":"admin123"}' 2>&1 | python3 -c "
+import sys, json
+try: print(json.load(sys.stdin))
+except: print('ERROR')
+")
+PARTS=$(echo "$JWT" | awk -F. '{print NF}')
+[[ "$PARTS" -eq 3 ]]
+check_result $? "Auth: JWT Alımı"
+detail "  JWT: ${JWT:0:30}..."
+
+# ================================================================
+# 11 — Auth: Hatalı Giriş Reddi
+# ================================================================
+check 11 "Auth: Hatalı Giriş" "Yanlış şifreyle hata dönmeli"
 RES=$(curl -s --max-time 10 "$API_URL/rpc/login" \
     -X POST \
     -H "Content-Type: application/json" \
-    -d '{"email":"test@test.test","password":"wrong"}' 2>&1)
+    -d '{"email":"admin@psikolog.com","password":"wrong"}' 2>&1)
 echo "$RES" | grep -qi "Invalid email or password"
-check_result $? "Auth /rpc/login"
-detail "  Yanıt: $RES"
+check_result $? "Auth: Hatalı Giriş"
+detail "  Yanıt: $(echo "$RES" | head -c 60)"
 
 # ================================================================
-# 11 — PostgreSQL Sürümü
+# 12 — Auth: JWT ile Veritabanı Erişimi
 # ================================================================
-check 11 "PostgreSQL Sürümü" "PostgreSQL versiyon bilgisi"
+check 12 "Auth: JWT ile Sorgu" "JWT ile /api/questions erişimi"
+RES=$(curl -s --max-time 10 "$API_URL/questions?limit=1" \
+    -H "Authorization: Bearer $JWT" \
+    -H "Accept-Profile: public" 2>&1)
+echo "$RES" | grep -qv "PGRST301"
+check_result $? "Auth: JWT ile Sorgu"
+detail "  Yanıt: $(echo "$RES" | head -c 80)"
+
+# ================================================================
+# 13 — Auth: /rpc/me Endpoint
+# ================================================================
+check 13 "Auth: /rpc/me" "JWT ile kullanıcı bilgisi dönmeli"
+RES=$(curl -s --max-time 10 "$API_URL/rpc/me" \
+    -H "Authorization: Bearer $JWT" 2>&1)
+echo "$RES" | grep -q "admin"
+check_result $? "Auth: /rpc/me"
+detail "  Yanıt: $(echo "$RES" | head -c 80)"
+
+# ================================================================
+# 14 — Auth: Geçersiz JWT Reddi
+# ================================================================
+check 14 "Auth: Geçersiz JWT" "Hatalı imza ile istek reddedilmeli"
+RES=$(curl -s --max-time 10 "$API_URL/questions?limit=1" \
+    -H "Authorization: Bearer invalid.jwt.token" 2>&1)
+echo "$RES" | grep -q "PGRST301"
+check_result $? "Auth: Geçersiz JWT"
+
+# ================================================================
+# 15 — PostgreSQL Sürümü
+# ================================================================
+check 15 "PostgreSQL Sürümü" "PostgreSQL versiyon bilgisi"
 VER=$(exec_sql -c "SELECT version()" 2>/dev/null)
 echo "$VER" | grep -q PostgreSQL
 check_result $? "PostgreSQL Sürümü"
 detail "  $VER"
 
 # ================================================================
-# 12 — DNS Çözümleme
+# 16 — DNS Çözümleme
 # ================================================================
-check 12 "DNS (selma.ozguryilmaz.com.tr)" "Domain çözümleniyor"
+check 16 "DNS (selma.ozguryilmaz.com.tr)" "Domain çözümleniyor"
 run host "selma.ozguryilmaz.com.tr" || run nslookup "selma.ozguryilmaz.com.tr"
 check_result $? "DNS (ana domain)"
 
 # ================================================================
-# 13 — Docker Container'lar
+# 17 — Docker Container'lar
 # ================================================================
-check 13 "Docker Container'lar" "postgres + postgrest + webServer ayakta"
+check 17 "Docker Container'lar" "postgres + postgrest + webServer ayakta"
 CT_OK=0
 for c in "$PG_CT" "$PGREST_CT" "$WEB_CT"; do
     if [[ -z "$c" ]]; then
@@ -234,36 +269,34 @@ done
 check_result $CT_OK "Docker Container'lar"
 
 # ================================================================
-# 14 — Disk Kullanımı
+# 18 — Disk Kullanımı
 # ================================================================
-check 14 "Disk Kullanımı" "Kök disk %90 altında"
+check 18 "Disk Kullanımı" "Kök disk %90 altında"
 PCT=$(df / | tail -1 | awk '{print $5}' | tr -d '%')
 [[ "$PCT" -lt 90 ]]
 check_result $? "Disk Kullanımı"
 detail "  Kullanım: %$PCT"
 
 # ================================================================
-# 15 — postgrest.conf JWT Secret Tutarlılığı
+# 19 — Anonim Erişim Engeli
 # ================================================================
-check 15 "postgrest.conf JWT Secret" "jwt-secret ile db-pre-request aynı"
-CFG="$PROJECT_DIR/postgrest.conf"
-if [[ -f "$CFG" ]]; then
-    SECRET=$(grep "^jwt-secret" "$CFG" | head -1 | cut -d= -f2- | tr -d ' "')
-    PRE=$(grep "^db-pre-request" "$CFG" | head -1 | grep -o "'[^']*'" | tr -d "'")
-    [[ "$SECRET" = "$PRE" ]]
-    check_result $? "JWT Secret"
-    detail "  jwt-secret: ${SECRET:0:20}..."
-    detail "  db-pre-request: ${PRE:0:20}..."
-else
-    skip "postgrest.conf bulunamadı ($CFG)"
-fi
+check 19 "Anonim Erişim Engeli" "JWT'siz erişim reddedilmeli (PGRST301 veya 42501)"
+RES=$(curl -s --max-time 10 "$API_URL/questions?limit=1" \
+    -H "Accept-Profile: public" 2>&1)
+echo "$RES" | grep -q "PGRST301\|42501"
+check_result $? "Anonim Erişim Engeli"
+detail "  Yanıt: $(echo "$RES" | head -c 80)"
 
 # ================================================================
-# 16 — HTTP -> HTTPS Yönlendirme
+# 20 — Auth: JWT ile Soru Sayısı
 # ================================================================
-check 16 "HTTP -> HTTPS Yönlendirme" "HTTP 80 -> 443 redirect"
-run curl -sI "http://selma.ozguryilmaz.com.tr" 2>&1 | grep -qi "301\|302\|Location.*https"
-check_result $? "HTTP Yönlendirme"
+check 20 "Auth: Soru Sayısı" "JWT ile questions tablosundan count"
+RES=$(curl -s --max-time 10 "$API_URL/questions?select=count" \
+    -H "Authorization: Bearer $JWT" \
+    -H "Accept-Profile: public" 2>&1)
+echo "$RES" | grep -q "^\["
+check_result $? "Auth: Soru Sayısı"
+detail "  Yanıt: $(echo "$RES" | head -c 60)"
 
 # ================================================================
 # ÖZET

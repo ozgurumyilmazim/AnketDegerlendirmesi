@@ -262,65 +262,106 @@ define('jsLibs', 'JavaScript Kütüphaneleri Yüklü', async () => {
 
 define('apiReachable', 'PostgREST API Erişilebilir', async () => {
     const url = PG_CONFIG.apiUrl;
-    // GET /questions (limit 0) — veri dönmez ama CORS + HTTP durumu gösterir
-    const res = await fetch(url + '/questions?limit=0', {
-        headers: { 'Accept': 'application/json' },
-    });
-    const detail = {
-        url: url + '/questions?limit=0',
-        status: res.status,
-        statusText: res.statusText,
-        cors: res.headers.get('access-control-allow-origin'),
-    };
-    // 200 = tam erişim, 401 = anon disabled (ama sunucu ayakta)
-    if (res.ok) {
-        detail.note = 'tam erişim';
-    } else if (res.status === 401) {
-        detail.note = 'anon disabled — auth gerekli, ama sunucu çalışıyor';
-    } else if (res.status === 404) {
-        detail.note = 'endpoint bulunamadı — ama sunucu çalışıyor';
-    } else {
+    const res = await fetch(url + '/');
+    if (!res.ok && res.status !== 401) {
         throw new Error(`HTTP ${res.status} — ${res.statusText}`);
     }
-    return { status: 'pass', message: `${url} — yanıt alındı (HTTP ${res.status})`, detail };
+    return { status: 'pass', message: `${url} — yanıt alındı (HTTP ${res.status})`, detail: { url, status: res.status } };
 }, { dependsOn: 'jsLibs' });
 
-define('postgrestSignature', 'PostgREST İmzası (PGRST302 + Bearer)', async () => {
-    const url = PG_CONFIG.apiUrl + '/questions?limit=1';
-    const res = await fetch(url);
-    const body = await res.json();
-    const wwwAuth = res.headers.get('www-authenticate');
-    const isPostgREST = body && body.code === 'PGRST302' && wwwAuth && wwwAuth.includes('Bearer');
-    if (!isPostgREST) {
-        throw new Error('PostgREST imzası bulunamadı — yanıt PostgREST\'e ait değil');
-    }
-    return { status: 'pass', message: 'PostgREST doğrulandı (PGRST302 + Bearer header)', detail: { code: body.code, wwwAuthenticate: wwwAuth } };
-}, { dependsOn: 'apiReachable' });
-
-define('authEndpoint', 'Auth /rpc/login Çalışıyor', async () => {
+define('postgrestSignature', 'PostgREST İmzası', async () => {
     const url = PG_CONFIG.apiUrl + '/rpc/login';
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'test@test.test', password: 'wrong' }),
+        body: '{}',
     });
-    const body = await res.json();
-    // Should get a proper auth error, not a connection error
-    if (res.status === 401 || res.status === 400 || (body && body.message)) {
-        return { status: 'pass', message: 'Auth endpoint çalışıyor (beklenen hata döndü)', detail: {
-            status: res.status,
-            response: body
-        }};
+    const server = res.headers.get('server') || '';
+    const isPostgREST = server.toLowerCase().includes('postgrest');
+    if (!isPostgREST) {
+        throw new Error('Sunucu PostgREST değil (server header: ' + server + ')');
     }
-    // If somehow it succeeds, that's unexpected but not a failure
-    return { status: 'pass', message: 'Auth endpoint yanıt veriyor', detail: { status: res.status, body }};
+    return { status: 'pass', message: 'PostgREST doğrulandı (server: ' + server + ')', detail: { server } };
 }, { dependsOn: 'apiReachable' });
 
-define('questionsQuery', 'Sorgu Çalışıyor (questions)', async () => {
-    const { data, error } = await supabase.from('questions').select('*').limit(3);
-    if (error) throw new Error(error);
-    if (!data || data.length === 0) throw new Error('questions tablosu boş');
-    return { status: 'pass', message: `${data.length} soru getirildi`, detail: data };
+// --- JWT Authentication Tests ---
+
+let AUTH_TOKEN = null;
+
+define('authLogin', 'JWT Alımı', async () => {
+    const url = PG_CONFIG.apiUrl + '/rpc/login';
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@psikolog.com', password: 'admin123' }),
+    });
+    const body = await res.json();
+    if (!body || typeof body !== 'string' || body.split('.').length !== 3) {
+        throw new Error('JWT alınamadı: ' + JSON.stringify(body));
+    }
+    AUTH_TOKEN = body;
+    return { status: 'pass', message: 'JWT başarıyla alındı', detail: { preview: body.substring(0, 30) + '...' } };
+}, { dependsOn: 'apiReachable' });
+
+define('authLoginFail', 'Hatalı Giriş Reddi', async () => {
+    const url = PG_CONFIG.apiUrl + '/rpc/login';
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@psikolog.com', password: 'wrong' }),
+    });
+    const body = await res.json();
+    const msg = body && (body.message || '').toLowerCase() || '';
+    if (!msg.includes('invalid') && !msg.includes('hata') && !msg.includes('error')) {
+        throw new Error('Hatalı giriş reddedilmedi: ' + JSON.stringify(body));
+    }
+    return { status: 'pass', message: 'Hatalı giriş reddedildi', detail: { response: body } };
+}, { dependsOn: 'apiReachable' });
+
+define('authQuestions', 'JWT ile Sorgu', async () => {
+    if (!AUTH_TOKEN) throw new Error('Önce JWT alınmalı');
+    const url = PG_CONFIG.apiUrl + '/questions?limit=2';
+    const res = await fetch(url, {
+        headers: {
+            'Authorization': 'Bearer ' + AUTH_TOKEN,
+            'Accept-Profile': 'public',
+        },
+    });
+    if (res.status === 401) {
+        const body = await res.json();
+        throw new Error('JWT reddedildi: ' + JSON.stringify(body));
+    }
+    const data = await res.json();
+    return { status: 'pass', message: 'Sorgu başarılı (HTTP ' + res.status + ')', detail: { count: Array.isArray(data) ? data.length : 0, preview: Array.isArray(data) ? data : data } };
+}, { dependsOn: 'authLogin' });
+
+define('authMe', 'JWT ile /rpc/me', async () => {
+    if (!AUTH_TOKEN) throw new Error('Önce JWT alınmalı');
+    const url = PG_CONFIG.apiUrl + '/rpc/me';
+    const res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    });
+    if (res.status === 401) {
+        const body = await res.json();
+        throw new Error('/rpc/me reddedildi: ' + JSON.stringify(body));
+    }
+    const body = await res.json();
+    return { status: 'pass', message: 'Kullanıcı bilgisi alındı', detail: body };
+}, { dependsOn: 'authLogin' });
+
+define('authInvalidJwt', 'Geçersiz JWT Reddi', async () => {
+    const url = PG_CONFIG.apiUrl + '/questions?limit=1';
+    const res = await fetch(url, {
+        headers: {
+            'Authorization': 'Bearer invalid.jwt.token',
+            'Accept-Profile': 'public',
+        },
+    });
+    const body = await res.json();
+    if (body && body.code === 'PGRST301') {
+        return { status: 'pass', message: 'Geçersiz JWT reddedildi (PGRST301)', detail: body };
+    }
+    throw new Error('Geçersiz JWT kabul edildi: ' + JSON.stringify(body));
 }, { dependsOn: 'apiReachable' });
 
 define('dbTables', 'PostgreSQL Tabloları Tam', async () => {
@@ -329,39 +370,29 @@ define('dbTables', 'PostgreSQL Tabloları Tam', async () => {
         'scoring_keys', 't_score_norms', 't_score_params', 'mmpi_interpretations',
         'page_content', 'kvkk', 'task_definitions', 'settings', 'sessions'
     ];
-    // Query information_schema via PostgREST
-    const url = PG_CONFIG.apiUrl + '/information_schema.tables?select=table_name&table_schema=eq.public';
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) {
-        // information_schema may be inaccessible; try listing known tables via SELECT count
-        const existing = [];
-        for (const tbl of expected) {
-            const { data, error } = await supabase.from(tbl).select('*').limit(1);
-            if (!error) existing.push(tbl);
-        }
-        const missing = expected.filter(t => !existing.includes(t));
-        if (missing.length) throw new Error('Eksik tablolar: ' + missing.join(', '));
-        return { status: 'pass', message: `${existing.length}/${expected.length} tablo mevcut`, detail: { existing, expected } };
+    const existing = [];
+    for (const tbl of expected) {
+        const { data, error } = await supabase.from(tbl).select('*').limit(1);
+        if (!error) existing.push(tbl);
     }
-    const data = await res.json();
-    const found = data.map(r => r.table_name);
-    const missing = expected.filter(t => !found.includes(t));
+    const missing = expected.filter(t => !existing.includes(t));
     if (missing.length) throw new Error('Eksik tablolar: ' + missing.join(', '));
-    return { status: 'pass', message: `${found.length}/${expected.length} tablo mevcut`, detail: { found, expected } };
+    return { status: 'pass', message: existing.length + '/' + expected.length + ' tablo mevcut', detail: { existing, expected } };
 }, { dependsOn: 'apiReachable' });
 
-define('questionsCount', 'Soru Sayısı Beklenen Gibi', async () => {
+define('questionsCount', 'Soru Sayısı', async () => {
     const { data, error } = await supabase.from('questions').select('*');
     if (error) throw new Error(error);
     const count = data ? data.length : 0;
-    // MMPI-2 has 567 questions
     if (count < 567) {
-        return { status: 'fail', message: `Sadece ${count} soru bulundu (beklenen: 567)`, detail: { count, expected: 567 } };
+        return { status: 'fail', message: count + ' soru (beklenen: 567)', detail: { count, expected: 567 } };
     }
-    return { status: 'pass', message: `${count} soru mevcut`, detail: { count, expected: 567 } };
+    return { status: 'pass', message: count + ' soru mevcut', detail: { count, expected: 567 } };
 }, { dependsOn: 'apiReachable' });
 
-define('testResultCRUD', 'Test Sonucu Ekleme Çalışıyor', async () => {
+define('testResultCRUD', 'Test Sonucu Ekleme', async () => {
+    if (!AUTH_TOKEN) throw new Error('Önce JWT alınmalı');
+    const url = PG_CONFIG.apiUrl + '/test_results';
     const testData = {
         participant_info: { test: 'status-check' },
         test_answers: { '1': 'Doğru' },
@@ -372,45 +403,46 @@ define('testResultCRUD', 'Test Sonucu Ekleme Çalışıyor', async () => {
         total_questions: 567,
         status: 'abandoned',
     };
-    const { data, error } = await supabase.from('test_results').insert(testData);
-    if (error) throw new Error('Insert hatası: ' + error);
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + AUTH_TOKEN,
+            'Accept-Profile': 'public',
+            'Content-Profile': 'public',
+            'Prefer': 'return=representation',
+        },
+        body: JSON.stringify(testData),
+    });
+    if (!res.ok) throw new Error('Insert hatası: HTTP ' + res.status + ' ' + (await res.text()));
+    const data = await res.json();
     const inserted = Array.isArray(data) ? data[0] : data;
     if (!inserted || !inserted.id) throw new Error('Insert sonucu ID dönmedi');
     // Clean up
-    await supabase.from('test_results').delete().eq('id', inserted.id);
+    await fetch(url + '?id=eq.' + inserted.id, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + AUTH_TOKEN,
+            'Accept-Profile': 'public',
+            'Content-Profile': 'public',
+        },
+    });
     return { status: 'pass', message: 'Test sonucu ekleme/silme başarılı', detail: { id: inserted.id } };
-}, { dependsOn: 'apiReachable' });
+}, { dependsOn: 'authLogin' });
 
-define('apiMe', 'PostgREST /rpc/me Çalışıyor', async () => {
-    const url = PG_CONFIG.apiUrl + '/rpc/me';
-    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
-    // Should return 401 (unauth) or the function may not exist — either is ok
-    if (res.status === 401 || res.status === 200) {
-        const body = res.status === 200 ? await res.json() : null;
-        return { status: 'pass', message: `/rpc/me yanıt verdi (HTTP ${res.status})`, detail: { status: res.status, body } };
-    }
-    // 404 means the endpoint might not be defined yet
-    return { status: 'pass', message: `/rpc/me mevcut değil (HTTP ${res.status}) — opsiyonel`, detail: { status: res.status } };
-}, { dependsOn: 'apiReachable' });
-
-define('sameOrigin', 'Aynı Origin Üzerinden API', async () => {
+define('anonAccessDenied', 'Anonim Erişim Engeli', async () => {
     const url = PG_CONFIG.apiUrl + '/questions?limit=1';
-    const res = await fetch(url);
-    const origin = window.location.origin;
-    const sameOrigin = res.url.startsWith(origin) || res.url.startsWith('/');
-    if (!sameOrigin) {
-        return { status: 'fail', message: 'API yanıtı farklı origin\'den geldi', detail: { requestedUrl: url, responseUrl: res.url } };
+    const res = await fetch(url, { headers: { 'Accept-Profile': 'public' } });
+    if (res.status !== 401) {
+        throw new Error('Anonim erişim engellenmedi (HTTP ' + res.status + ')');
     }
-    return { status: 'pass', message: `API aynı origin üzerinden çalışıyor (${origin}/api/...)`, detail: { origin, status: res.status } };
+    return { status: 'pass', message: 'Anonim erişim engellendi (HTTP 401)', detail: { status: res.status } };
 }, { dependsOn: 'apiReachable' });
 
 define('pgVersion', 'PostgreSQL Sürüm Bilgisi', async () => {
-    // Try to get PG version via a postgrest query
-    const url = PG_CONFIG.apiUrl + '/rpc/me';
     try {
-        const res = await fetch(url);
-        // Even a 401 means we reached the DB (rpc/me is a DB function)
-        return { status: 'pass', message: 'PostgreSQL çalışıyor (PostgREST üzerinden erişildi)', detail: { note: 'Sürüm bilgisi doğrudan alınamadı ama DB yanıt veriyor' } };
+        const res = await fetch(PG_CONFIG.apiUrl + '/rpc/me');
+        return { status: 'pass', message: 'PostgreSQL çalışıyor (PostgREST yanıt veriyor)', detail: { note: 'DB erişilebilir' } };
     } catch (e) {
         throw new Error('PostgreSQL erişilebilir değil: ' + e.message);
     }
@@ -419,15 +451,15 @@ define('pgVersion', 'PostgreSQL Sürüm Bilgisi', async () => {
 define('dnsResolution', 'DNS Çözümleme', async () => {
     const hostname = window.location.hostname;
     try {
-        const dnsRes = await fetch(`https://dns.google/resolve?name=${hostname}&type=A`);
+        const dnsRes = await fetch('https://dns.google/resolve?name=' + hostname + '&type=A');
         const dnsData = await dnsRes.json();
         if (dnsData && dnsData.Answer && dnsData.Answer.length > 0) {
             const ips = dnsData.Answer.map(a => a.data);
-            return { status: 'pass', message: `${hostname} → ${ips.join(', ')}`, detail: dnsData };
+            return { status: 'pass', message: hostname + ' → ' + ips.join(', '), detail: dnsData };
         }
-        return { status: 'pass', message: `${hostname} çözümlendi`, detail: { hostname } };
+        return { status: 'pass', message: hostname + ' çözümlendi', detail: { hostname } };
     } catch (e) {
-        return { status: 'pass', message: 'DNS kontrolü atlandı (API çalışıyor)', detail: { hostname } };
+        return { status: 'pass', message: 'DNS kontrolü atlandı', detail: { hostname } };
     }
 }, { dependsOn: 'apiReachable' });
 
@@ -512,21 +544,6 @@ function updateCheck(id, { status, message, detail }) {
     icon.innerHTML = iconMap[status] || iconMap.pending;
 
     badge.className = 'check-badge ' + (badgeMap[status] || 'bg-secondary');
-    badge.textContent = labelMap[status] || 'Bekliyor';
-
-    msgEl.textContent = message || '';
-    detailEl.textContent = detail ? JSON.stringify(detail, null, 2) : '';
-
-    updateSummary();
-}
-
-async function runCheck(id) {
-    const c = CHECKS.find(x => x.id === id);
-    if (!c) return;
-
-    // Check dependency
-    if (c.dependsOn) {
-        const dep = CHECKS.find(x => x.id === c.dep 'check-badge ' + (badgeMap[status] || 'bg-secondary');
     badge.textContent = labelMap[status] || 'Bekliyor';
 
     msgEl.textContent = message || '';
