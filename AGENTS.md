@@ -26,12 +26,14 @@ In every HTML page, scripts are loaded in this specific order:
 | Service | Hostname | Port | Public URL |
 |---|---|---|---|
 | **PostgreSQL** | `postgres_db` | 5432 | — |
-| **PostgREST** (internal) | `postgrest` | 3000 | `https://selma-api.ozguryilmaz.com.tr` |
-| **Web App** (static files) | served via nginx + Cloudflare Tunnel | 80/443 | `https://selma.ozguryilmaz.com.tr` |
+| **PostgREST** (internal) | `postgrest` | 3000 | proxied via nginx |
+| **Web App** (static files) | nginx + Cloudflare Tunnel | 80/443 | `https://selma.ozguryilmaz.com.tr` |
 
-- Browser calls PostgREST directly at `https://selma-api.ozguryilmaz.com.tr` (no nginx proxy)
-- `pg-config.js` switches URL based on hostname: dev → `http://postgrest:3000`, prod → `https://selma-api.ozguryilmaz.com.tr`
-- `postgrest.conf` has `cors-origin = "*"` to allow cross-origin requests from the web app
+- **Nginx reverse proxy**: `/api/` → `http://postgrest:3000/` (same origin, no CORS needed)
+- Browser calls PostgREST at `https://selma.ozguryilmaz.com.tr/api/...` (same domain)
+- `pg-config.js` switches URL based on hostname:
+  - dev → `http://postgrest:3000` (direct Docker internal)
+  - prod → `https://selma.ozguryilmaz.com.tr/api` (via nginx proxy)
 
 ## Backend (PostgreSQL + PostgREST)
 - Supabase has been **replaced** with direct PostgreSQL via **PostgREST** (a standalone REST API server that turns PostgreSQL into a REST API — no custom backend code)
@@ -49,11 +51,11 @@ In every HTML page, scripts are loaded in this specific order:
 ### PostgREST
 - Config: `postgrest.conf` — connects to `postgres_db:5432`, exposes `public` + `api` schemas
 - Listens on port 3000, `db-anon-role = anon`, `jwt-secret` configured
-- Public URL: `https://selma-api.ozguryilmaz.com.tr`
-- Login flow: `POST /rpc/login {email, password}` → JWT string (verified by `api.login()` DB function)
-- All data CRUD: `GET/POST/PATCH/DELETE /table_name?col=eq.value`
+- Public URL: `https://selma.ozguryilmaz.com.tr/api`
+- Login flow: `POST /api/rpc/login {email, password}` → JWT string (verified by `api.login()` DB function)
+- All data CRUD: `GET/POST/PATCH/DELETE /api/table_name?col=eq.value`
 - Auth: JWT `role` claim tells PostgREST which DB role to use (anon vs authenticated)
-- Start: `postgrest postgrest.conf`
+- Start: `postgrest postgrest.conf` (inside Docker, nginx proxy at `/api/` → `postgrest:3000`)
 
 ### Key changes in HTML
 - Removed `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">` from all 22 pages
@@ -73,7 +75,7 @@ php -S localhost:8000
 ## Production deployment
 - **nginx** on port 80 serves the static files from this directory
 - **Cloudflare Tunnel** (`cloudflared`) handles HTTPS externally — no local TLS config needed
-- PostgREST is NOT proxied through nginx; browser calls `https://selma-api.ozguryilmaz.com.tr` directly
+- PostgREST is proxied through nginx at `/api/` → `http://postgrest:3000` (same origin, no CORS problems)
 
 ## Local dev
 - On `localhost` or `127.0.0.1`, `personal-info.html` auto-fills test data (TCKN: `12345678921`)
@@ -120,7 +122,7 @@ php -S localhost:8000
 db-uri = "postgres://postgres:$(DB_PASSWORD)@postgres_db:5432/mmpi_db"
 jwt-secret = "$(JWT_SECRET)"
 db-pre-request = "SET app.jwt_secret = '$(JWT_SECRET)'"
-cors-origin = "https://selma.ozguryilmaz.com.tr"
+cors-origin = "https://selma.ozguryilmaz.com.tr"   # artık gerekli değil (same-origin), ama opsiyonel
 ```
 
 Ortam değişkenleri ise **`.env` dosyasında** tutulur ve bu dosya `.gitignore`'a eklenir:

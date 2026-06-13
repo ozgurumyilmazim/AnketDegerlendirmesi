@@ -18,7 +18,7 @@ NC='\033[0m'
 
 # ---- Konfigürasyon (dışarı aktarılır) ----
 export WEB_URL="https://selma.ozguryilmaz.com.tr"
-export API_URL="https://selma-api.ozguryilmaz.com.tr"
+export API_URL="${API_URL:-https://selma.ozguryilmaz.com.tr/api}"
 export PG_DB="mmpi_db"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -144,9 +144,11 @@ check_result $? "PostgREST (public)"
 # ================================================================
 # 6 — CORS
 # ================================================================
-check  6 "CORS Başlıkları" "access-control-allow-origin var mı"
-curl -sI "$API_URL/questions?limit=1" 2>&1 | grep -qi "access-control-allow-origin"
-check_result $? "CORS"
+check  6 "Aynı Origin /api Proxy" "Nginx reverse proxy /api → PostgREST"
+RES=$(curl -s "$API_URL/questions?limit=1" -H "Accept: application/json" 2>&1)
+echo "$RES" | grep -q "PGRST302"
+check_result $? "/api Proxy"
+detail "  Proxy: $API_URL → PGRST302 (anon disabled, ama proxy çalışıyor)"
 
 # ================================================================
 # 7 — PostgreSQL Tabloları
@@ -211,9 +213,13 @@ check 12 "DNS (selma.ozguryilmaz.com.tr)" "Domain çözümleniyor"
 run host "selma.ozguryilmaz.com.tr" || run nslookup "selma.ozguryilmaz.com.tr"
 check_result $? "DNS (ana domain)"
 
-check 12 "DNS (selma-api.ozguryilmaz.com.tr)" "API domain çözümleniyor"
-run host "selma-api.ozguryilmaz.com.tr" || run nslookup "selma-api.ozguryilmaz.com.tr"
-check_result $? "DNS (api domain)"
+TOTAL=$((TOTAL+1))
+bold " ${CYAN}#12${NC} API (same origin /api)"
+detail "Nginx proxy — /api üzerinden HTTP 401 dönüyor mu"
+RES=$(curl -sI "$API_URL/questions?limit=1" 2>&1)
+echo "$RES" | grep -q "HTTP/2 401"
+check_result $? "/api Proxy (same origin)"
+detail "  API aynı domain altında — CORS sorunu yok. Test #5-6'da doğrulandı."
 
 # ================================================================
 # 13 — Docker Container'lar

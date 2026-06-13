@@ -381,15 +381,15 @@ define('apiMe', 'PostgREST /rpc/me Çalışıyor', async () => {
     return { status: 'pass', message: `/rpc/me mevcut değil (HTTP ${res.status}) — opsiyonel`, detail: { status: res.status } };
 }, { dependsOn: 'apiReachable' });
 
-define('cors', 'CORS Başlıkları Var', async () => {
+define('sameOrigin', 'Aynı Origin Üzerinden API', async () => {
     const url = PG_CONFIG.apiUrl + '/questions?limit=1';
     const res = await fetch(url);
-    const acao = res.headers.get('access-control-allow-origin');
-    const aceh = res.headers.get('access-control-expose-headers');
-    if (!acao) {
-        return { status: 'fail', message: 'access-control-allow-origin eksik', detail: { url, headers: [...res.headers].reduce((o,[k,v]) => (o[k]=v,o), {}) } };
+    const origin = window.location.origin;
+    const sameOrigin = res.url.startsWith(origin) || res.url.startsWith('/');
+    if (!sameOrigin) {
+        return { status: 'fail', message: 'API yanıtı farklı origin\'den geldi', detail: { requestedUrl: url, responseUrl: res.url } };
     }
-    return { status: 'pass', message: `access-control-allow-origin: ${acao}`, detail: { 'access-control-allow-origin': acao, 'access-control-expose-headers': aceh } };
+    return { status: 'pass', message: `API aynı origin üzerinden çalışıyor (${origin}/api/...)`, detail: { origin, status: res.status } };
 }, { dependsOn: 'apiReachable' });
 
 define('pgVersion', 'PostgreSQL Sürüm Bilgisi', async () => {
@@ -405,20 +405,17 @@ define('pgVersion', 'PostgreSQL Sürüm Bilgisi', async () => {
 }, { dependsOn: 'apiReachable' });
 
 define('dnsResolution', 'DNS Çözümleme', async () => {
-    const hostname = new URL(PG_CONFIG.apiUrl).hostname;
+    const hostname = window.location.hostname;
     try {
-        // Use an external DNS-over-HTTPS for resolution check
         const dnsRes = await fetch(`https://dns.google/resolve?name=${hostname}&type=A`);
         const dnsData = await dnsRes.json();
         if (dnsData && dnsData.Answer && dnsData.Answer.length > 0) {
             const ips = dnsData.Answer.map(a => a.data);
             return { status: 'pass', message: `${hostname} → ${ips.join(', ')}`, detail: dnsData };
         }
-        // If DNS-over-HTTPS fails, we can still see if the API resolved by trying to reach it
-        return { status: 'pass', message: `${hostname} çözümlendi (API erişilebilir)`, detail: { hostname } };
+        return { status: 'pass', message: `${hostname} çözümlendi`, detail: { hostname } };
     } catch (e) {
-        // DNS check failure isn't critical since apiReachable already passed
-        return { status: 'pass', message: 'DNS çözümleme kontrolü atlandı (API zaten erişilebilir)', detail: { hostname, note: 'DNS sorgusu başarısız ama API çalışıyor' } };
+        return { status: 'pass', message: 'DNS kontrolü atlandı (API çalışıyor)', detail: { hostname } };
     }
 }, { dependsOn: 'apiReachable' });
 
