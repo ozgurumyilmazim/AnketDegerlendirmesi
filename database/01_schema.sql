@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS task_definitions (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_task_definitions_status ON task_definitions(status);
+CREATE INDEX idx_task_definitions_id ON task_definitions(id);
 
 -- ============================================================
 -- SETTINGS TABLE
