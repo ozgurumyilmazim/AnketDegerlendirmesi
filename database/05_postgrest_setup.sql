@@ -138,7 +138,10 @@ $$;
 -- Called by admin panel: POST /rpc/create_user
 -- Body: { "name": "...", "email": "...", "password": "...", "role": "admin"|"psychologist" }
 -- Returns the created user (without password_hash)
-CREATE OR REPLACE FUNCTION api.create_user(name text, email text, password text, role text DEFAULT 'psychologist')
+-- Remove old api-schema version if it exists
+DROP FUNCTION IF EXISTS api.create_user(text, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.create_user(name text, email text, password text, role text DEFAULT 'psychologist')
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -158,6 +161,8 @@ BEGIN
   );
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.create_user(text, text, text, text) TO authenticated;
 
 -- ============================================================
 -- 9. Pre-request function: set JWT secret for api.login()
