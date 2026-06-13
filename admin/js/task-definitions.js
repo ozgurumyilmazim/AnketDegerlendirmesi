@@ -22,10 +22,9 @@ class TaskDefinitionsManager {
         try {
             this.showLoading(true);
             
-            // Load from Supabase only - no static fallback
-            if (window.supabaseClient && window.supabaseClient.supabaseClient) {
+            if (window.supabase) {
                 try {
-                    const { data, error } = await window.supabaseClient.supabaseClient
+                    const { data, error } = await window.supabase
                         .from('task_definitions')
                         .select('*')
                         .order('task_number', { ascending: true });
@@ -41,13 +40,13 @@ class TaskDefinitionsManager {
                         this.tasks = [];
                         console.log('No tasks found in database');
                     }
-                } catch (supabaseError) {
-                    console.error('Error loading from Supabase:', supabaseError);
-                    this.showError('Veritabanından görevler yüklenirken hata oluştu: ' + supabaseError.message);
+                } catch (dbError) {
+                    console.error('Error loading from database:', dbError);
+                    this.showError('Veritabanından görevler yüklenirken hata oluştu: ' + dbError.message);
                     this.tasks = [];
                 }
             } else {
-                console.error('Supabase client not available');
+                console.error('Database client not available');
                 this.showError('Veritabanı bağlantısı mevcut değil.');
                 this.tasks = [];
             }
@@ -191,8 +190,7 @@ class TaskDefinitionsManager {
     async saveTask() {
         try {
             console.log('saveTask called');
-            console.log('window.supabaseClient:', window.supabaseClient);
-            console.log('Available window properties:', Object.keys(window).filter(k => k.includes('supabase')));
+            console.log('window.supabase:', window.supabase);
             
             const formData = this.getFormData('addTaskForm');
             console.log('Form data:', formData);
@@ -213,38 +211,34 @@ class TaskDefinitionsManager {
                 updated_at: new Date().toISOString()
             };
             
-            let savedToSupabase = false;
+            let savedToDb = false;
 
-            // Try to save to Supabase first
-            if (window.supabaseClient && window.supabaseClient.supabaseClient) {
+            if (window.supabase) {
                 try {
-                    console.log('Attempting to save to Supabase...');
+                    console.log('Saving to database...');
                     
-                    // Don't include ID in the insert - let Supabase generate UUID
-                    const { data, error } = await window.supabaseClient.supabaseClient
+                    const { data, error } = await window.supabase
                         .from('task_definitions')
-                        .insert([newTask])
-                        .select();
+                        .insert([newTask]);
                     
                     if (error) {
-                        console.error('Supabase save error:', error);
+                        console.error('Database save error:', error);
                         throw error;
                     }
                     
                     if (data && data.length > 0) {
-                        newTask = data[0]; // Use the complete record returned by Supabase with UUID
-                        console.log('Successfully saved to Supabase with ID:', newTask.id);
-                        savedToSupabase = true;
+                        newTask = data[0]; // Use the complete record returned with UUID
+                        console.log('Successfully saved to database with ID:', newTask.id);
+                        savedToDb = true;
                     }
-                } catch (supabaseError) {
-                    console.error('Supabase error details:', supabaseError);
-                    this.showError(`Veritabanına kaydetme hatası: ${supabaseError.message || 'Bilinmeyen hata'}`);
-                    return; // Stop execution on Supabase error
+                } catch (dbError) {
+                    console.error('Database error details:', dbError);
+                    this.showError(`Veritabanına kaydetme hatası: ${dbError.message || 'Bilinmeyen hata'}`);
+                    return;
                 }
             } else {
-                // If no Supabase, generate local ID and warn user
                 newTask.id = 'local-' + Date.now();
-                console.warn('Supabase client not available, saving locally only');
+                console.warn('Database client not available, saving locally only');
                 this.showError('Veritabanı bağlantısı yok. Görev sadece yerel olarak kaydedildi.');
             }
 
@@ -261,8 +255,7 @@ class TaskDefinitionsManager {
             }
             document.getElementById('addTaskForm').reset();
             
-            // Show appropriate success message
-            if (savedToSupabase) {
+            if (savedToDb) {
                 this.showSuccess('Görev başarıyla veritabanına kaydedildi.');
             } else {
                 this.showSuccess('Görev yerel olarak kaydedildi.');
@@ -304,27 +297,26 @@ class TaskDefinitionsManager {
             
             console.log('Updated task:', updatedTask);
             
-            let savedToSupabase = false;
+            let savedToDb = false;
 
-            // Try to update in Supabase (only if not a static task and has valid UUID)
-            if (window.supabaseClient && window.supabaseClient.supabaseClient && !this.currentEditId.startsWith('static-') && !this.currentEditId.startsWith('local-')) {
+            if (window.supabase && !this.currentEditId.startsWith('static-') && !this.currentEditId.startsWith('local-')) {
                 try {
-                    const { error } = await window.supabaseClient.supabaseClient
+                    const { error } = await window.supabase
                         .from('task_definitions')
                         .update(formData)
                         .eq('id', this.currentEditId);
                     
                     if (error) {
-                        console.error('Supabase update error:', error);
+                        console.error('Database update error:', error);
                         this.showError(`Veritabanı güncelleme hatası: ${error.message}`);
                         return;
                     }
                     
-                    savedToSupabase = true;
-                    console.log('Successfully updated in Supabase');
-                } catch (supabaseError) {
-                    console.error('Supabase update error:', supabaseError);
-                    this.showError(`Veritabanı güncelleme hatası: ${supabaseError.message}`);
+                    savedToDb = true;
+                    console.log('Successfully updated in database');
+                } catch (dbError) {
+                    console.error('Database update error:', dbError);
+                    this.showError(`Veritabanı güncelleme hatası: ${dbError.message}`);
                     return;
                 }
             }
@@ -341,8 +333,7 @@ class TaskDefinitionsManager {
                 modal.hide();
             }
             
-            // Show appropriate success message
-            if (savedToSupabase) {
+            if (savedToDb) {
                 this.showSuccess('Görev başarıyla veritabanında güncellendi.');
             } else if (this.currentEditId.startsWith('static-')) {
                 this.showSuccess('Statik görev yerel olarak güncellendi.');
@@ -363,17 +354,16 @@ class TaskDefinitionsManager {
                 return;
             }
 
-            // Try to delete from Supabase
-            if (window.supabaseClient && !this.currentDeleteId.startsWith('static-')) {
+            if (window.supabase && !this.currentDeleteId.startsWith('static-')) {
                 try {
-                    const { error } = await window.supabaseClient.supabaseClient
+                    const { error } = await window.supabase
                         .from('task_definitions')
                         .delete()
                         .eq('id', this.currentDeleteId);
                     
                     if (error) throw error;
-                } catch (supabaseError) {
-                    console.warn('Could not delete from Supabase:', supabaseError);
+                } catch (dbError) {
+                    console.warn('Could not delete from database:', dbError);
                 }
             }
 
@@ -403,17 +393,16 @@ class TaskDefinitionsManager {
             const task = this.tasks[taskIndex];
             const newStatus = !task.is_active;
 
-            // Try to update in Supabase
-            if (window.supabaseClient && !taskId.startsWith('static-')) {
+            if (window.supabase && !taskId.startsWith('static-')) {
                 try {
-                    const { error } = await window.supabaseClient.supabaseClient
+                    const { error } = await window.supabase
                         .from('task_definitions')
                         .update({ is_active: newStatus, updated_at: new Date().toISOString() })
                         .eq('id', taskId);
                     
                     if (error) throw error;
-                } catch (supabaseError) {
-                    console.warn('Could not update in Supabase:', supabaseError);
+                } catch (dbError) {
+                    console.warn('Could not update in database:', dbError);
                 }
             }
 

@@ -9,12 +9,12 @@ class TaskDefinitionsMigration {
         try {
             console.log('Starting task definitions migration...');
             
-            if (!window.supabaseClient) {
-                throw new Error('Supabase client not available');
+            if (!window.supabase) {
+                throw new Error('Database client not available');
             }
 
             // Get all reports that might have old task_definitions_evaluation data
-            const { data: reports, error } = await window.supabaseClient.supabaseClient
+            const { data: reports, error } = await window.supabase
                 .from('reports')
                 .select('id, task_definitions_evaluation')
                 .not('task_definitions_evaluation', 'is', null);
@@ -68,7 +68,7 @@ class TaskDefinitionsMigration {
             const migratedData = this.convertToNewFormat(currentData);
 
             // Update the report
-            const { error } = await window.supabaseClient.supabaseClient
+            const { error } = await window.supabase
                 .from('reports')
                 .update({
                     task_definitions_evaluation: migratedData,
@@ -239,11 +239,11 @@ class TaskDefinitionsMigration {
         try {
             console.log('Starting dry run migration...');
             
-            if (!window.supabaseClient) {
-                throw new Error('Supabase client not available');
+            if (!window.supabase) {
+                throw new Error('Database client not available');
             }
 
-            const { data: reports, error } = await window.supabaseClient.supabaseClient
+            const { data: reports, error } = await window.supabase
                 .from('reports')
                 .select('id, task_definitions_evaluation')
                 .not('task_definitions_evaluation', 'is', null);

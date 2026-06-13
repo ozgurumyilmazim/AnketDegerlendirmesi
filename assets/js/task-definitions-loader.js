@@ -10,11 +10,11 @@ if (typeof TaskDefinitionsLoader === 'undefined') {
     async loadTaskDefinitions() {
         try {
             // Wait for Supabase client to be available
-            if (!window.supabaseClient) {
-                throw new Error('Supabase client not available');
+            if (!window.supabase) {
+                throw new Error('Database client not available');
             }
 
-            const { data, error } = await window.supabaseClient.supabaseClient
+            const { data, error } = await window.supabase
                 .from('task_definitions')
                 .select('*')
                 .eq('is_active', true)
@@ -537,13 +537,13 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Wait for supabase client to be ready
                 let attempts = 0;
-                while (!window.supabaseClient && attempts < 50) {
+                while (!window.supabase && attempts < 50) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     attempts++;
                 }
                 
-                if (!window.supabaseClient) {
-                    throw new Error('Supabase client not available after waiting');
+                if (!window.supabase) {
+                    throw new Error('Database client not available after waiting');
                 }
                 
                 await window.taskDefinitionsLoader.renderTaskDefinitionsTable();
