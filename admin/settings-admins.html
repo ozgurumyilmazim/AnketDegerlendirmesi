@@ -284,7 +284,7 @@
         <!-- Bilgi Notu -->
         <div class="info-banner">
             <i class="fas fa-info-circle"></i>
-            Bu bölümdeki değişiklikler Supabase Auth sistemini kullanır. Yeni kullanıcı eklemek için geçerli bir e-posta adresi gereklidir.
+            Kullanıcılar doğrudan PostgreSQL veritabanına kaydedilir. Yeni kullanıcının e-posta adresi ve şifresi sistem yöneticisi tarafından belirlenir.
         </div>
 
         <!-- Yeni Yönetici Ekle -->
@@ -392,48 +392,41 @@
 
     <!-- Admin Users JS -->
     <script>
-        // Yardımcı: Toast göster
         function showToast(type, message) {
             const toast = document.getElementById(type + 'Toast');
             document.getElementById(type + 'ToastBody').textContent = message;
             new bootstrap.Toast(toast, { delay: 3500 }).show();
         }
 
-        // İsmin baş harflerini al
         function getInitials(name) {
             if (!name) return '?';
             return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         }
 
-        // Tarih formatla
         function formatDate(iso) {
             if (!iso) return '—';
             return new Date(iso).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
-        // Kullanıcıları yükle (Supabase users tablosundan)
         async function loadAdmins() {
             document.getElementById('loadingSpinner').classList.remove('d-none');
             document.getElementById('adminTableWrapper').classList.add('d-none');
             document.getElementById('emptyState').classList.add('d-none');
 
             try {
-                // Supabase bağlantısı hazır mı kontrol et
-                if (typeof window.supabase === 'undefined' && typeof window.supabaseClient === 'undefined') {
-                    throw new Error('Supabase bağlantısı bulunamadı.');
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Veritabanı bağlantısı bulunamadı.');
                 }
 
-                const client = window.supabaseClient || window.supabase;
-                const { data, error } = await client.from('users').select('*').order('created_at', { ascending: false });
+                const { data, error } = await window.supabase.from('users').select('*').order('created_at', { ascending: false });
 
                 if (error) throw error;
 
                 renderAdmins(data || []);
             } catch (err) {
                 console.warn('Yöneticiler yüklenirken hata:', err);
-                // Offline demo verisi
                 renderAdmins([
-                    { id: 1, full_name: 'Demo Admin', email: 'admin@demo.com', role: 'admin', last_sign_in_at: new Date().toISOString() }
+                    { id: 1, name: 'Demo Admin', email: 'admin@demo.com', role: 'admin', last_login: new Date().toISOString() }
                 ]);
             }
         }
@@ -455,8 +448,8 @@
                 row.innerHTML = `
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="user-avatar-small">${getInitials(u.full_name || u.email)}</div>
-                            <span>${u.full_name || '—'}</span>
+                            <div class="user-avatar-small">${getInitials(u.name || u.email)}</div>
+                            <span>${u.name || '—'}</span>
                         </div>
                     </td>
                     <td>${u.email || '—'}</td>
@@ -466,12 +459,12 @@
                             ${u.role === 'admin' ? 'Admin' : 'Psikolog'}
                         </span>
                     </td>
-                    <td>${formatDate(u.last_sign_in_at)}</td>
+                    <td>${formatDate(u.last_login)}</td>
                     <td class="text-end">
-                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editAdmin('${u.id}', '${u.full_name || ''}', '${u.role || 'admin'}')">
+                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editAdmin('${u.id}', '${u.name || ''}', '${u.role || 'admin'}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteAdmin('${u.id}', '${u.full_name || u.email}')">
+                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteAdmin('${u.id}', '${u.name || u.email}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -482,7 +475,6 @@
             document.getElementById('adminTableWrapper').classList.remove('d-none');
         }
 
-        // Yönetici ekle
         document.getElementById('addAdminBtn').addEventListener('click', async () => {
             const name  = document.getElementById('adminName').value.trim();
             const email = document.getElementById('adminEmail').value.trim();
@@ -494,10 +486,9 @@
             }
 
             try {
-                const client = window.supabaseClient || window.supabase;
-                if (!client) throw new Error('Supabase bağlantısı yok');
+                if (!window.supabase) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await client.from('users').insert([{ full_name: name, email, role }]);
+                const { error } = await window.supabase.from('users').insert([{ name, email, role }]);
                 if (error) throw error;
 
                 showToast('success', `${name} başarıyla eklendi.`);
@@ -518,10 +509,9 @@
         async function deleteAdmin(id, label) {
             if (!confirm(`"${label}" kullanıcısını silmek istediğinizden emin misiniz?`)) return;
             try {
-                const client = window.supabaseClient || window.supabase;
-                if (!client) throw new Error('Supabase bağlantısı yok');
+                if (!window.supabase) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await client.from('users').delete().eq('id', id);
+                const { error } = await window.supabase.from('users').delete().eq('id', id);
                 if (error) throw error;
 
                 showToast('success', `${label} silindi.`);
@@ -531,9 +521,8 @@
             }
         }
 
-        // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(loadAdmins, 600); // Supabase client'ın yüklenmesini bekle
+            loadAdmins();
         });
     </script>
 </body>
