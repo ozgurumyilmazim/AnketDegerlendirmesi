@@ -192,7 +192,13 @@ window.PG_API = {
         const _buildQuery = () => {
             const params = new URLSearchParams();
             if (_select !== '*') params.set('select', _select);
-            _filters.forEach(f => params.set(f.field, 'eq.' + f.value));
+            _filters.forEach(f => {
+                if (f.type === 'in') {
+                    params.set(f.field, 'in.(' + f.value.join(',') + ')');
+                } else {
+                    params.set(f.field, 'eq.' + f.value);
+                }
+            });
             if (_orderBy) params.set('order', _orderBy + '.' + (_orderDir === 'asc' ? 'asc' : 'desc'));
             if (_limit) params.set('limit', _limit);
             const qs = params.toString();
@@ -205,7 +211,12 @@ window.PG_API = {
                 return this;
             },
             eq(field, value) {
-                _filters.push({ field, value });
+                _filters.push({ field, value, type: 'eq' });
+                return this;
+            },
+            in(field, values) {
+                const arr = Array.isArray(values) ? values : [values];
+                _filters.push({ field, value: arr.filter(v => v != null), type: 'in' });
                 return this;
             },
             order(column, { ascending = true } = {}) {
