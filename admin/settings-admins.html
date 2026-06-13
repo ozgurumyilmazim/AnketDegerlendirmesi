@@ -299,11 +299,15 @@
                             <label class="form-label" for="adminName">Ad Soyad</label>
                             <input type="text" class="form-control" id="adminName" placeholder="Ad Soyad">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label" for="adminEmail">E-posta Adresi</label>
                             <input type="email" class="form-control" id="adminEmail" placeholder="ornek@kurum.com">
                         </div>
                         <div class="col-md-2">
+                            <label class="form-label" for="adminPassword">Şifre</label>
+                            <input type="password" class="form-control" id="adminPassword" placeholder="Şifre">
+                        </div>
+                        <div class="col-md-1">
                             <label class="form-label" for="adminRole">Rol</label>
                             <select class="form-select" id="adminRole">
                                 <option value="admin">Admin</option>
@@ -476,19 +480,25 @@
         }
 
         document.getElementById('addAdminBtn').addEventListener('click', async () => {
-            const name  = document.getElementById('adminName').value.trim();
-            const email = document.getElementById('adminEmail').value.trim();
-            const role  = document.getElementById('adminRole').value;
+            const name     = document.getElementById('adminName').value.trim();
+            const email    = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const role     = document.getElementById('adminRole').value;
 
-            if (!name || !email) {
-                showToast('error', 'Ad Soyad ve E-posta alanları zorunludur.');
+            if (!name || !email || !password) {
+                showToast('error', 'Ad Soyad, E-posta ve Şifre alanları zorunludur.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('error', 'Şifre en az 6 karakter olmalıdır.');
                 return;
             }
 
             try {
                 if (!window.supabase) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await window.supabase.from('users').insert([{ name, email, role }]);
+                const { error } = await window.supabase.rpc('create_user', { name, email, password, role });
                 if (error) throw error;
 
                 showToast('success', `${name} başarıyla eklendi.`);

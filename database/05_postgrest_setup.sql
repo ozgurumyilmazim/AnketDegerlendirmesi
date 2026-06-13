@@ -133,7 +133,34 @@ AS $$
 $$;
 
 -- ============================================================
--- 7. Pre-request function: set JWT secret for api.login()
+-- 7. Create user function — hashes password, inserts into users
+-- ============================================================
+-- Called by admin panel: POST /rpc/create_user
+-- Body: { "name": "...", "email": "...", "password": "...", "role": "admin"|"psychologist" }
+-- Returns the created user (without password_hash)
+CREATE OR REPLACE FUNCTION api.create_user(name text, email text, password text, role text DEFAULT 'psychologist')
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  user_record public.users%ROWTYPE;
+BEGIN
+  INSERT INTO public.users (name, email, password_hash, role)
+  VALUES (create_user.name, create_user.email, crypt(create_user.password, gen_salt('bf')), create_user.role)
+  RETURNING * INTO user_record;
+
+  RETURN jsonb_build_object(
+    'id', user_record.id,
+    'name', user_record.name,
+    'email', user_record.email,
+    'role', user_record.role
+  );
+END;
+$$;
+
+-- ============================================================
+-- 9. Pre-request function: set JWT secret for api.login()
 -- ============================================================
 -- PostgREST calls this before every request (via db-pre-request config).
 -- It makes the JWT signing secret available to api.login() via
@@ -152,13 +179,13 @@ END;
 $$;
 
 -- ============================================================
--- 8. Grants for the anon role
+-- 10. Grants for the anon role
 -- ============================================================
 GRANT USAGE ON SCHEMA api TO anon;
 GRANT EXECUTE ON FUNCTION api.login(text, text) TO anon;
 
 -- ============================================================
--- 9. Grants for the authenticated role
+-- 11. Grants for the authenticated role
 -- ============================================================
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
@@ -170,7 +197,7 @@ GRANT USAGE ON SCHEMA api TO authenticated;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA api TO authenticated;
 
 -- ============================================================
--- 10. Grant public.users select to anon (so login function can read)
+-- 12. Grant public.users select to anon (so login function can read)
 -- ============================================================
 -- The login function is SECURITY DEFINER (runs as owner), so it can
 -- read public.users even without explicit grant to anon.

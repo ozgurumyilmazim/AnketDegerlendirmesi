@@ -268,6 +268,14 @@ window.PG_API = {
                 return { data: result.data, error: null };
             },
         };
+    },
+
+    // RPC call — POST /rpc/function_name with params
+    async rpc(name, params = {}) {
+        return this._fetch('/rpc/' + name, {
+            method: 'POST',
+            body: JSON.stringify(params),
+        });
     }
 };
 
