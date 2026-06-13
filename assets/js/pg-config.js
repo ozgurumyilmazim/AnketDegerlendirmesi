@@ -123,8 +123,12 @@ window.AuthService = {
 // PG_API — generic CRUD via PostgREST (mimics supabase.from())
 // ====================================================================
 window.PG_API = {
-    _getHeaders() {
-        const headers = { 'Content-Type': 'application/json' };
+    _getHeaders(profile) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept-Profile': profile || 'public',
+            'Content-Profile': profile || 'public',
+        };
         const token = localStorage.getItem('mmpi_token');
         if (token) headers['Authorization'] = 'Bearer ' + token;
         return headers;

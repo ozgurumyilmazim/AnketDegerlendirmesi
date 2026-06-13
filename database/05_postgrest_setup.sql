@@ -35,7 +35,7 @@ CREATE SCHEMA IF NOT EXISTS api;
 CREATE OR REPLACE FUNCTION api.url_b64(data bytea)
 RETURNS text AS $$
 BEGIN
-  RETURN replace(replace(replace(encode(data, 'base64'), E'\n', ''), '+', '-'), '/', '_');
+  RETURN replace(replace(replace(replace(encode(data, 'base64'), E'\n', ''), '+', '-'), '/', '_'), '=', '');
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -133,13 +133,32 @@ AS $$
 $$;
 
 -- ============================================================
--- 7. Grants for the anon role
+-- 7. Pre-request function: set JWT secret for api.login()
+-- ============================================================
+-- PostgREST calls this before every request (via db-pre-request config).
+-- It makes the JWT signing secret available to api.login() via
+-- the custom GUC app.jwt_secret.
+--
+-- The secret MUST match PostgREST's jwt-secret config.
+-- In production, setup-database.sh overrides this with the .env value.
+CREATE OR REPLACE FUNCTION api.set_jwt_secret()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  PERFORM set_config('app.jwt_secret', 'super-secret-jwt-key-change-this-in-production', true);
+END;
+$$;
+
+-- ============================================================
+-- 8. Grants for the anon role
 -- ============================================================
 GRANT USAGE ON SCHEMA api TO anon;
 GRANT EXECUTE ON FUNCTION api.login(text, text) TO anon;
 
 -- ============================================================
--- 8. Grants for the authenticated role
+-- 9. Grants for the authenticated role
 -- ============================================================
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
@@ -151,7 +170,7 @@ GRANT USAGE ON SCHEMA api TO authenticated;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA api TO authenticated;
 
 -- ============================================================
--- 9. Grant public.users select to anon (so login function can read)
+-- 10. Grant public.users select to anon (so login function can read)
 -- ============================================================
 -- The login function is SECURITY DEFINER (runs as owner), so it can
 -- read public.users even without explicit grant to anon.

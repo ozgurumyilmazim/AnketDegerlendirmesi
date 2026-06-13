@@ -270,18 +270,23 @@ define('apiReachable', 'PostgREST API Erişilebilir', async () => {
 }, { dependsOn: 'jsLibs' });
 
 define('postgrestSignature', 'PostgREST İmzası', async () => {
+    // Cloudflare forwards to nginx -> PostgREST, but may overwrite the
+    // Server header with "cloudflare". So instead of checking the header,
+    // we verify PostgREST is responding by checking its JSON error format.
     const url = PG_CONFIG.apiUrl + '/rpc/login';
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
     });
-    const server = res.headers.get('server') || '';
-    const isPostgREST = server.toLowerCase().includes('postgrest');
+    const body = await res.json();
+    const isPostgREST = body && typeof body.code === 'string' &&
+        body.code.startsWith('PGRST');
     if (!isPostgREST) {
-        throw new Error('Sunucu PostgREST değil (server header: ' + server + ')');
+        throw new Error('PostgREST yanıtı algılanamadı: ' + JSON.stringify(body));
     }
-    return { status: 'pass', message: 'PostgREST doğrulandı (server: ' + server + ')', detail: { server } };
+    const server = res.headers.get('server') || 'bilinmiyor';
+    return { status: 'pass', message: 'PostgREST doğrulandı (server: ' + server + ')', detail: { server, body } };
 }, { dependsOn: 'apiReachable' });
 
 // --- JWT Authentication Tests ---
