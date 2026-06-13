@@ -175,10 +175,23 @@
     <div id="checksContainer"></div>
 
     <hr class="my-4">
+
+    <div class="server-info">
+        <div style="flex:1">
+            <dt><i class="fas fa-terminal me-1"></i> Terminal'den çalıştır</dt>
+            <dd style="font-size:.9rem; font-family:monospace;">bash tests/status.sh</dd>
+        </div>
+        <div style="flex:1">
+            <dt>JSON çıktı</dt>
+            <dd style="font-size:.9rem; font-family:monospace;">bash tests/status.sh --json</dd>
+        </div>
+    </div>
+
     <p class="text-center text-muted small">
         <i class="fas fa-info-circle me-1"></i>
         Bu sayfa sistem bileşenlerinin durumunu kontrol eder.
         Herhangi bir sorun varsa ilgili kartın üzerine tıklayarak detayları görebilirsiniz.
+        Terminal'den <code>bash tests/status.sh</code> ile de aynı testleri çalıştırabilirsiniz.
     </p>
 </div>
 
@@ -249,16 +262,27 @@ define('jsLibs', 'JavaScript Kütüphaneleri Yüklü', async () => {
 
 define('apiReachable', 'PostgREST API Erişilebilir', async () => {
     const url = PG_CONFIG.apiUrl;
-    // PostgREST returns 404 on root with CORS headers – that's fine, means it's alive
-    const res = await fetch(url, { method: 'OPTIONS' });
-    if (res.ok || res.status === 404 || res.status === 401) {
-        return { status: 'pass', message: `${url} — yanıt alındı`, detail: {
-            url,
-            status: res.status,
-            cors: res.headers.get('access-control-allow-origin'),
-        }};
+    // GET /questions (limit 0) — veri dönmez ama CORS + HTTP durumu gösterir
+    const res = await fetch(url + '/questions?limit=0', {
+        headers: { 'Accept': 'application/json' },
+    });
+    const detail = {
+        url: url + '/questions?limit=0',
+        status: res.status,
+        statusText: res.statusText,
+        cors: res.headers.get('access-control-allow-origin'),
+    };
+    // 200 = tam erişim, 401 = anon disabled (ama sunucu ayakta)
+    if (res.ok) {
+        detail.note = 'tam erişim';
+    } else if (res.status === 401) {
+        detail.note = 'anon disabled — auth gerekli, ama sunucu çalışıyor';
+    } else if (res.status === 404) {
+        detail.note = 'endpoint bulunamadı — ama sunucu çalışıyor';
+    } else {
+        throw new Error(`HTTP ${res.status} — ${res.statusText}`);
     }
-    throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+    return { status: 'pass', message: `${url} — yanıt alındı (HTTP ${res.status})`, detail };
 }, { dependsOn: 'jsLibs' });
 
 define('authEndpoint', 'Auth /rpc/login Çalışıyor', async () => {
