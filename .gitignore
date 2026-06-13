@@ -1,0 +1,22 @@
+# ============================================================
+# MMPI Test System — .gitignore
+# ============================================================
+
+# Production deployment files (secrets, configs, scripts)
+# See production/ for production-ready templates
+/production/
+
+# Environment variables with real secrets
+.env
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node.js (if any)
+node_modules/
