@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yönetici Tanımları - MMPI Test Sistemi</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -35,7 +36,9 @@
             font-weight: 500;
         }
 
-        .breadcrumb-nav a:hover { text-decoration: underline; }
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
 
         .breadcrumb-nav span {
             color: #6b7280;
@@ -68,7 +71,7 @@
         .panel-card {
             background: white;
             border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             margin-bottom: 2rem;
         }
@@ -100,7 +103,8 @@
             margin-bottom: 0.4rem;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border: 2px solid #e5e7eb;
             border-radius: 10px;
             padding: 0.6rem 0.9rem;
@@ -108,7 +112,8 @@
             transition: border-color 0.2s;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: #f5576c;
             box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.15);
         }
@@ -149,9 +154,13 @@
             color: #374151;
         }
 
-        .users-table tbody tr:last-child td { border-bottom: none; }
+        .users-table tbody tr:last-child td {
+            border-bottom: none;
+        }
 
-        .users-table tbody tr:hover { background: #fdf2f4; }
+        .users-table tbody tr:hover {
+            background: #fdf2f4;
+        }
 
         .role-badge {
             display: inline-flex;
@@ -250,10 +259,13 @@
         }
 
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; }
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div id="sidebar-container"></div>
@@ -271,7 +283,8 @@
         <!-- Header -->
         <div class="header-section d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="page-title"><i class="fas fa-user-shield me-2" style="color:#f5576c;"></i>Yönetici Tanımları</h1>
+                <h1 class="page-title"><i class="fas fa-user-shield me-2" style="color:#f5576c;"></i>Yönetici Tanımları
+                </h1>
                 <p class="page-subtitle">Sisteme erişim yetkisi olan kullanıcıları yönetin</p>
             </div>
             <div>
@@ -284,7 +297,7 @@
         <!-- Bilgi Notu -->
         <div class="info-banner">
             <i class="fas fa-info-circle"></i>
-            Kullanıcılar doğrudan PostgreSQL veritabanına kaydedilir. Yeni kullanıcının e-posta adresi ve şifresi sistem yöneticisi tarafından belirlenir.
+            Dikkat! Bu ekranda tanımlanan yönetici, tüm yetkilere sahip olacaktır.
         </div>
 
         <!-- Yeni Yönetici Ekle -->
@@ -480,10 +493,10 @@
         }
 
         document.getElementById('addAdminBtn').addEventListener('click', async () => {
-            const name     = document.getElementById('adminName').value.trim();
-            const email    = document.getElementById('adminEmail').value.trim();
+            const name = document.getElementById('adminName').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
-            const role     = document.getElementById('adminRole').value;
+            const role = document.getElementById('adminRole').value;
 
             if (!name || !email || !password) {
                 showToast('error', 'Ad Soyad, E-posta ve Şifre alanları zorunludur.');
@@ -510,8 +523,8 @@
         });
 
         function editAdmin(id, name, role) {
-            document.getElementById('adminName').value  = name;
-            document.getElementById('adminRole').value  = role;
+            document.getElementById('adminName').value = name;
+            document.getElementById('adminRole').value = role;
             document.getElementById('adminEmail').focus();
             showToast('success', 'Düzenleme için bilgileri güncelleyip tekrar ekleyin.');
         }
@@ -536,4 +549,5 @@
         });
     </script>
 </body>
+
 </html>
