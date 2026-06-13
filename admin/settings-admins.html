@@ -441,10 +441,11 @@
 
                 renderAdmins(data || []);
             } catch (err) {
-                console.warn('Yöneticiler yüklenirken hata:', err);
-                renderAdmins([
-                    { id: 1, name: 'Demo Admin', email: 'admin@demo.com', role: 'admin', last_login: new Date().toISOString() }
-                ]);
+                const msg = err?.message || err;
+                console.error('Yöneticiler yüklenirken hata:', msg);
+                showToast('error', 'Yöneticiler yüklenemedi: ' + msg);
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('emptyState').classList.remove('d-none');
             }
         }
 
@@ -518,7 +519,9 @@
                 document.getElementById('addAdminForm').reset();
                 loadAdmins();
             } catch (err) {
-                showToast('error', 'Kullanıcı eklenirken hata: ' + err.message);
+                const msg = err?.message || err;
+                console.error('Kullanıcı eklenirken hata:', msg);
+                showToast('error', 'Kullanıcı eklenirken hata: ' + msg);
             }
         });
 
@@ -540,7 +543,9 @@
                 showToast('success', `${label} silindi.`);
                 loadAdmins();
             } catch (err) {
-                showToast('error', 'Silme işlemi başarısız: ' + err.message);
+                const msg = err?.message || err;
+                console.error('Silme işlemi başarısız:', msg);
+                showToast('error', 'Silme işlemi başarısız: ' + msg);
             }
         }
 

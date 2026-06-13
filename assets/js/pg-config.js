@@ -142,8 +142,15 @@ window.PG_API = {
             });
             // PostgREST returns 204 No Content for some operations
             if (res.status === 204) return { data: null, error: null };
-            const body = await res.json();
-            if (!res.ok) return { data: null, error: body.message || 'Request failed' };
+            let body;
+            try {
+                body = await res.json();
+            } catch (_) {
+                const text = await res.text();
+                if (!res.ok) return { data: null, error: text || 'Request failed' };
+                return { data: null, error: null };
+            }
+            if (!res.ok) return { data: null, error: body.message || body.details || 'Request failed' };
             return { data: body, error: null };
         } catch (err) {
             return { data: null, error: err.message };
