@@ -145,12 +145,22 @@
 
                 <!-- Search and Filter Section -->
                 <div class="search-container">
-                    <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="row g-3">
+                        <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 <input type="text" class="form-control" id="searchInput" placeholder="Görev tanımında ara...">
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">Tüm Kategoriler</option>
+                                <option value="security">Güvenlik</option>
+                                <option value="maintenance">Bakım</option>
+                                <option value="customer">Müşteri Hizmetleri</option>
+                                <option value="hr">İnsan Kaynakları</option>
+                                <option value="finance">Finans</option>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <select class="form-select" id="statusFilter">
@@ -159,7 +169,7 @@
                                 <option value="inactive">Pasif</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <button type="button" class="btn btn-outline-secondary w-100" id="clearFilters">
                                 <i class="fas fa-times"></i> Temizle
                             </button>
@@ -177,8 +187,10 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 10%;">No</th>
-                                        <th style="width: 70%;">Görev Tanımı</th>
+                                        <th style="width: 8%;">No</th>
+                                        <th style="width: 42%;">Görev Tanımı</th>
+                                        <th style="width: 15%;">Kategori</th>
+                                        <th style="width: 15%;">Durum</th>
                                         <th style="width: 20%;">İşlemler</th>
                                     </tr>
                                 </thead>
@@ -227,10 +239,22 @@
                 <div class="modal-body">
                     <form id="addTaskForm">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="taskNumber" class="form-label">Görev Numarası <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="taskNumber" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addTaskCategory" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="addTaskCategory" required>
+                                        <option value="security">Güvenlik</option>
+                                        <option value="maintenance">Bakım</option>
+                                        <option value="customer">Müşteri Hizmetleri</option>
+                                        <option value="hr">İnsan Kaynakları</option>
+                                        <option value="finance">Finans</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -238,9 +262,12 @@
                             <label for="taskDescription" class="form-label">Görev Tanımı <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="taskDescription" rows="4" required></textarea>
                         </div>
-                        <!-- Hidden fields for automatic values -->
-                        <input type="hidden" id="taskCategory" value="security">
-                        <input type="hidden" id="isActive" value="true">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="addIsActive" checked>
+                                <label class="form-check-label" for="addIsActive">Aktif</label>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -265,10 +292,22 @@
                     <form id="editTaskForm">
                         <input type="hidden" id="editTaskId">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editTaskNumber" class="form-label">Görev Numarası <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="editTaskNumber" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editTaskCategory" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="editTaskCategory" required>
+                                        <option value="security">Güvenlik</option>
+                                        <option value="maintenance">Bakım</option>
+                                        <option value="customer">Müşteri Hizmetleri</option>
+                                        <option value="hr">İnsan Kaynakları</option>
+                                        <option value="finance">Finans</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -276,9 +315,12 @@
                             <label for="editTaskDescription" class="form-label">Görev Tanımı <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="editTaskDescription" rows="4" required></textarea>
                         </div>
-                        <!-- Hidden fields for automatic values -->
-                        <input type="hidden" id="editTaskCategory" value="security">
-                        <input type="hidden" id="editIsActive" value="true">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editIsActive" checked>
+                                <label class="form-check-label" for="editIsActive">Aktif</label>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">

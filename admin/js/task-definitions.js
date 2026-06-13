@@ -75,11 +75,28 @@ class TaskDefinitionsManager {
             });
         }
 
+        // Category filter
+        const categoryFilter = document.getElementById('categoryFilter');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', () => {
+                this.filterTasks();
+            });
+        }
+
+        // Status filter
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', () => {
+                this.filterTasks();
+            });
+        }
+
         // Clear filters
         const clearFilters = document.getElementById('clearFilters');
         if (clearFilters) {
             clearFilters.addEventListener('click', () => {
                 document.getElementById('searchInput').value = '';
+                document.getElementById('categoryFilter').value = '';
                 document.getElementById('statusFilter').value = '';
                 this.filterTasks();
             });
@@ -122,20 +139,20 @@ class TaskDefinitionsManager {
 
     filterTasks() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const categoryFilter = document.getElementById('categoryFilter').value;
         const statusFilter = document.getElementById('statusFilter').value;
-        // Removed category filter
 
         this.filteredTasks = this.tasks.filter(task => {
             const matchesSearch = task.task_description.toLowerCase().includes(searchTerm) ||
                                 task.task_number.toString().includes(searchTerm);
             
+            const matchesCategory = !categoryFilter || task.category === categoryFilter;
+
             const matchesStatus = !statusFilter || 
                                 (statusFilter === 'active' && task.is_active) ||
                                 (statusFilter === 'inactive' && !task.is_active);
-            
-            // Removed category matching since no category filter
 
-            return matchesSearch && matchesStatus;
+            return matchesSearch && matchesCategory && matchesStatus;
         });
 
         this.renderTasks();
@@ -153,11 +170,22 @@ class TaskDefinitionsManager {
         document.getElementById('noResults').style.display = 'none';
 
         tbody.innerHTML = this.filteredTasks.map(task => `
-            <tr>
+            <tr class="${task.is_active ? '' : 'table-secondary'}">
                 <td class="fw-bold">${task.task_number}</td>
                 <td>
                     <div class="task-description" title="${this.escapeHtml(task.task_description)}">
                         ${this.truncateText(task.task_description, 120)}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-info text-dark">${this.getCategoryName(task.category)}</span>
+                </td>
+                <td>
+                    <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" 
+                               ${task.is_active ? 'checked' : ''}
+                               onchange="taskManager.toggleTask('${task.id}')"
+                               style="cursor: pointer;">
                     </div>
                 </td>
                 <td>
@@ -489,13 +517,12 @@ class TaskDefinitionsManager {
 
         this.currentEditId = taskId;
 
-        // Populate form - only show editable fields
         document.getElementById('editTaskId').value = task.id;
         document.getElementById('editTaskNumber').value = task.task_number;
         document.getElementById('editTaskDescription').value = task.task_description;
-        // Category and Active status are hidden and automatically set
+        document.getElementById('editTaskCategory').value = task.category || 'security';
+        document.getElementById('editIsActive').checked = task.is_active !== false;
 
-        // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
         modal.show();
     }
@@ -516,8 +543,8 @@ class TaskDefinitionsManager {
         return {
             task_number: parseInt(document.getElementById(isEditForm ? 'editTaskNumber' : 'taskNumber').value),
             task_description: document.getElementById(isEditForm ? 'editTaskDescription' : 'taskDescription').value,
-            category: 'security', // Always set to security
-            is_active: true // Always set to active
+            category: document.getElementById(isEditForm ? 'editTaskCategory' : 'addTaskCategory').value,
+            is_active: document.getElementById(isEditForm ? 'editIsActive' : 'addIsActive').checked
         };
     }
 
@@ -539,9 +566,11 @@ class TaskDefinitionsManager {
         const categories = {
             'security': 'Güvenlik',
             'maintenance': 'Bakım',
-            'customer': 'Müşteri Hizmetleri'
+            'customer': 'Müşteri Hizmetleri',
+            'hr': 'İnsan Kaynakları',
+            'finance': 'Finans'
         };
-        return categories[category] || category;
+        return categories[category] || category || 'Belirtilmemiş';
     }
 
     truncateText(text, maxLength) {
