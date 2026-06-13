@@ -5,10 +5,10 @@
 
 window.PG_CONFIG = {
     // Dev: PostgREST at postgrest:3000 (internal Docker hostname)
-    // Prod: PostgREST at selma-api.ozguryilmaz.com.tr (public)
+    // Prod: PostgREST at selma.ozguryilmaz.com.tr/api (public)
     apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://postgrest:3000'
-        : 'https://selma-api.ozguryilmaz.com.tr',
+        : 'https://selma.ozguryilmaz.com.tr/api',
     tables: {
         testResults: 'test_results',
         participants: 'participants',
