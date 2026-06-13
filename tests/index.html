@@ -285,6 +285,18 @@ define('apiReachable', 'PostgREST API Erişilebilir', async () => {
     return { status: 'pass', message: `${url} — yanıt alındı (HTTP ${res.status})`, detail };
 }, { dependsOn: 'jsLibs' });
 
+define('postgrestSignature', 'PostgREST İmzası (PGRST302 + Bearer)', async () => {
+    const url = PG_CONFIG.apiUrl + '/questions?limit=1';
+    const res = await fetch(url);
+    const body = await res.json();
+    const wwwAuth = res.headers.get('www-authenticate');
+    const isPostgREST = body && body.code === 'PGRST302' && wwwAuth && wwwAuth.includes('Bearer');
+    if (!isPostgREST) {
+        throw new Error('PostgREST imzası bulunamadı — yanıt PostgREST\'e ait değil');
+    }
+    return { status: 'pass', message: 'PostgREST doğrulandı (PGRST302 + Bearer header)', detail: { code: body.code, wwwAuthenticate: wwwAuth } };
+}, { dependsOn: 'apiReachable' });
+
 define('authEndpoint', 'Auth /rpc/login Çalışıyor', async () => {
     const url = PG_CONFIG.apiUrl + '/rpc/login';
     const res = await fetch(url, {

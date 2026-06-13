@@ -133,22 +133,24 @@ RES=$(curl -s localhost:3000/questions?limit=1 -H "Accept: application/json" 2>&
 echo "$RES" | grep -q "PGRST302"
 check_result $? "PostgREST (localhost)"
 
+# PostgREST imzası: PGRST302 + www-authenticate header
 # ================================================================
-# 5 — PostgREST (public URL)
+# 5 — PostgREST İmzası
 # ================================================================
-check  5 "PostgREST (public API)" "Cloudflare tunnel üzerinden $API_URL"
+check  5 "PostgREST İmzası" "Sunucu yanıtında PGRST302 + Bearer header"
+HEADERS=$(curl -sI localhost:3000/questions?limit=1 2>&1)
+BODY=$(curl -s localhost:3000/questions?limit=1 -H "Accept: application/json" 2>&1)
+echo "$BODY" | grep -q "PGRST302" && echo "$HEADERS" | grep -qi "www-authenticate.*Bearer"
+check_result $? "PostgREST İmzası"
+detail "  code=PGRST302 + www-authenticate: Bearer → PostgREST onaylandı"
+
+# ================================================================
+# 6 — PostgREST (public URL)
+# ================================================================
+check  6 "PostgREST (public API)" "Cloudflare tunnel üzerinden $API_URL"
 RES=$(curl -s --max-time 10 "$API_URL/questions?limit=1" -H "Accept: application/json" 2>&1)
 echo "$RES" | grep -q "PGRST302"
 check_result $? "PostgREST (public)"
-
-# ================================================================
-# 6 — CORS
-# ================================================================
-check  6 "Aynı Origin /api Proxy" "Nginx reverse proxy /api → PostgREST"
-RES=$(curl -s "$API_URL/questions?limit=1" -H "Accept: application/json" 2>&1)
-echo "$RES" | grep -q "PGRST302"
-check_result $? "/api Proxy"
-detail "  Proxy: $API_URL → PGRST302 (anon disabled, ama proxy çalışıyor)"
 
 # ================================================================
 # 7 — PostgreSQL Tabloları
@@ -212,14 +214,6 @@ detail "  $VER"
 check 12 "DNS (selma.ozguryilmaz.com.tr)" "Domain çözümleniyor"
 run host "selma.ozguryilmaz.com.tr" || run nslookup "selma.ozguryilmaz.com.tr"
 check_result $? "DNS (ana domain)"
-
-TOTAL=$((TOTAL+1))
-bold " ${CYAN}#12${NC} API (same origin /api)"
-detail "Nginx proxy — /api üzerinden HTTP 401 dönüyor mu"
-RES=$(curl -sI "$API_URL/questions?limit=1" 2>&1)
-echo "$RES" | grep -q "HTTP/2 401"
-check_result $? "/api Proxy (same origin)"
-detail "  API aynı domain altında — CORS sorunu yok. Test #5-6'da doğrulandı."
 
 # ================================================================
 # 13 — Docker Container'lar
