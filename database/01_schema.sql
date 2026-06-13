@@ -207,13 +207,10 @@ CREATE TABLE IF NOT EXISTS kvkk (
 -- ============================================================
 CREATE TABLE IF NOT EXISTS task_definitions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
+    task_number INTEGER NOT NULL,
+    task_description TEXT,
+    is_active BOOLEAN DEFAULT true,
     category VARCHAR(100),
-    assigned_to VARCHAR(100),
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'cancelled')),
-    due_date DATE,
-    created_by VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
