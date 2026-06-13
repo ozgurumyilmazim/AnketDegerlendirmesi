@@ -305,6 +305,7 @@ define('authLogin', 'JWT Alımı', async () => {
         throw new Error('JWT alınamadı: ' + JSON.stringify(body));
     }
     AUTH_TOKEN = body;
+    localStorage.setItem('mmpi_token', body);
     return { status: 'pass', message: 'JWT başarıyla alındı', detail: { preview: body.substring(0, 30) + '...' } };
 }, { dependsOn: 'apiReachable' });
 
