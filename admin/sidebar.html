@@ -31,6 +31,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="questions.html" id="nav-questions">
+                    <i class="fas fa-question-circle me-2"></i>
+                    <span class="sidebar-text">Sorular</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="task-definitions.html" id="nav-task-definitions">
                     <i class="fas fa-tasks me-2"></i>
                     <span class="sidebar-text">Görev Tanımları</span>
@@ -72,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
             break;
         case 'reports.html':
             document.getElementById('nav-reports').classList.add('active');
+            break;
+        case 'questions.html':
+            document.getElementById('nav-questions').classList.add('active');
             break;
         case 'task-definitions.html':
             document.getElementById('nav-task-definitions').classList.add('active');
