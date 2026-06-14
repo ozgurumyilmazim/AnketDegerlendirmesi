@@ -256,7 +256,7 @@ async function getTestResults() {
         const { data: testResults, error: testError } = await supabase
             .from('test_results')
             .select('*')
-            .order('created', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (testError) {
             console.error('Test sonuçları çekilirken hata:', testError);
@@ -323,7 +323,7 @@ async function getTestResults() {
                 id: test.id,
                 participantName: participantName,
                 testType: test.test_type || 'MMPI',
-                completedAt: test.end_time || test.created,
+                completedAt: test.end_time || test.created_at,
                 status: test.status || 'unknown',
                 score: score,
                 duration: duration,
