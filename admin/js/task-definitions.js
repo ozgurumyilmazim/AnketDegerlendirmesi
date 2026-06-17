@@ -22,9 +22,9 @@ class TaskDefinitionsManager {
         try {
             this.showLoading(true);
             
-            if (window.supabase) {
+            if (window.PG_API) {
                 try {
-                    const { data, error } = await window.supabase
+                    const { data, error } = await window.PG_API
                         .from('task_definitions')
                         .select('*')
                         .order('task_number', { ascending: true });
@@ -218,7 +218,7 @@ class TaskDefinitionsManager {
     async saveTask() {
         try {
             console.log('saveTask called');
-            console.log('window.supabase:', window.supabase);
+            console.log('window.PG_API:', window.PG_API);
             
             const formData = this.getFormData('addTaskForm');
             console.log('Form data:', formData);
@@ -241,11 +241,11 @@ class TaskDefinitionsManager {
             
             let savedToDb = false;
 
-            if (window.supabase) {
+            if (window.PG_API) {
                 try {
                     console.log('Saving to database...');
                     
-                    const { data, error } = await window.supabase
+                    const { data, error } = await window.PG_API
                         .from('task_definitions')
                         .insert([newTask]);
                     
@@ -327,9 +327,9 @@ class TaskDefinitionsManager {
             
             let savedToDb = false;
 
-            if (window.supabase && !this.currentEditId.startsWith('static-') && !this.currentEditId.startsWith('local-')) {
+            if (window.PG_API && !this.currentEditId.startsWith('static-') && !this.currentEditId.startsWith('local-')) {
                 try {
-                    const { error } = await window.supabase
+                    const { error } = await window.PG_API
                         .from('task_definitions')
                         .update(formData)
                         .eq('id', this.currentEditId);
@@ -382,9 +382,9 @@ class TaskDefinitionsManager {
                 return;
             }
 
-            if (window.supabase && !this.currentDeleteId.startsWith('static-')) {
+            if (window.PG_API && !this.currentDeleteId.startsWith('static-')) {
                 try {
-                    const { error } = await window.supabase
+                    const { error } = await window.PG_API
                         .from('task_definitions')
                         .delete()
                         .eq('id', this.currentDeleteId);
@@ -421,9 +421,9 @@ class TaskDefinitionsManager {
             const task = this.tasks[taskIndex];
             const newStatus = !task.is_active;
 
-            if (window.supabase && !taskId.startsWith('static-')) {
+            if (window.PG_API && !taskId.startsWith('static-')) {
                 try {
-                    const { error } = await window.supabase
+                    const { error } = await window.PG_API
                         .from('task_definitions')
                         .update({ is_active: newStatus, updated_at: new Date().toISOString() })
                         .eq('id', taskId);

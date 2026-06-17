@@ -9,12 +9,12 @@ class TaskDefinitionsMigration {
         try {
             console.log('Starting task definitions migration...');
             
-            if (!window.supabase) {
+            if (!window.PG_API) {
                 throw new Error('Database client not available');
             }
 
             // Get all reports that might have old task_definitions_evaluation data
-            const { data: reports, error } = await window.supabase
+            const { data: reports, error } = await window.PG_API
                 .from('reports')
                 .select('id, task_definitions_evaluation')
                 .not('task_definitions_evaluation', 'is', null);
@@ -68,7 +68,7 @@ class TaskDefinitionsMigration {
             const migratedData = this.convertToNewFormat(currentData);
 
             // Update the report
-            const { error } = await window.supabase
+            const { error } = await window.PG_API
                 .from('reports')
                 .update({
                     task_definitions_evaluation: migratedData,
@@ -239,11 +239,11 @@ class TaskDefinitionsMigration {
         try {
             console.log('Starting dry run migration...');
             
-            if (!window.supabase) {
+            if (!window.PG_API) {
                 throw new Error('Database client not available');
             }
 
-            const { data: reports, error } = await window.supabase
+            const { data: reports, error } = await window.PG_API
                 .from('reports')
                 .select('id, task_definitions_evaluation')
                 .not('task_definitions_evaluation', 'is', null);

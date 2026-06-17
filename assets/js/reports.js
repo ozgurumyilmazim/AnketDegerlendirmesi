@@ -125,7 +125,7 @@ function setupEventListeners() {
     window.logout = async function() {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
-                // Supabase'den çıkış yap
+                // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }
@@ -222,11 +222,11 @@ async function loadReportData() {
     }
 }
 
-// Rapor verilerini getir (Supabase'den)
+// Rapor verilerini getir (PG_API'den)
 async function getReportData() {
     try {
         // Test sonuçlarını al
-        const { data: testResults, error: testError } = await supabase
+        const { data: testResults, error: testError } = await PG_API
             .from('test_results')
             .select('id, participant_id, test_answers, start_time, end_time, completed_questions, total_questions, status, created_at')
             .eq('status', 'completed');
@@ -237,7 +237,7 @@ async function getReportData() {
         }
 
         // Raporları al
-        const { data: reports, error: reportsError } = await supabase
+        const { data: reports, error: reportsError } = await PG_API
             .from('reports')
             .select(`
                 *,
@@ -251,7 +251,7 @@ async function getReportData() {
 
         // Katılımcı adlarını topla (liste görünümü için)
         const participantIds = [...new Set(testResults.map(t => t.participant_id).filter(Boolean))];
-        const { data: participants } = await supabase
+        const { data: participants } = await PG_API
             .from('participants')
             .select('id, first_name, last_name')
             .in('id', participantIds);
@@ -318,7 +318,7 @@ async function getReportData() {
         // Yaş grupları: participants tablosundan yaş çek
         for (const test of testResults) {
             try {
-                const { data: p } = await supabase
+                const { data: p } = await PG_API
                     .from('participants')
                     .select('age')
                     .eq('id', test.participant_id)
@@ -691,7 +691,7 @@ function showNotification(message, type = 'info') {
 // Bireysel raporları yükle
 async function loadIndividualReports() {
     try {
-        const { data: reports, error } = await supabase
+        const { data: reports, error } = await PG_API
             .from('reports')
             .select(`
                 id,
@@ -722,7 +722,7 @@ async function loadIndividualReports() {
         try {
             const participantIds = [...new Set((reports || []).map(r => r.test_results?.participant_id).filter(Boolean))];
             if (participantIds.length > 0) {
-                const { data: participants } = await supabase
+                const { data: participants } = await PG_API
                     .from('participants')
                     .select('id, first_name, last_name')
                     .in('id', participantIds);
@@ -961,7 +961,7 @@ async function deleteReport(reportId) {
     }
     
     try {
-        const { error } = await supabase
+        const { error } = await PG_API
             .from('reports')
             .delete()
             .eq('id', reportId);

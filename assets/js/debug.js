@@ -2,12 +2,12 @@
 // This script is intended for temporary troubleshooting.
 
 (async () => {
-    if (!window.supabase) {
+    if (!window.PG_API) {
         document.getElementById('status').textContent = 'DB client not initialized.';
         return;
     }
     try {
-        const { data: users, error: err } = await supabase.from('users').select('id, email, role');
+        const { data: users, error: err } = await PG_API.from('users').select('id, email, role');
         if (err) throw err;
 
         const tbody = document.querySelector('#usersTable tbody');

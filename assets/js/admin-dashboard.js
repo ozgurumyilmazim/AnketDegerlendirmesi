@@ -35,12 +35,12 @@ async function checkAuthentication() {
     }
 
     try {
-        // Önce Supabase session kontrolü
+        // Önce PG_API session kontrolü
         const session = await AuthService.getSession();
-        console.log('Supabase session object:', session);
+        console.log('PG_API session object:', session);
         
         if (session && session.user) {
-            // Supabase session var, kullanıcı bilgilerini al
+            // PG_API session var, kullanıcı bilgilerini al
             const userRole = await AuthService.getUserRole();
             const isAdmin = await AuthService.isAdmin();
             
@@ -58,7 +58,7 @@ async function checkAuthentication() {
             return;
         }
         
-        // Supabase session yok, local storage kontrolü (fallback)
+        // PG_API session yok, local storage kontrolü (fallback)
         const sessionLogin = sessionStorage.getItem('adminLogin');
         const localLogin = localStorage.getItem('adminLogin');
         console.log('sessionLogin storage:', sessionLogin);
@@ -137,21 +137,21 @@ async function loadDashboardData() {
     }
 }
 
-// Dashboard verilerini getir (Supabase)
+// Dashboard verilerini getir (PG_API)
 async function getDashboardData() {
     try {
-        // Supabase bağlantısını kontrol et
-        if (!window.supabase || typeof window.supabase.from !== 'function') {
-            console.warn('Supabase bağlantısı bulunamadı, demo veriler kullanılıyor.');
+        // PG_API bağlantısını kontrol et
+        if (!window.PG_API || typeof window.PG_API.from !== 'function') {
+            console.warn('PG_API bağlantısı bulunamadı, demo veriler kullanılıyor.');
             showConnectionWarning('Veritabanı bağlantısı kurulamadı. Demo veriler gösteriliyor.');
             return getDemoData();
         }
 
         // Paralel olarak tüm verileri çek
         const [participantsResult, testsResult, reportsResult] = await Promise.all([
-            window.supabase.from('participants').select('*'),
-            window.supabase.from('test_results').select('*'),
-            window.supabase.from('reports').select('*')
+            window.PG_API.from('participants').select('*'),
+            window.PG_API.from('test_results').select('*'),
+            window.PG_API.from('reports').select('*')
         ]);
 
         // Hata kontrolü
@@ -207,7 +207,7 @@ async function getDashboardData() {
         };
 
     } catch (error) {
-        console.error('Supabase verisi alınırken hata:', error);
+        console.error('PG_API verisi alınırken hata:', error);
         
         // Kullanıcıya hata mesajı göster
         let errorMessage = 'Veritabanı bağlantısında sorun yaşanıyor. Demo veriler gösteriliyor.';
@@ -548,7 +548,7 @@ function setupEventListeners() {
     window.logout = async function() {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
-                // Supabase'den çıkış yap
+                // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }

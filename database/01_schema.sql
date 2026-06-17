@@ -1,7 +1,6 @@
 -- ============================================================
 -- MMPI PostgreSQL Schema Migration
 -- Phase 1: Full database schema for MMPI-2 Test System
--- Replaces Supabase managed schema with direct PostgreSQL
 -- ============================================================
 
 -- Run as superuser once: createdb mmpi_db
@@ -12,7 +11,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ============================================================
--- USERS TABLE (replaces Supabase auth.users + custom users)
+-- USERS TABLE (auth.users + custom users)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -229,7 +228,7 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- ============================================================
--- SESSIONS TABLE (replaces Supabase Auth sessions)
+-- SESSIONS TABLE (replaces PG_API Auth sessions)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS sessions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

@@ -9,12 +9,12 @@ if (typeof TaskDefinitionsLoader === 'undefined') {
 
     async loadTaskDefinitions() {
         try {
-            // Wait for Supabase client to be available
-            if (!window.supabase) {
+            // Wait for PG_API client to be available
+            if (!window.PG_API) {
                 throw new Error('Database client not available');
             }
 
-            const { data, error } = await window.supabase
+            const { data, error } = await window.PG_API
                 .from('task_definitions')
                 .select('*')
                 .eq('is_active', true)
@@ -532,17 +532,17 @@ if (!window.taskDefinitionsLoader) {
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on the report page
     if (document.getElementById('task-definition-evaluation')) {
-        // Wait for Supabase to be initialized
+        // Wait for PG_API to be initialized
         const initTaskDefinitions = async () => {
             try {
-                // Wait for supabase client to be ready
+                // Wait for PG_API client to be ready
                 let attempts = 0;
-                while (!window.supabase && attempts < 50) {
+                while (!window.PG_API && attempts < 50) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     attempts++;
                 }
                 
-                if (!window.supabase) {
+                if (!window.PG_API) {
                     throw new Error('Database client not available after waiting');
                 }
                 

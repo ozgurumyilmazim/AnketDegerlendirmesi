@@ -1,7 +1,7 @@
 // Admin Login JavaScript
-// Psikolog giriş sistemi - Supabase Authentication
+// Psikolog giriş sistemi - PG_API Authentication
 
-// Supabase authentication kullanılıyor
+// PG_API authentication kullanılıyor
 
 // DOM elementleri (jQuery ile)
 const $loginForm = $('#loginForm');
@@ -18,8 +18,8 @@ const $resetEmailInput = $('#resetEmail');
 
 // Sayfa yüklendiğinde
 $(document).ready(async function () {
-    // Supabase kontrolü
-    if (typeof supabase !== 'undefined' && supabase) {
+    // PG_API kontrolü
+    if (typeof PG_API !== 'undefined' && PG_API) {
         // Önceden giriş yapılmış mı kontrol et
         await checkExistingLogin();
 
@@ -34,7 +34,7 @@ $(document).ready(async function () {
             }
         });
     } else {
-        console.log('Supabase bağlantısı mevcut değil, offline modda çalışıyor.');
+        console.log('PG_API bağlantısı mevcut değil, offline modda çalışıyor.');
     }
 
     // Event listener'ları ekle
@@ -121,7 +121,7 @@ async function handleLogin(e) {
     setLoadingState(true);
 
     try {
-        // Supabase ile giriş yap
+        // PG_API ile giriş yap
         const { data, error } = await AuthService.signIn(email, password);
 
         if (error) {
@@ -171,7 +171,7 @@ async function handleLogin(e) {
 
     } catch (error) {
         console.error('Giriş hatası:', error);
-        // Supabase errors expose a .message property
+        // PG_API errors expose a .message property
         const friendlyMsg = error?.message ?? 'Bilinmeyen bir hata oluştu.';
         showAlert(friendlyMsg, 'danger');   // shows the message in #loginAlert
         setLoadingState(false);
@@ -201,7 +201,7 @@ async function handleLogin(e) {
 // Önceden giriş yapılmış mı kontrol et
 async function checkExistingLogin() {
     try {
-        // Supabase session kontrolü
+        // PG_API session kontrolü
         const session = await AuthService.getSession();
 
         if (session && session.user) {
@@ -224,7 +224,7 @@ async function checkExistingLogin() {
             const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
 
             if (hoursDiff < 24) {
-                // Local storage'da geçerli giriş var ama Supabase session yok
+                // Local storage'da geçerli giriş var ama PG_API session yok
                 // Kullanıcıyı tekrar giriş yapmaya yönlendir
                 console.log('Local storage login bulundu ama session yok');
             } else {
@@ -270,7 +270,7 @@ async function handlePasswordReset() {
     $sendResetLinkBtn.prop('disabled', true);
 
     try {
-        // Supabase ile şifre sıfırlama e-postası gönder
+        // PG_API ile şifre sıfırlama e-postası gönder
         await AuthService.resetPassword(email);
 
         alert('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
@@ -330,7 +330,7 @@ function isValidEmail(email) {
 // Logout fonksiyonu (diğer sayfalarda kullanılmak üzere)
 async function logout() {
     try {
-        // Supabase'den çıkış yap
+        // PG_API'den çıkış yap
         await AuthService.signOut();
 
         // Local storage'ı temizle

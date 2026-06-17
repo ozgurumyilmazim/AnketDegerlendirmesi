@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/pg-config.js"></script>
-    <script src="assets/js/supabase-config.js"></script>
     <style>
         .navbar-custom {
             background: rgba(255,255,255,0.95);
@@ -396,7 +395,7 @@
     <script>
         async function loadPageContent() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await PG_API
                     .from('page_content')
                     .select('*')
                     .eq('page_key', 'ana-sayfa')

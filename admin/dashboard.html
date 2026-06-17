@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MMPI Test Sistemi</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.ico">
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -16,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
-    
+
     <style>
         .sidebar {
             min-height: 100vh;
@@ -29,48 +30,48 @@
             z-index: 1000;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar.collapsed {
             width: 70px;
         }
-        
+
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             padding: 12px 20px;
             border-radius: 8px;
             margin: 2px 10px;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
-        
+
         .main-content {
             margin-left: 250px;
             transition: all 0.3s ease;
         }
-        
+
         .main-content.expanded {
             margin-left: 70px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 15px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             border: none;
             transition: all 0.3s ease;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
-        
+
         .stat-icon {
             width: 60px;
             height: 60px;
@@ -81,56 +82,56 @@
             font-size: 1.5rem;
             color: white;
         }
-        
+
         .bg-primary-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+
         .bg-success-gradient {
             background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
         }
-        
+
         .bg-warning-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        
+
         .bg-info-gradient {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
-        
+
         .chart-container {
             background: white;
             border-radius: 15px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             margin-bottom: 2rem;
         }
-        
+
         .recent-tests {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-        
+
         .test-item {
             padding: 1rem;
             border-bottom: 1px solid #f0f0f0;
             transition: all 0.3s ease;
         }
-        
+
         .test-item:hover {
             background: #f8f9fa;
         }
-        
+
         .test-item:last-child {
             border-bottom: none;
         }
-        
+
         .navbar {
             background: white !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .user-avatar {
             width: 35px;
             height: 35px;
@@ -142,7 +143,7 @@
             color: white;
             font-weight: bold;
         }
-        
+
         .sidebar-toggle {
             background: none;
             border: none;
@@ -152,32 +153,33 @@
             border-radius: 5px;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar-toggle:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
-        
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <!-- Include Sidebar -->
     <div id="sidebar-container"></div>
-    
+
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Navbar -->
@@ -186,17 +188,17 @@
                 <button class="sidebar-toggle d-md-none me-3" onclick="toggleSidebar()">
                     <i class="fas fa-bars text-dark"></i>
                 </button>
-                
+
                 <button class="sidebar-toggle d-none d-md-block me-3" onclick="collapseSidebar()">
                     <i class="fas fa-bars text-dark"></i>
                 </button>
-                
+
                 <h4 class="mb-0 text-dark">Dashboard</h4>
-                
+
                 <div class="ms-auto d-flex align-items-center">
                     <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle d-flex align-items-center" 
-                                type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button"
+                            data-bs-toggle="dropdown">
                             <div class="user-avatar me-2">
                                 <span id="userInitials">A</span>
                             </div>
@@ -204,14 +206,14 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="logout()">
-                                <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
-                            </a></li>
+                                    <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                </a></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </nav>
-        
+
         <!-- Dashboard Content -->
         <div class="container-fluid p-4">
             <!-- İstatistik Kartları -->
@@ -229,7 +231,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card">
                         <div class="d-flex align-items-center">
@@ -243,7 +245,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card">
                         <div class="d-flex align-items-center">
@@ -257,7 +259,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card">
                         <div class="d-flex align-items-center">
@@ -272,7 +274,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Grafikler -->
             <div class="row mb-4">
                 <div class="col-lg-8">
@@ -284,7 +286,7 @@
                         <canvas id="testsChart" height="120"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4">
                     <div class="chart-container">
                         <h5 class="mb-3">
@@ -295,7 +297,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Son Testler -->
             <div class="row">
                 <div class="col-12">
@@ -320,16 +322,14 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- PG Config -->
     <script src="../assets/js/pg-config.js"></script>
-    <!-- Supabase Config -->
-    <script src="../assets/js/supabase-config.js"></script>
     <!-- Dashboard JS -->
     <script src="../assets/js/admin-dashboard.js"></script>
-    
+
     <!-- Load Sidebar -->
     <script>
         fetch('sidebar.html')
@@ -340,4 +340,5 @@
             .catch(error => console.error('Error loading sidebar:', error));
     </script>
 </body>
+
 </html>

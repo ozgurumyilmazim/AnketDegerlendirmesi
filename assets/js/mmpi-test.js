@@ -33,25 +33,25 @@ class MMPITest {
     async loadQuestions() {
         try {
             console.log('loadQuestions başladı');
-            console.log('supabase object:', typeof supabase, supabase);
+            console.log('PG_API object:', typeof PG_API, PG_API);
             
-            // Supabase kontrolü
-            if (typeof supabase === 'undefined' || !supabase) {
-                throw new Error('Supabase client bulunamadı. Lütfen sayfayı yenileyin.');
+            // PG_API kontrolü
+            if (typeof PG_API === 'undefined' || !PG_API) {
+                throw new Error('PG_API client bulunamadı. Lütfen sayfayı yenileyin.');
             }
             
-            console.log('Supabase bağlantısı deneniyor...');
+            console.log('PG_API bağlantısı deneniyor...');
             
-            // Supabase'den veri çek
-            const { data, error } = await supabase
+            // PG_API'den veri çek
+            const { data, error } = await PG_API
                 .from('questions')
                 .select('id, question_number, question_text, category')
                 .order('question_number', { ascending: true });
             
-            console.log('Supabase yanıtı:', { data, error });
+            console.log('PG_API yanıtı:', { data, error });
             
             if (error) {
-                console.error('Supabase sorgu hatası:', error);
+                console.error('PG_API sorgu hatası:', error);
                 throw new Error(`Veritabanı hatası: ${error.message}`);
             }
             
@@ -155,11 +155,11 @@ class MMPITest {
                 return true;
             }
             
-            // Supabase kontrolü (eğer bağlantı varsa)
-            if (typeof supabase !== 'undefined' && supabase) {
+            // PG_API kontrolü (eğer bağlantı varsa)
+            if (typeof PG_API !== 'undefined' && PG_API) {
                 try {
                     // participant_id üzerinden kontrol et (daha güvenilir)
-                    const { data: participantData, error: participantError } = await supabase
+                    const { data: participantData, error: participantError } = await PG_API
                         .from('participants')
                         .select('id')
                         .eq('first_name', normalizedInfo.name)
@@ -172,22 +172,22 @@ class MMPITest {
                     } else if (participantData && participantData.length > 0) {
                         // Bu katılımcının tamamlanmış testi var mı kontrol et
                         // Minimal görünüm: sadece var mı diye kontrol edilir
-                        const { data, error } = await supabase
+                        const { data, error } = await PG_API
                             .from('test_results_min')
                             .select('id')
                             .eq('participant_id', participantData[0].id)
                             .limit(1);
                         
                         if (error) {
-                            console.log('Supabase kontrolü başarısız, localStorage kontrolü yeterli');
+                            console.log('PG_API kontrolü başarısız, localStorage kontrolü yeterli');
                         } else if (data && data.length > 0) {
-                            console.log('Supabase\'de aynı kişinin testi bulundu (min görünüm):', data[0]);
+                            console.log('PG_API\'de aynı kişinin testi bulundu (min görünüm):', data[0]);
                             this.showPreviousTestWarning();
                             return true;
                         }
                     }
-                } catch (supabaseError) {
-                    console.log('Supabase bağlantı hatası, localStorage kontrolü yeterli');
+                } catch (PostgreSQLError) {
+                    console.log('PG_API bağlantı hatası, localStorage kontrolü yeterli');
                 }
             }
             
@@ -630,14 +630,14 @@ class MMPITest {
             console.log('Tamamlanmış test bilgisi localStorage\'a kaydedildi:', completedTest);
         }
         
-        // Supabase'e kaydet (eğer yapılandırılmışsa)
-        console.log('Supabase bağlantısı kontrol ediliyor...');
-        console.log('typeof supabase:', typeof supabase);
-        console.log('supabase object:', supabase);
+        // PG_API'e kaydet (eğer yapılandırılmışsa)
+        console.log('PG_API bağlantısı kontrol ediliyor...');
+        console.log('typeof PG_API:', typeof PG_API);
+        console.log('PG_API object:', PG_API);
         
-        if (typeof supabase !== 'undefined' && supabase) {
+        if (typeof PG_API !== 'undefined' && PG_API) {
             try {
-                console.log('Supabase bağlantısı mevcut, test sonuçları kaydediliyor...');
+                console.log('PG_API bağlantısı mevcut, test sonuçları kaydediliyor...');
                 console.log('Kişisel bilgiler:', personalInfo);
                 
                 // Önce localStorage'dan participant_id'yi kontrol et
@@ -663,7 +663,7 @@ class MMPITest {
                     
                     console.log('Katılımcı verisi hazırlandı:', participantData);
                     
-                    const { data: participantResult, error: participantError } = await supabase
+                    const { data: participantResult, error: participantError } = await PG_API
                         .from('participants')
                         .insert([participantData])
                         .select()
@@ -683,7 +683,7 @@ class MMPITest {
                 }
                 
                 // Önce aynı participant_id ile test sonucu var mı kontrol et
-                const { data: existingTest, error: checkError } = await supabase
+                const { data: existingTest, error: checkError } = await PG_API
                     .from('test_results')
                     .select('id')
                     .eq('participant_id', participantId)
@@ -696,7 +696,7 @@ class MMPITest {
                 }
                 
                 // Eğer aynı katılımcı için test sonucu varsa, güncelle
-                const supabaseData = {
+                const PostgreSQLData = {
                     participant_id: participantId,
                     // participant_info kaldırıldı
                     test_answers: this.answers, // { [question_number]: 'Doğru'|'Yanlış'|'Bilmiyorum' }
@@ -711,25 +711,25 @@ class MMPITest {
                     status: 'completed'
                 };
                 
-                console.log('Test sonucu verisi hazırlandı:', supabaseData);
+                console.log('Test sonucu verisi hazırlandı:', PostgreSQLData);
                 
                 let data, error;
                 
                 if (existingTest && existingTest.length > 0) {
                     console.log('Aynı katılımcı için mevcut test sonucu güncelleniyor:', existingTest[0].id);
                     // Mevcut test sonucunu güncelle
-                    const result = await supabase
+                    const result = await PG_API
                         .from('test_results')
-                        .update(supabaseData)
+                        .update(PostgreSQLData)
                         .eq('id', existingTest[0].id);
                     
                     data = result.data;
                     error = result.error;
                 } else {
                     // Yeni test sonucu ekle
-                    const result = await supabase
+                    const result = await PG_API
                         .from('test_results')
-                        .insert([supabaseData]);
+                        .insert([PostgreSQLData]);
                     
                     data = result.data;
                     error = result.error;
@@ -741,15 +741,15 @@ class MMPITest {
                     throw error;
                 }
                 
-                console.log('Test sonuçları Supabase\'e başarıyla kaydedildi:', data);
+                console.log('Test sonuçları PG_API\'e başarıyla kaydedildi:', data);
             } catch (error) {
-                console.error('Supabase kayıt hatası:', error);
+                console.error('PG_API kayıt hatası:', error);
                 alert('Veritabanı kayıt hatası: ' + error.message);
                 // Hata durumunda da devam et, localStorage'da zaten kayıtlı
                 console.log('Test sonuçları yerel olarak kaydedildi.');
             }
         } else {
-            console.warn('Supabase bağlantısı mevcut değil, sadece yerel kayıt yapılıyor.');
+            console.warn('PG_API bağlantısı mevcut değil, sadece yerel kayıt yapılıyor.');
             alert('Veritabanı bağlantısı yok, test sonuçları sadece yerel olarak kaydedildi.');
         }
         
@@ -884,12 +884,12 @@ class MMPITest {
         // Verileri localStorage'a kaydet
         localStorage.setItem('mmpiPersonalInfo', JSON.stringify(formData));
         
-        // Supabase'e de kaydet/güncelle
+        // PG_API'e de kaydet/güncelle
         try {
-            await this.updateSupabaseRecord(formData, originalTcNo);
-            console.log('Katılımcı bilgileri Supabase\'e güncellendi.');
+            await this.updatePostgreSQLRecord(formData, originalTcNo);
+            console.log('Katılımcı bilgileri PG_API\'e güncellendi.');
         } catch (error) {
-            console.error('Supabase güncelleme hatası:', error);
+            console.error('PG_API güncelleme hatası:', error);
             // Hata durumunda da devam et
         }
         
@@ -900,10 +900,10 @@ class MMPITest {
 //        alert('Kişisel bilgileriniz başarıyla güncellendi.');
     }
     
-    async updateSupabaseRecord(participantData, originalTcNo = null) {
-        // Supabase bağlantısı kontrolü
-        if (typeof supabase === 'undefined' || !supabase) {
-            console.log('Supabase bağlantısı mevcut değil.');
+    async updatePostgreSQLRecord(participantData, originalTcNo = null) {
+        // PG_API bağlantısı kontrolü
+        if (typeof PG_API === 'undefined' || !PG_API) {
+            console.log('PG_API bağlantısı mevcut değil.');
             return;
         }
         
@@ -912,7 +912,7 @@ class MMPITest {
             const searchTcNo = originalTcNo || participantData.tcNo;
             
             // TC No ile kayıt bul ve güncelle
-            const { data, error } = await supabase
+            const { data, error } = await PG_API
                 .from('participants')
                 .update({
                     first_name: participantData.firstName,
@@ -942,7 +942,7 @@ class MMPITest {
             }
             
         } catch (error) {
-            console.error('Supabase güncelleme hatası:', error);
+            console.error('PG_API güncelleme hatası:', error);
             throw error;
         }
     }

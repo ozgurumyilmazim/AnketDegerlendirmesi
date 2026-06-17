@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
     try {
-        // Önce Supabase session kontrolü
+        // Önce PG_API session kontrolü
         const session = await AuthService.getSession();
         
         if (session && session.user) {
-            // Supabase session var, kullanıcı bilgilerini al
+            // PG_API session var, kullanıcı bilgilerini al
             const userRole = await AuthService.getUserRole();
             const isAdmin = await AuthService.isAdmin();
             
@@ -266,7 +266,7 @@ function setupEventListeners() {
     window.logout = async function() {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
-                // Supabase'den çıkış yap
+                // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }

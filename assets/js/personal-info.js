@@ -55,8 +55,8 @@ $(document).ready(function() {
         // Verileri localStorage'a kaydet
         localStorage.setItem('mmpiPersonalInfo', JSON.stringify(formData));
         
-        // Supabase'e katılımcı bilgilerini kaydet (eğer yapılandırılmışsa)
-        saveParticipantToSupabase(formData).then(() => {
+        // PG_API'e katılımcı bilgilerini kaydet (eğer yapılandırılmışsa)
+        saveParticipantToPostgreSQL(formData).then(() => {
             // KVKK onay sayfasına yönlendir
             window.location.href = 'kvkk-consent.html';
         }).catch(error => {
@@ -72,17 +72,17 @@ $(document).ready(function() {
     });
 });
 
-// Katılımcı bilgilerini Supabase'e kaydet
-async function saveParticipantToSupabase(participantData) {
-    // Supabase bağlantısı kontrolü
-    if (typeof supabase === 'undefined' || !supabase) {
-        console.log('Supabase bağlantısı mevcut değil, sadece localStorage kullanılıyor.');
+// Katılımcı bilgilerini PG_API'e kaydet
+async function saveParticipantToPostgreSQL(participantData) {
+    // PG_API bağlantısı kontrolü
+    if (typeof PG_API === 'undefined' || !PG_API) {
+        console.log('PG_API bağlantısı mevcut değil, sadece localStorage kullanılıyor.');
         throw new Error('Veritabanı bağlantısı kurulamadı');
     }
     
     try {
         // Önce aynı TC No ile kayıt var mı kontrol et
-        const { data: existingParticipant, error: checkError } = await supabase
+        const { data: existingParticipant, error: checkError } = await PG_API
             .from('participants')
             .select('id')
             .eq('tc_no', participantData.tcNo)
@@ -101,7 +101,7 @@ async function saveParticipantToSupabase(participantData) {
         console.log('Gender değeri:', participantData.gender);
         
         // Yeni katılımcı kaydet
-        const { data, error } = await supabase
+        const { data, error } = await PG_API
             .from('participants')
             .insert([{
                 first_name: participantData.firstName,
@@ -122,7 +122,7 @@ async function saveParticipantToSupabase(participantData) {
             throw error;
         }
         
-        console.log('Katılımcı bilgileri Supabase\'e kaydedildi:', data);
+        console.log('Katılımcı bilgileri PG_API\'e kaydedildi:', data);
         
         // Katılımcı ID'sini localStorage'a kaydet
         if (data && data.length > 0) {
@@ -132,7 +132,7 @@ async function saveParticipantToSupabase(participantData) {
         return data;
         
     } catch (error) {
-        console.error('Supabase katılımcı kayıt hatası:', error);
+        console.error('PG_API katılımcı kayıt hatası:', error);
         
         // Bağlantı hatası mesajını daha açıklayıcı hale getir
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
@@ -187,15 +187,15 @@ async function checkPreviousTestForPersonalInfo(formData) {
             return false;
         }
         
-        // Supabase bağlantısı kontrolü
-        if (typeof supabase === 'undefined' || !supabase) {
-            console.log('Supabase bağlantısı mevcut değil, test devam edebilir');
+        // PG_API bağlantısı kontrolü
+        if (typeof PG_API === 'undefined' || !PG_API) {
+            console.log('PG_API bağlantısı mevcut değil, test devam edebilir');
             return false;
         }
         
         try {
             // TC No üzerinden katılımcıyı bul
-            const { data: participantData, error: participantError } = await supabase
+            const { data: participantData, error: participantError } = await PG_API
                 .from('participants')
                 .select('id')
                 .eq('tc_no', normalizedInfo.tcNo)
@@ -208,7 +208,7 @@ async function checkPreviousTestForPersonalInfo(formData) {
             
             if (participantData && participantData.length > 0) {
                 // Bu katılımcının tamamlanmış testi var mı kontrol et
-                const { data, error } = await supabase
+                const { data, error } = await PG_API
                     .from('test_results')
                     .select('id, created, status')
                     .eq('participant_id', participantData[0].id)
@@ -222,13 +222,13 @@ async function checkPreviousTestForPersonalInfo(formData) {
                 }
                 
                 if (data && data.length > 0) {
-                    console.log('Supabase\'de aynı kişinin testi bulundu:', data[0]);
+                    console.log('PG_API\'de aynı kişinin testi bulundu:', data[0]);
                     showPreviousTestWarningForPersonalInfo(data[0]);
                     return true;
                 }
             }
-        } catch (supabaseError) {
-            console.error('Supabase bağlantı hatası:', supabaseError);
+        } catch (PostgreSQLError) {
+            console.error('PG_API bağlantı hatası:', PostgreSQLError);
             return false;
         }
         

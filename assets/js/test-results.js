@@ -162,7 +162,7 @@ function initializeDataTable() {
                         const btn = document.getElementById(reportBtnId);
                         if (btn) {
                             try {
-                                const { data: existingReport, error: reportError } = await supabase
+                                const { data: existingReport, error: reportError } = await PG_API
                                     .from('reports')
                                     .select('id')
                                     .eq('test_result_id', testId)
@@ -227,7 +227,7 @@ async function loadTestResults() {
     try {
         showLoading(true);
         
-        // Supabase'den test sonuçlarını çek
+        // PG_API'den test sonuçlarını çek
         allTestResults = await getTestResults();
         
         // Tabloyu güncelle
@@ -244,16 +244,16 @@ async function loadTestResults() {
     }
 }
 
-// Test sonuçlarını Supabase'den getir
+// Test sonuçlarını PG_API'den getir
 async function getTestResults() {
     try {
-        if (!supabase) {
-            console.error('Supabase bağlantısı mevcut değil');
+        if (!PG_API) {
+            console.error('PG_API bağlantısı mevcut değil');
             return [];
         }
 
         // Test sonuçlarını ve katılımcı bilgilerini çek
-        const { data: testResults, error: testError } = await supabase
+        const { data: testResults, error: testError } = await PG_API
             .from('test_results')
             .select('*')
             .order('created_at', { ascending: false });
@@ -264,7 +264,7 @@ async function getTestResults() {
         }
 
         // Katılımcı bilgilerini çek (gerekli alanlar)
-        const { data: participants, error: participantError } = await supabase
+        const { data: participants, error: participantError } = await PG_API
             .from('participants')
             .select('id, first_name, last_name, tc_no, age, gender, education, profession, institution_code, institution_name, marital_status');
 
@@ -274,7 +274,7 @@ async function getTestResults() {
         }
 
         // Soru metinlerini çek
-        const { data: questions, error: questionsError } = await supabase
+        const { data: questions, error: questionsError } = await PG_API
             .from('questions')
             .select('*');
 
@@ -399,7 +399,7 @@ function setupEventListeners() {
     window.logout = async function() {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
-                // Supabase'den çıkış yap
+                // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }
@@ -568,7 +568,7 @@ async function viewTestDetail(testId) {
     // Bu test için rapor var mı kontrol et
     let hasReport = false;
     let reportId = null;
-    const { data: existingReport, error: reportError } = await supabase
+    const { data: existingReport, error: reportError } = await PG_API
         .from('reports')
         .select('id')
         .eq('test_result_id', testId)
@@ -757,7 +757,7 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
     
     try {
         // K düzeltme parametrelerini veritabanından al
-        const { data: kParams, error: kError } = await supabase
+        const { data: kParams, error: kError } = await PG_API
             .from('t_score_params')
             .select('scale_name, k_correction')
             .eq('gender', isMale ? 'male' : 'female');
@@ -855,7 +855,7 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
 
     try {
         // Önce t_score_params tablosunu dene (formül bazlı)
-        const { data: tScoreParams, error: paramsError } = await supabase
+        const { data: tScoreParams, error: paramsError } = await PG_API
             .from('t_score_params')
             .select('scale_name, mean_m, sd')
             .eq('gender', genderKey);
@@ -867,7 +867,7 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         } else {
             // t_score_params başarısız → t_score_norms tablosunu dene (lookup bazlı)
             if (paramsError) console.warn('t_score_params alınamadı:', paramsError);
-            const { data: tScoreNorms, error: normsError } = await supabase
+            const { data: tScoreNorms, error: normsError } = await PG_API
                 .from('t_score_norms')
                 .select('scale_name, raw_score, t_score')
                 .eq('gender', genderKey);
@@ -1120,7 +1120,7 @@ async function generateResultData(tScores, interpretations, gender) {
 // mmpi_interpretations tablosundan değerlendirme al
 async function getInterpretationFromDatabase(scale, tScore, gender = null) {
     try {
-        let query = supabase
+        let query = PG_API
             .from('mmpi_interpretations')
             .select('description')
             .eq('scale_name', scale)
@@ -1162,7 +1162,7 @@ async function generateReport(testId) {
     
     try {
         // Önce bu test için rapor var mı kontrol et
-        const { data: existingReport, error: checkError } = await supabase
+        const { data: existingReport, error: checkError } = await PG_API
             .from('reports')
             .select('id')
             .eq('test_result_id', testId)
@@ -1177,7 +1177,7 @@ async function generateReport(testId) {
         showNotification('Rapor oluşturuluyor...', 'info');
     
         // Test cevaplarını al (test_results tablosundan)
-        const { data: testResult, error: answersError } = await supabase
+        const { data: testResult, error: answersError } = await PG_API
             .from('test_results')
             .select('test_answers, participant_id')
             .eq('id', testId)
@@ -1198,7 +1198,7 @@ async function generateReport(testId) {
         // Cinsiyet bilgisini participants tablosundan al
         let gender = null;
         try {
-            const { data: p } = await supabase
+            const { data: p } = await PG_API
                 .from('participants')
                 .select('gender')
                 .eq('id', testResult.participant_id)
@@ -1207,7 +1207,7 @@ async function generateReport(testId) {
         } catch (_) {}
         
         // Scoring keys'leri al
-        const { data: scoringKeys, error: keysError } = await supabase
+        const { data: scoringKeys, error: keysError } = await PG_API
             .from('scoring_keys')
             .select('scale_name, question_number, scoring_answer');
         
@@ -1248,7 +1248,7 @@ async function generateReport(testId) {
             generated_at: new Date().toISOString()
         };
         
-        const { data: reportData, error: reportError } = await supabase
+        const { data: reportData, error: reportError } = await PG_API
             .from('reports')
             .insert({
                 test_result_id: testId,

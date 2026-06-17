@@ -497,7 +497,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/pg-config.js"></script>
-    <script src="../assets/js/supabase-config.js"></script>
 
     <!-- Load Sidebar -->
     <script>
@@ -521,10 +520,10 @@
 
         // ---------- Default Content ----------
         // These are embedded from the existing HTML pages (extracted body content).
-        // They serve as fallback when Supabase has no saved data.
+        // They serve as fallback when PG_API has no saved data.
         const defaultPages = {};
 
-        // Will be populated from Supabase or inline fallback
+        // Will be populated from PG_API or inline fallback
         let currentPage = 'ana-sayfa';
         let sourceMode = false;
 
@@ -632,13 +631,13 @@
             // If source mode is on, turn it off
             if (sourceMode) toggleSource();
 
-            // Try Supabase
-            loadFromSupabase(key);
+            // Try PG_API
+            loadFromVeritabani(key);
         }
 
-        async function loadFromSupabase(key) {
+        async function loadFromVeritabani(key) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await PG_API
                     .from('page_content')
                     .select('*')
                     .eq('page_key', key)
@@ -654,7 +653,7 @@
                     loadDefault(key);
                 }
             } catch (err) {
-                console.warn('Supabase yüklenemedi, varsayılan içerik kullanılıyor:', err);
+                console.warn('PG_API yüklenemedi, varsayılan içerik kullanılıyor:', err);
                 loadDefault(key);
             }
         }
@@ -672,7 +671,7 @@
             const body = getEditorHtml();
 
             try {
-                const { error } = await supabase
+                const { error } = await PG_API
                     .from('page_content')
                     .upsert({
                         page_key: currentPage,
@@ -695,8 +694,8 @@
         // ---------- Reset Page ----------
         function resetPage() {
             if (!confirm('Bu sayfayı varsayılan haline döndürmek istediğinizden emin misiniz?')) return;
-            // Remove saved data from Supabase
-            supabase
+            // Remove saved data from PG_API
+            PG_API
                 .from('page_content')
                 .delete()
                 .eq('page_key', currentPage)

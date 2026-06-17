@@ -165,8 +165,8 @@ async function loadSettings() {
             currentSettings = { ...defaultSettings };
         }
         
-        // Supabase'den KVKK ayarlarını yükle
-        const kvkkSettings = await loadKvkkFromSupabase();
+        // PG_API'den KVKK ayarlarını yükle
+        const kvkkSettings = await loadKvkkFromPostgreSQL();
         currentSettings.kvkkText = kvkkSettings.kvkkText;
         currentSettings.kvkkRequired = kvkkSettings.kvkkRequired;
         
@@ -242,7 +242,7 @@ function setupEventListeners() {
     window.logout = async function() {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
-                // Supabase'den çıkış yap
+                // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }
@@ -338,8 +338,8 @@ async function saveSettings() {
         // Mevcut form verilerini al
         const newSettings = getCurrentFormData();
         
-        // KVKK ayarlarını Supabase'e kaydet
-        const kvkkSaved = await saveKvkkToSupabase(newSettings.kvkkText, newSettings.kvkkRequired);
+        // KVKK ayarlarını PG_API'e kaydet
+        const kvkkSaved = await saveKvkkToPostgreSQL(newSettings.kvkkText, newSettings.kvkkRequired);
         if (!kvkkSaved) {
             showNotification('KVKK ayarları kaydedilirken hata oluştu.', 'error');
             return;
@@ -347,8 +347,8 @@ async function saveSettings() {
         
         // Diğer ayarları localStorage'a kaydet
         const settingsToSave = { ...newSettings };
-        delete settingsToSave.kvkkText; // KVKK metni Supabase'de saklanıyor
-        delete settingsToSave.kvkkRequired; // KVKK zorunluluğu da Supabase'de
+        delete settingsToSave.kvkkText; // KVKK metni PG_API'de saklanıyor
+        delete settingsToSave.kvkkRequired; // KVKK zorunluluğu da PG_API'de
         localStorage.setItem('systemSettings', JSON.stringify(settingsToSave));
         
         // Global ayarları güncelle
@@ -722,11 +722,11 @@ function previewKvkk() {
     previewWindow.document.close();
 }
 
-// KVKK metnini Supabase'e kaydet
-async function saveKvkkToSupabase(kvkkText, kvkkRequired) {
+// KVKK metnini PG_API'e kaydet
+async function saveKvkkToPostgreSQL(kvkkText, kvkkRequired) {
     try {
         // Settings tablosuna KVKK ayarlarını kaydet
-        const { data, error } = await supabase
+        const { data, error } = await PG_API
             .from('settings')
             .upsert([
                 { key: 'kvkk_text', value: kvkkText },
@@ -741,10 +741,10 @@ async function saveKvkkToSupabase(kvkkText, kvkkRequired) {
     }
 }
 
-// KVKK metnini Supabase'den yükle
-async function loadKvkkFromSupabase() {
+// KVKK metnini PG_API'den yükle
+async function loadKvkkFromPostgreSQL() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await PG_API
             .from('settings')
             .select('key, value')
             .in('key', ['kvkk_text', 'kvkk_required']);

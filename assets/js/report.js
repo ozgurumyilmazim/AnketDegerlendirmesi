@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadReport() {
     try {
         // Önce raporu al (URL'den gelen ID reports tablosundaki ID olabilir)
-        const { data: report, error: reportError } = await supabase
+        const { data: report, error: reportError } = await PG_API
             .from('reports')
             .select('*')
             .eq('id', testId)
@@ -69,7 +69,7 @@ async function loadReport() {
         }
 
         // Test sonucunu al (report'tan test_result_id kullanarak)
-        const { data: testResult, error: testError } = await supabase
+        const { data: testResult, error: testError } = await PG_API
             .from('test_results')
             .select('*')
             .eq('id', report.test_result_id)
@@ -82,7 +82,7 @@ async function loadReport() {
         }
 
         // Katılımcı bilgilerini participants tablosundan al
-        const { data: participant, error: pErr } = await supabase
+        const { data: participant, error: pErr } = await PG_API
             .from('participants')
             .select('*')
             .eq('id', testResult.participant_id)
@@ -786,7 +786,7 @@ async function computeScoresFromTestResult(testResult, participant = null) {
         });
 
         // Scoring keys'i çek
-        const { data: scoringKeys, error } = await supabase
+        const { data: scoringKeys, error } = await PG_API
             .from('scoring_keys')
             .select('scale_name, question_number, scoring_answer');
         if (error) throw error;
@@ -909,7 +909,7 @@ async function computeScoresFromTestResult(testResult, participant = null) {
 // T parametrelerini getir: t_score_params (M, SD, k_correction)
 async function fetchTScoreParams(gender) {
     const { testVersion, locale, ageGroup } = NORM_DEFAULTS;
-    const { data, error } = await supabase
+    const { data, error } = await PG_API
         .from('t_score_params')
         .select('scale_name, mean_m, sd, k_correction')
         .eq('test_version', testVersion)
@@ -1171,8 +1171,8 @@ async function savePsychologistEvaluation() {
             result_data: resultData
         };
 
-        // Supabase'e yeni alanları kullanarak kaydet
-        const { data, error } = await supabase
+        // PG_API'e yeni alanları kullanarak kaydet
+        const { data, error } = await PG_API
             .from('reports')
             .update({
                 psychologist_name: psychologistData.psychologist_name,
@@ -1637,8 +1637,8 @@ async function saveSummary() {
             summary_data: summaryData
         };
 
-        // Supabase'e kaydet
-        const { data, error } = await supabase
+        // PG_API'e kaydet
+        const { data, error } = await PG_API
             .from('reports')
             .update({
                 report_content: updatedReportContent,
@@ -1691,8 +1691,8 @@ async function saveReportResult() {
             result_data: resultData
         };
 
-        // Supabase'e kaydet
-        const { data, error } = await supabase
+        // PG_API'e kaydet
+        const { data, error } = await PG_API
             .from('reports')
             .update({
                 report_content: updatedReportContent,
@@ -1838,7 +1838,7 @@ async function generateAutomaticEvaluations() {
 // mmpi_interpretations tablosundan değerlendirme al
 async function getInterpretationFromDatabase(scale, tScore, gender = null) {
     try {
-        let query = supabase
+        let query = PG_API
             .from('mmpi_interpretations')
             .select('description')
             .eq('scale_name', scale)

@@ -21,7 +21,7 @@ const testConfig = {
     // Kaydetme ayarları
     autoSaveInterval: 30000, // 30 saniye (milisaniye)
     enableLocalStorage: true,
-    enableSupabaseSync: true,
+    enableDbSync: true,
     
     // Validasyon ayarları
     requireAllAnswers: false, // Tüm soruların cevaplanması zorunlu mu?

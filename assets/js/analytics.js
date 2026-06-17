@@ -106,17 +106,17 @@ async function loadAnalyticsData() {
     }
 }
 
-// Analitik verilerini getir (Supabase)
+// Analitik verilerini getir (PG_API)
 async function getAnalyticsData() {
     try {
-        // Supabase bağlantısını kontrol et
-        if (!window.supabase) {
-            console.warn('Supabase bağlantısı bulunamadı, demo veriler kullanılıyor.');
+        // PG_API bağlantısını kontrol et
+        if (!window.PG_API) {
+            console.warn('PG_API bağlantısı bulunamadı, demo veriler kullanılıyor.');
             return getDemoAnalyticsData();
         }
 
         // Test sonuçlarını ve katılımcı bilgilerini çek
-        const { data: tests, error } = await window.supabase
+        const { data: tests, error } = await window.PG_API
             .from('test_results')
             .select(`
                 *,
@@ -129,7 +129,7 @@ async function getAnalyticsData() {
             .order('created', { ascending: false });
 
         if (error) {
-            console.error('Supabase veri hatası:', error);
+            console.error('PG_API veri hatası:', error);
             return getDemoAnalyticsData();
         }
 

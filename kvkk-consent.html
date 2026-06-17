@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="assets/css/style.css">
     
     <script src="assets/js/pg-config.js"></script>
-    <script src="assets/js/supabase-config.js"></script>
 </head>
 <body>
     <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
@@ -129,10 +128,10 @@
             window.history.back();
         }
         
-        // KVKK metnini Supabase'den yükle
+        // KVKK metnini PG_API'den yükle
         async function loadKvkkContent() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await PG_API
                     .from('kvkk')
                     .select('*')
                     .eq('id', 1)
@@ -198,7 +197,7 @@
                 <h6><strong>2. MUVAFAKATNAME</strong></h6>
                 <p>OGULTURK A.Ş. MMPI Testi esnasında alınan 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında yer alan kişisel verilerimin/özel nitelikli kişisel verilerimin alınmasına, işlenmesine, aktarılmasına, silinmesine, anonim hale getirilmesine ve sair surette işlenmesine ve 2 yıl müddetle muhafaza edilmesine özgür irademle açık rızamla <strong>MUVAFAKAT EDİYORUM.</strong></p>
                 
-                <p><strong>Not:</strong> KVKK metni Supabase'den yüklenemedi. Varsayılan metin gösteriliyor.</p>
+                <p><strong>Not:</strong> KVKK metni PG_API'den yüklenemedi. Varsayılan metin gösteriliyor.</p>
             `;
             document.getElementById('kvkkContent').innerHTML = defaultKvkkText;
         }

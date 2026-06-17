@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analitik - MMPI Test Sistemi</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,27 +16,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom CSS -->
     <link href="../assets/css/style.css" rel="stylesheet">
-    
+
     <style>
         .analytics-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
             overflow: hidden;
         }
-        
+
         .analytics-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 1.5rem;
             margin: 0;
         }
-        
+
         .analytics-body {
             padding: 2rem;
         }
-        
+
         .metric-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -45,52 +46,52 @@
             margin-bottom: 1rem;
             transition: transform 0.3s ease;
         }
-        
+
         .metric-card:hover {
             transform: translateY(-5px);
         }
-        
+
         .metric-value {
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
-        
+
         .metric-label {
             font-size: 0.9rem;
             opacity: 0.9;
         }
-        
+
         .metric-change {
             font-size: 0.8rem;
             margin-top: 0.5rem;
         }
-        
+
         .metric-change.positive {
             color: #28a745;
         }
-        
+
         .metric-change.negative {
             color: #dc3545;
         }
-        
+
         .chart-container {
             position: relative;
             height: 250px;
             margin-bottom: 2rem;
         }
-        
+
         .chart-small {
             height: 200px;
         }
-        
+
         .filter-section {
             background: #f8f9fa;
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        
+
         .insight-card {
             background: #f8f9fa;
             border-left: 4px solid #667eea;
@@ -98,13 +99,13 @@
             margin-bottom: 1rem;
             border-radius: 0 8px 8px 0;
         }
-        
+
         .insight-icon {
             color: #667eea;
             font-size: 1.2rem;
             margin-right: 0.5rem;
         }
-        
+
         .performance-indicator {
             display: flex;
             align-items: center;
@@ -113,9 +114,9 @@
             background: white;
             border-radius: 8px;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .performance-bar {
             width: 100px;
             height: 8px;
@@ -123,29 +124,29 @@
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         .performance-fill {
             height: 100%;
             border-radius: 4px;
             transition: width 0.3s ease;
         }
-        
+
         .performance-excellent {
             background: #28a745;
         }
-        
+
         .performance-good {
             background: #17a2b8;
         }
-        
+
         .performance-average {
             background: #ffc107;
         }
-        
+
         .performance-poor {
             background: #dc3545;
         }
-        
+
         .heatmap-cell {
             width: 30px;
             height: 30px;
@@ -154,7 +155,7 @@
             margin: 2px;
             position: relative;
         }
-        
+
         .heatmap-cell:hover::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -169,49 +170,50 @@
             white-space: nowrap;
             z-index: 1000;
         }
-        
+
         .trend-indicator {
             display: inline-flex;
             align-items: center;
             font-size: 0.9rem;
             font-weight: 600;
         }
-        
+
         .trend-up {
             color: #28a745;
         }
-        
+
         .trend-down {
             color: #dc3545;
         }
-        
+
         .trend-stable {
             color: #6c757d;
         }
-        
+
         @media (max-width: 768px) {
             .analytics-body {
                 padding: 1rem;
             }
-            
+
             .metric-value {
                 font-size: 2rem;
             }
-            
+
             .chart-container {
                 height: 200px;
             }
-            
+
             .chart-small {
                 height: 150px;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Include Sidebar -->
     <div id="sidebar-container"></div>
-    
+
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Navigation -->
@@ -223,21 +225,23 @@
                     </button>
                     <h5 class="mb-0">Gelişmiş Analitik</h5>
                 </div>
-                
+
                 <div class="d-flex align-items-center">
                     <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button"
+                            data-bs-toggle="dropdown">
                             <div class="user-avatar me-2" id="userInitials">AD</div>
                             <span id="userName">Admin User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </nav>
-        
+
         <!-- Content -->
         <div class="content-wrapper">
             <!-- Filtreler -->
@@ -284,7 +288,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Ana Metrikler -->
             <div class="row">
                 <div class="col-lg-3 col-md-6">
@@ -316,7 +320,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Test Trendleri ve Performans -->
             <div class="row">
                 <div class="col-lg-8">
@@ -350,7 +354,7 @@
                                     <small>75%</small>
                                 </div>
                             </div>
-                            
+
                             <div class="performance-indicator">
                                 <div>
                                     <strong>İyi Skorlar</strong>
@@ -364,7 +368,7 @@
                                     <small>60%</small>
                                 </div>
                             </div>
-                            
+
                             <div class="performance-indicator">
                                 <div>
                                     <strong>Ortalama Skorlar</strong>
@@ -378,7 +382,7 @@
                                     <small>45%</small>
                                 </div>
                             </div>
-                            
+
                             <div class="performance-indicator">
                                 <div>
                                     <strong>Düşük Skorlar</strong>
@@ -396,7 +400,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Detaylı Analizler -->
             <div class="row">
                 <div class="col-lg-6">
@@ -424,7 +428,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Aktivite Haritası -->
             <div class="analytics-card">
                 <h5 class="analytics-header">
@@ -446,7 +450,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- İçgörüler ve Öneriler -->
             <div class="analytics-card">
                 <h5 class="analytics-header">
@@ -458,15 +462,17 @@
                             <div class="insight-card">
                                 <i class="fas fa-trending-up insight-icon"></i>
                                 <strong>Test Sayısında Artış</strong>
-                                <p class="mb-0 mt-2">Bu ay test sayısında %23 artış gözlemlendi. Pazartesi günleri en yoğun gün.</p>
+                                <p class="mb-0 mt-2">Bu ay test sayısında %23 artış gözlemlendi. Pazartesi günleri en
+                                    yoğun gün.</p>
                             </div>
-                            
+
                             <div class="insight-card">
                                 <i class="fas fa-clock insight-icon"></i>
                                 <strong>Optimal Test Saatleri</strong>
-                                <p class="mb-0 mt-2">En yüksek performans 10:00-12:00 ve 14:00-16:00 saatleri arasında görülüyor.</p>
+                                <p class="mb-0 mt-2">En yüksek performans 10:00-12:00 ve 14:00-16:00 saatleri arasında
+                                    görülüyor.</p>
                             </div>
-                            
+
                             <div class="insight-card">
                                 <i class="fas fa-users insight-icon"></i>
                                 <strong>Yaş Grubu Analizi</strong>
@@ -479,17 +485,19 @@
                                 <strong>Puan Trendleri</strong>
                                 <p class="mb-0 mt-2">Ortalama test puanları son 3 ayda %8 artış gösterdi.</p>
                             </div>
-                            
+
                             <div class="insight-card">
                                 <i class="fas fa-exclamation-triangle insight-icon"></i>
                                 <strong>Dikkat Gereken Alanlar</strong>
-                                <p class="mb-0 mt-2">"Bilmiyorum" cevap oranı %15'in üzerinde olan testlerde puan düşüklüğü gözlemleniyor.</p>
+                                <p class="mb-0 mt-2">"Bilmiyorum" cevap oranı %15'in üzerinde olan testlerde puan
+                                    düşüklüğü gözlemleniyor.</p>
                             </div>
-                            
+
                             <div class="insight-card">
                                 <i class="fas fa-star insight-icon"></i>
                                 <strong>Başarı Faktörleri</strong>
-                                <p class="mb-0 mt-2">45-60 dakika arası süren testlerde en yüksek doğruluk oranı elde ediliyor.</p>
+                                <p class="mb-0 mt-2">45-60 dakika arası süren testlerde en yüksek doğruluk oranı elde
+                                    ediliyor.</p>
                             </div>
                         </div>
                     </div>
@@ -497,16 +505,14 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- PG Config -->
     <script src="../assets/js/pg-config.js"></script>
-    <!-- Supabase Config -->
-    <script src="../assets/js/supabase-config.js"></script>
     <!-- Analytics JS -->
     <script src="../assets/js/analytics.js"></script>
-    
+
     <!-- Load Sidebar -->
     <script>
         fetch('sidebar.html')
@@ -517,4 +523,5 @@
             .catch(error => console.error('Error loading sidebar:', error));
     </script>
 </body>
+
 </html>

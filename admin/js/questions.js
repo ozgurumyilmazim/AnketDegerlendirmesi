@@ -33,9 +33,9 @@ class QuestionsManager {
         try {
             this.showLoading(true);
             
-            if (window.supabase) {
+            if (window.PG_API) {
                 try {
-                    const { data, error } = await window.supabase
+                    const { data, error } = await window.PG_API
                         .from('questions')
                         .select('*')
                         .order('question_number', { ascending: true });
@@ -189,9 +189,9 @@ class QuestionsManager {
             
             let savedToDb = false;
 
-            if (window.supabase) {
+            if (window.PG_API) {
                 try {
-                    const { data, error } = await window.supabase
+                    const { data, error } = await window.PG_API
                         .from('questions')
                         .insert([newQuestion]);
                     
@@ -252,9 +252,9 @@ class QuestionsManager {
             
             let savedToDb = false;
 
-            if (window.supabase && !this.currentEditId.startsWith('local-')) {
+            if (window.PG_API && !this.currentEditId.startsWith('local-')) {
                 try {
-                    const { error } = await window.supabase
+                    const { error } = await window.PG_API
                         .from('questions')
                         .update(formData)
                         .eq('id', this.currentEditId);
@@ -290,9 +290,9 @@ class QuestionsManager {
                 return;
             }
 
-            if (window.supabase && !this.currentDeleteId.startsWith('local-')) {
+            if (window.PG_API && !this.currentDeleteId.startsWith('local-')) {
                 try {
-                    const { error } = await window.supabase
+                    const { error } = await window.PG_API
                         .from('questions')
                         .delete()
                         .eq('id', this.currentDeleteId);

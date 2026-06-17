@@ -1,6 +1,6 @@
 // ====================================================================
 // PostgreSQL API CONFIGURATION (via PostgREST)
-// Replaces Supabase and the Express API layer
+// Replaces PG_API and the Express API layer
 // ====================================================================
 
 window.PG_CONFIG = {
@@ -120,7 +120,7 @@ window.AuthService = {
 };
 
 // ====================================================================
-// PG_API — generic CRUD via PostgREST (mimics supabase.from())
+// PG_API — generic CRUD via PostgREST (mimics PG_API.from())
 // ====================================================================
 window.PG_API = {
     _getHeaders(profile) {
@@ -179,7 +179,7 @@ window.PG_API = {
         return this._fetch(path, { method: 'DELETE' });
     },
 
-    // Chainable query builder matching Supabase API
+    // Chainable query builder matching PG_API API
     from(table) {
         const self = this;
         let _select = '*';
@@ -294,17 +294,6 @@ window.PG_API = {
             method: 'POST',
             body: JSON.stringify(params),
         });
-    }
-};
-
-// ====================================================================
-// Compatibility aliases
-// ====================================================================
-window.supabase = window.PG_API;
-
-window.supabaseClient = {
-    get supabaseClient() {
-        return window.PG_API;
     }
 };
 

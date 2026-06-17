@@ -250,7 +250,7 @@ define('jsLibs', 'JavaScript Kütüphaneleri Yüklü', async () => {
         'test-config': typeof testConfig !== 'undefined',
         'mmpi-scoring': typeof MMPIScoring !== 'undefined',
         'pg-config': typeof PG_CONFIG !== 'undefined' && typeof PG_API !== 'undefined',
-        'supabase (compat)': typeof supabase !== 'undefined',
+        'PG_API (compat)': typeof PG_API !== 'undefined',
     };
     const allOk = Object.values(libs).every(Boolean);
     if (!allOk) {
@@ -378,7 +378,7 @@ define('dbTables', 'PostgreSQL Tabloları Tam', async () => {
     ];
     const existing = [];
     for (const tbl of expected) {
-        const { data, error } = await supabase.from(tbl).select('*').limit(1);
+        const { data, error } = await PG_API.from(tbl).select('*').limit(1);
         if (!error) existing.push(tbl);
     }
     const missing = expected.filter(t => !existing.includes(t));
@@ -387,7 +387,7 @@ define('dbTables', 'PostgreSQL Tabloları Tam', async () => {
 }, { dependsOn: 'apiReachable' });
 
 define('questionsCount', 'Soru Sayısı', async () => {
-    const { data, error } = await supabase.from('questions').select('*');
+    const { data, error } = await PG_API.from('questions').select('*');
     if (error) throw new Error(error);
     const count = data ? data.length : 0;
     if (count < 567) {

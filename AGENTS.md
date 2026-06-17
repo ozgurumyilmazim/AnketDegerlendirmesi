@@ -1,7 +1,7 @@
 # AGENTS.md — MMPI Psikolojik Test Sistemi
 
 ## Project overview
-Vanilla HTML/CSS/JS single-page app (no bundler, no framework, no build step). MMPI-2 psychological test with optional Supabase backend. Turkish language throughout. Served via any static file server.
+Vanilla HTML/CSS/JS single-page app (no bundler, no framework, no build step). MMPI-2 psychological test with optional PostgreSQL backend. Turkish language throughout. Served via any static file server.
 
 ## Key directories
 - `/` — Root HTML pages: `index.html` → `personal-info.html` → `kvkk-consent.html` → `mmpi-test.html` → `test-complete.html` → `report.html`
@@ -15,9 +15,8 @@ In every HTML page, scripts are loaded in this specific order:
 1. Bootstrap + jQuery (CDN)
 2. `test-config.js` — global config object
 3. `mmpi-scoring.js` — scoring engine
-4. **`pg-config.js`** — PostgreSQL API client (replaces Supabase JS CDN)
-5. `supabase-config.js` — now a **compat wrapper** delegating to `pg-config.js` (will be removed eventually)
-6. Page-specific JS (e.g. `mmpi-test.js`, `personal-info.js`)
+4. **`pg-config.js`** — PostgreSQL API client
+5. Page-specific JS (e.g. `mmpi-test.js`, `personal-info.js`)
 
 **DO NOT change this order** — scripts depend on globals set by earlier ones.
 
@@ -36,9 +35,8 @@ In every HTML page, scripts are loaded in this specific order:
   - prod → `https://selma.ozguryilmaz.com.tr/api` (via nginx proxy)
 
 ## Backend (PostgreSQL + PostgREST)
-- Supabase has been **replaced** with direct PostgreSQL via **PostgREST** (a standalone REST API server that turns PostgreSQL into a REST API — no custom backend code)
+- The project uses direct PostgreSQL via **PostgREST** (a standalone REST API server that turns PostgreSQL into a REST API — no custom backend code)
 - `pg-config.js` provides `window.PG_API` (generic CRUD via `fetch` to PostgREST) and `window.AuthService` (JWT auth via `/rpc/login` database function)
-- `window.supabase = window.PG_API` for backward compat — all existing `supabase.from()` calls work unchanged
 - **No custom API server** — PostgREST is a single binary, no Node.js required
 
 ### Database (hostname: `postgres_db`)
@@ -58,9 +56,7 @@ In every HTML page, scripts are loaded in this specific order:
 - Start: `postgrest postgrest.conf` (inside Docker, nginx proxy at `/api/` → `postgrest:3000`)
 
 ### Key changes in HTML
-- Removed `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">` from all 22 pages
-- Added `<script src="assets/js/pg-config.js"></script>` before supabase-config.js
-- **Note**: `assets/js/debug.js` and `admin/js/settings.js` were updated to remove `supabase.auth` calls
+- **Note**: `assets/js/debug.js` and `admin/js/settings.js` were updated to remove legacy auth calls
 
 ## Running the app
 ```sh
@@ -99,11 +95,10 @@ php -S localhost:8000
 - Test answers stored as `{ [question_number]: 'Doğru' | 'Yanlış' | 'Bilmiyorum' }`
 
 ## Test config
-- `assets/js/test-config.js` — `testConfig` object with `maxDontKnowAnswers: 10`, `autoSaveInterval: 30000`, `enableLocalStorage: true`, `enableSupabaseSync: true`
+- `assets/js/test-config.js` — `testConfig` object with `maxDontKnowAnswers: 10`, `autoSaveInterval: 30000`, `enableLocalStorage: true`, `enableDbSync: true`
 - 567 total questions (MMPI-2), max 15 "Bilmiyorum" answers
 
 ## Git & contribution notes
-- Real Supabase anon keys are in the repo — OK for public anon keys, but be mindful
 - No CI/CD, no test framework, no linter/formatter config found
 - Commit messages are in English (short descriptive style)
 
@@ -160,7 +155,7 @@ openssl rand -base64 48
 - [ ] `tests/index.html` üzerinden tüm kontrolleri doğrula
 
 ## Architecture notes
-- All state flows: `localStorage` → optional Supabase sync (not the other way)
+- All state flows: `localStorage` → optional PostgreSQL sync (not the other way)
 - Navigation: not a SPA — each page is a separate `.html` file, state passed via `localStorage`
 - Duplicate test detection: checks both `localStorage` (`mmpiCompletedTests`) and PostgREST (`participants` + `test_results`)
 - Debug helpers available in console: `window.mmpiDebug` (in test mode)

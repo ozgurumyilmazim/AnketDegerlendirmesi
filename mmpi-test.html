@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <link href="assets/css/style.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
+
 <body>
     <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
         <div class="container">
@@ -17,31 +19,32 @@
                 <div class="logo">
                     <div class="d-flex justify-content-between align-items-center">
                         <h1><i class="fas fa-brain"></i> MMPI Testi</h1>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="mmpiTest.editPersonalInfo()">
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                            onclick="mmpiTest.editPersonalInfo()">
                             <i class="fas fa-user-edit"></i> Kişisel Bilgileri Düzenle
                         </button>
                     </div>
                 </div>
-                
+
                 <!-- Progress Bar -->
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar" style="width: 0%">
                         <div class="progress-text" id="progressText">0 / 0</div>
                     </div>
                 </div>
-                
+
                 <!-- Bilmiyorum Sayacı -->
                 <div class="alert alert-info" id="dontKnowCounter">
-                    <i class="fas fa-info-circle"></i> 
+                    <i class="fas fa-info-circle"></i>
                     <strong>Bilmiyorum Hakkı:</strong> <span id="dontKnowCount">10</span> / 10 kaldı
                 </div>
-                
+
                 <!-- Soru Konteyner -->
                 <div class="question-container" id="questionContainer">
                     <div class="question-text" id="questionText">
                         Test yükleniyor...
                     </div>
-                    
+
                     <div class="answer-options" id="answerOptions">
                         <div class="answer-option">
                             <input type="radio" id="answerTrue" name="answer" value="true">
@@ -49,14 +52,14 @@
                                 <i class="fas fa-check"></i> Doğru
                             </label>
                         </div>
-                        
+
                         <div class="answer-option">
                             <input type="radio" id="answerFalse" name="answer" value="false">
                             <label for="answerFalse">
                                 <i class="fas fa-times"></i> Yanlış
                             </label>
                         </div>
-                        
+
                         <div class="answer-option dont-know">
                             <input type="radio" id="answerDontKnow" name="answer" value="dont_know">
                             <label for="answerDontKnow">
@@ -65,13 +68,13 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Uyarı Mesajları -->
                 <div class="alert alert-warning" id="warningMessage" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <span id="warningText"></span>
                 </div>
-                
+
                 <!-- Navigasyon Butonları -->
                 <div class="mt-3">
                     <div class="row g-1">
@@ -84,13 +87,14 @@
                             <button type="button" class="btn btn-primary btn-mobile w-100" id="nextBtn" disabled>
                                 Sonraki <i class="fas fa-arrow-right"></i>
                             </button>
-                            <button type="button" class="btn btn-success btn-mobile w-100" id="finishBtn" style="display: none;">
+                            <button type="button" class="btn btn-success btn-mobile w-100" id="finishBtn"
+                                style="display: none;">
                                 <i class="fas fa-check-circle"></i> Tamamla
                             </button>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Test Bilgileri -->
                 <div class="mt-4 text-center">
                     <small class="text-muted">
@@ -101,7 +105,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Loading Modal -->
     <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
@@ -114,29 +118,26 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Test Config -->
     <script src="assets/js/test-config.js"></script>
-    
+
     <!-- MMPI Scoring -->
     <script src="assets/js/mmpi-scoring.js"></script>
-    
+
     <!-- PG Config -->
     <script src="assets/js/pg-config.js"></script>
-    
-    <!-- Supabase Config -->
-    <script src="assets/js/supabase-config.js"></script>
-    
+
     <!-- Test Logic -->
     <script src="assets/js/mmpi-test.js"></script>
-    
+
     <!-- Erişim Kontrolü -->
     <script>
         // Sayfa yüklendiğinde erişim kontrolü yap
-        $(document).ready(function() {
+        $(document).ready(function () {
             // KVKK onayı kontrolü
             const kvkkConsent = localStorage.getItem('kvkkConsent');
             if (!kvkkConsent || kvkkConsent !== 'true') {
@@ -144,7 +145,7 @@
                 window.location.href = 'index.html';
                 return;
             }
-            
+
             // Kişisel bilgiler kontrolü
             const personalInfo = localStorage.getItem('mmpiPersonalInfo');
             if (!personalInfo) {
@@ -152,15 +153,15 @@
                 window.location.href = 'index.html';
                 return;
             }
-            
+
             // Test sonuçları kontrolü - eğer test tamamlanmışsa bu sayfaya erişimi engelle
             const testResults = localStorage.getItem('mmpiTestResults');
             const participantInfo = JSON.parse(personalInfo);
-            
+
             if (testResults) {
                 const results = JSON.parse(testResults);
                 // Sadece aynı katılımcının tamamlanmış testi varsa yönlendir
-                if (results.createdAt && results.tcNo && 
+                if (results.createdAt && results.tcNo &&
                     results.tcNo === participantInfo.tcNo) {
                     alert('Bu TC kimlik numarası ile test zaten tamamlanmış. Sonuçları görüntülemek için raporlar sayfasına yönlendiriliyorsunuz.');
                     window.location.href = 'test-complete.html';
@@ -200,7 +201,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -215,7 +216,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -242,7 +243,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -263,7 +264,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -292,4 +293,5 @@
         </div>
     </div>
 </body>
+
 </html>

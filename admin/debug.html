@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Debug – Users Overview</title>
-    <meta name="description" content="Temporary debug page showing Supabase auth.users and public.users tables with role information.">
+    <meta name="description" content="Temporary debug page showing PG_API auth.users and public.users tables with role information.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -56,23 +56,22 @@
 </head>
 <body>
 <div class="container">
-    <h1>Supabase Users Overview (Debug)</h1>
+    <h1>PG_API Users Overview (Debug)</h1>
     <div id="status" class="status">Loading data…</div>
     <table id="usersTable">
         <thead>
             <tr>
                 <th>E‑posta</th>
                 <th>Rol (public.users)</th>
-                <th>Supabase UID</th>
+                <th>PG_API UID</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
 </div>
 
-<!-- Load Supabase library and config -->
+<!-- Load PG_API library and config -->
 <script src="../assets/js/pg-config.js"></script>
-<script src="../assets/js/supabase-config.js"></script>
 <script src="../assets/js/debug.js"></script>
 </body>
 </html>

@@ -108,8 +108,7 @@ JS_OK=0
 for f in \
     assets/js/test-config.js \
     assets/js/mmpi-scoring.js \
-    assets/js/pg-config.js \
-    assets/js/supabase-config.js; do
+    assets/js/pg-config.js; do
     [[ -f "$PROJECT_DIR/$f" ]] || { JS_OK=1; detail "  Eksik: $f"; }
 done
 check_result $JS_OK "JS Kütüphaneleri"

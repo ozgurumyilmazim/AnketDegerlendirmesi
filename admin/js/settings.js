@@ -116,7 +116,7 @@ async function checkAuthentication() {
 // KVKK ayarlarını yükle
     async function loadKvkkSettings() {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await PG_API
             .from('kvkk')
             .select('*')
             .limit(1);
@@ -156,7 +156,7 @@ async function checkAuthentication() {
             const sourceTa = document.getElementById('kvkkSource');
             const kvkkText = sourceTa ? sourceTa.value : (editor ? editor.innerHTML : '');
             
-            const { error } = await supabase
+            const { error } = await PG_API
                 .from('kvkk')
                 .upsert({
                     id: 1,

@@ -390,7 +390,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/pg-config.js"></script>
-    <script src="../assets/js/supabase-config.js"></script>
 
     <!-- Load Sidebar -->
     <script>
@@ -424,11 +423,11 @@
             document.getElementById('emptyState').classList.add('d-none');
 
             try {
-                if (typeof window.supabase === 'undefined') {
+                if (typeof window.PG_API === 'undefined') {
                     throw new Error('Veritabanı bağlantısı bulunamadı.');
                 }
 
-                const { data, error } = await window.supabase.from('users').select('*').order('created_at', { ascending: false });
+                const { data, error } = await window.PG_API.from('users').select('*').order('created_at', { ascending: false });
 
                 if (error) throw error;
 
@@ -503,9 +502,9 @@
             }
 
             try {
-                if (!window.supabase) throw new Error('Veritabanı bağlantısı yok');
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await window.supabase.rpc('create_user', { name, email, password, role });
+                const { error } = await window.PG_API.rpc('create_user', { name, email, password, role });
                 if (error) throw error;
 
                 showToast('success', `${name} başarıyla eklendi.`);
@@ -527,9 +526,9 @@
         async function deleteAdmin(id, label) {
             if (!confirm(`"${label}" kullanıcısını silmek istediğinizden emin misiniz?`)) return;
             try {
-                if (!window.supabase) throw new Error('Veritabanı bağlantısı yok');
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await window.supabase.from('users').delete().eq('id', id);
+                const { error } = await window.PG_API.from('users').delete().eq('id', id);
                 if (error) throw error;
 
                 showToast('success', `${label} silindi.`);
