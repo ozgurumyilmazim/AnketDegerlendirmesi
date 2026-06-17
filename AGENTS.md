@@ -85,7 +85,9 @@ php -S localhost:8000
 ## Admin panel
 - Path: `/admin/login.html`
 - Uses JWT auth (email/password via `AuthService` in `pg-config.js`)
-- Users table with `role` column (`admin` / `psychologist`)
+- **User Roles (`admin` vs `psychologist`)**:
+  - `admin`: Tam yetkiye sahip kullanıcıdır. Ayarlara ve sisteme tam erişimi vardır. Sadece adminler "Psikolog Tanımları" sayfasını görebilir ve yeni psikolog hesapları oluşturabilir.
+  - `psychologist`: Standart erişime sahip kullanıcıdır. Ayarlardaki "Psikolog Tanımları" sayfasına erişimleri kısıtlanmıştır, diğer test ve raporlama özelliklerini kullanabilirler.
 - After login redirects to `/admin/dashboard.html`, session via `localStorage` (`adminLogin` key)
 
 ## Scoring
