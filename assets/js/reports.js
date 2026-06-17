@@ -228,7 +228,7 @@ async function getReportData() {
         // Test sonuçlarını al
         const { data: testResults, error: testError } = await PG_API
             .from('test_results')
-            .select('id, participant_id, test_answers, start_time, end_time, completed_questions, total_questions, status, created_at')
+            .select('id, participant_id, test_answers, start_time, end_time, completed_questions, total_questions, status, created')
             .eq('status', 'completed');
 
         if (testError) {
@@ -303,7 +303,7 @@ async function getReportData() {
             }),
             mmpiA: last7Days.map(date => {
                 return testResults.filter(test => 
-                    test.created_at.split('T')[0] === date
+                    test.created && test.created.split('T')[0] === date
                 ).length;
             }),
             mmpi2: [] // MMPI-2 için ayrı veriler eklenebilir
@@ -699,8 +699,8 @@ async function loadIndividualReports() {
                 report_content,
                 report_type,
                 generated_by,
-                created_at,
-                updated_at,
+                created,
+                updated,
                 test_results (
                     id,
                     participant_id,
@@ -710,7 +710,7 @@ async function loadIndividualReports() {
                     status
                 )
             `)
-            .order('created_at', { ascending: false });
+            .order('created', { ascending: false });
 
         if (error) {
             console.error('Raporlar yüklenirken hata:', error);
@@ -808,7 +808,7 @@ function displayReports() {
         const testDate = report.test_results?.start_time ? 
             new Date(report.test_results.start_time).toLocaleDateString('tr-TR') : '-';
         
-        const reportDate = new Date(report.created_at).toLocaleDateString('tr-TR');
+        const reportDate = new Date(report.created).toLocaleDateString('tr-TR');
         
         const testType = report.test_results?.test_type || 'MMPI';
         const reportType = report.report_type || 'Standart';
