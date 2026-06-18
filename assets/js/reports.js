@@ -800,7 +800,6 @@ function displayReports() {
             <tr>
                 <td>
                     <div class="fw-bold">${participantName}</div>
-                    <small class="text-muted">ID: ${report.test_results?.participant_id || '-'}</small>
                 </td>
                 <td><span class="badge bg-primary">${testType}</span></td>
                 <td>${testDate}</td>
