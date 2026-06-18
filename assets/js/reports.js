@@ -239,24 +239,15 @@ async function getReportData() {
         // Raporları al
         const { data: reports, error: reportsError } = await PG_API
             .from('reports')
-            .select(`
-                *,
-                test_results(id, participant_id, test_type, status, start_time, end_time)
-            `);
+            .select('*,test_results(id,participant_id,test_type,status,start_time,end_time)');
 
         if (reportsError) {
             console.error('Raporlar alınırken hata:', reportsError);
             throw reportsError;
         }
 
-        // Katılımcı adlarını topla (test_results + reports üzerindeki participant_id)
-        const participantIds = [
-            ...new Set([
-                ...testResults.map(t => t.participant_id),
-                ...reports.map(r => r.participant_id),
-                ...reports.map(r => r.test_results?.participant_id),
-            ].filter(Boolean))
-        ];
+        // Katılımcı adlarını topla (liste görünümü için)
+        const participantIds = [...new Set(testResults.map(t => t.participant_id).filter(Boolean))];
         const { data: participants } = await PG_API
             .from('participants')
             .select('id, first_name, last_name')
@@ -264,8 +255,9 @@ async function getReportData() {
         const pMap = {};
         (participants || []).forEach(p => { pMap[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim(); });
         (reports || []).forEach(r => {
-            const pid = r.participant_id || r.test_results?.participant_id;
-            if (pid) r._participantName = pMap[pid] || 'Bilinmiyor';
+            if (r.test_results?.participant_id) {
+                r._participantName = pMap[r.test_results.participant_id] || 'Bilinmiyor';
+            }
         });
 
         // İstatistikleri hesapla
@@ -698,24 +690,7 @@ async function loadIndividualReports() {
     try {
         const { data: reports, error } = await PG_API
             .from('reports')
-            .select(`
-                id,
-                test_result_id,
-                participant_id,
-                report_content,
-                report_type,
-                generated_by,
-                created,
-                updated,
-                test_results (
-                    id,
-                    participant_id,
-                    start_time,
-                    end_time,
-                    test_type,
-                    status
-                )
-            `)
+            .select('id,test_result_id,report_content,report_type,generated_by,created,updated,test_results(id,participant_id,start_time,end_time,test_type,status)')
             .order('created', { ascending: false });
 
         if (error) {
@@ -726,10 +701,7 @@ async function loadIndividualReports() {
 
         // Katılımcı adlarını doldur (rapor listesi için)
         try {
-            // Hem reports.participant_id hem de test_results.participant_id'yi topla
-            const participantIds = [
-                ...new Set((reports || []).flatMap(r => [r.participant_id, r.test_results?.participant_id]).filter(Boolean))
-            ];
+            const participantIds = [...new Set((reports || []).map(r => r.test_results?.participant_id).filter(Boolean))];
             if (participantIds.length > 0) {
                 const { data: participants } = await PG_API
                     .from('participants')
@@ -740,7 +712,7 @@ async function loadIndividualReports() {
                     pMap[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim();
                 });
                 (reports || []).forEach(r => {
-                    const pid = r.participant_id || r.test_results?.participant_id;
+                    const pid = r.test_results?.participant_id;
                     if (pid) r._participantName = pMap[pid] || 'Bilinmiyor';
                 });
             }
