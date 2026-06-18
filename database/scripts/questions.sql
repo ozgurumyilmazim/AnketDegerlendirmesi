@@ -7,11 +7,15 @@ CREATE TABLE IF NOT EXISTS public.questions
     id integer NOT NULL DEFAULT nextval('questions_id_seq'::regclass),
     question_number integer NOT NULL,
     question_text text COLLATE pg_catalog."default" NOT NULL,
-    category character varying(100) COLLATE pg_catalog."default",
+    category_id integer,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
     CONSTRAINT questions_pkey PRIMARY KEY (id),
-    CONSTRAINT questions_question_number_key UNIQUE (question_number)
+    CONSTRAINT questions_question_number_key UNIQUE (question_number),
+    CONSTRAINT fk_questions_category FOREIGN KEY (category_id)
+        REFERENCES public.question_category (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE SET NULL
 )
 
 TABLESPACE pg_default;

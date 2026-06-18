@@ -45,7 +45,7 @@ class MMPITest {
             // PG_API'den veri çek
             const { data, error } = await PG_API
                 .from('questions')
-                .select('id, question_number, question_text, category')
+                .select('id, question_number, question_text, category_id')
                 .order('question_number', { ascending: true });
             
             console.log('PG_API yanıtı:', { data, error });

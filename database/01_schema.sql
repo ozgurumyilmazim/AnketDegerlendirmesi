@@ -81,12 +81,13 @@ CREATE TABLE IF NOT EXISTS questions (
     id SERIAL PRIMARY KEY,
     question_number INTEGER NOT NULL UNIQUE,
     question_text TEXT NOT NULL,
-    category VARCHAR(100),
+    category_id INTEGER REFERENCES question_category(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_questions_number ON questions(question_number);
+CREATE INDEX idx_questions_category ON questions(category_id);
 
 -- ============================================================
 -- REPORTS TABLE

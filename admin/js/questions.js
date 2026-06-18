@@ -60,12 +60,19 @@ class QuestionsManager {
             }
             this.categories.forEach(c => {
                 const opt = document.createElement('option');
-                opt.value = c.name;
+                opt.value = c.id;
                 opt.textContent = c.name;
                 sel.appendChild(opt);
             });
             if (currentVal) sel.value = currentVal;
         });
+    }
+
+    getCategoryNameById(id) {
+        if (!id && id !== 0) return 'Belirtilmemiş';
+        const numId = parseInt(id);
+        const found = this.categories.find(c => c.id === numId);
+        return found ? found.name : 'Belirtilmemiş';
     }
 
     async loadQuestions() {
@@ -151,7 +158,7 @@ class QuestionsManager {
             addModal.addEventListener('show.bs.modal', () => {
                 document.getElementById('addQuestionForm').reset();
                 if (this.categories.length > 0) {
-                    document.getElementById('addQuestionCategory').value = this.categories[0].name;
+                    document.getElementById('addQuestionCategory').value = this.categories[0].id;
                 }
             });
         }
@@ -164,7 +171,7 @@ class QuestionsManager {
         this.filteredQuestions = this.questions.filter(q => {
             const matchesSearch = q.question_text.toLowerCase().includes(searchTerm) ||
                                 q.question_number.toString().includes(searchTerm);
-            const matchesCategory = !categoryFilter || q.category === categoryFilter;
+            const matchesCategory = !categoryFilter || parseInt(q.category_id) === parseInt(categoryFilter);
             return matchesSearch && matchesCategory;
         });
 
@@ -191,7 +198,7 @@ class QuestionsManager {
                     </div>
                 </td>
                 <td>
-                    <span class="badge bg-info text-dark">${this.getCategoryName(q.category)}</span>
+                    <span class="badge bg-info text-dark">${this.getCategoryNameById(q.category_id)}</span>
                 </td>
                 <td>
                     <div class="d-flex justify-content-end">
@@ -382,7 +389,7 @@ class QuestionsManager {
                             <div class="row">
                                 <div class="col-md-6">
                                     <p><strong>Soru Numarası:</strong> ${q.question_number}</p>
-                                    <p><strong>Kategori:</strong> ${this.getCategoryName(q.category)}</p>
+                                    <p><strong>Kategori:</strong> ${this.getCategoryNameById(q.category_id)}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>ID:</strong> ${q.id}</p>
@@ -428,7 +435,7 @@ class QuestionsManager {
         document.getElementById('editQuestionId').value = q.id;
         document.getElementById('editQuestionNumber').value = q.question_number;
         document.getElementById('editQuestionText').value = q.question_text;
-        document.getElementById('editQuestionCategory').value = q.category || (this.categories.length > 0 ? this.categories[0].name : '');
+        document.getElementById('editQuestionCategory').value = q.category_id || (this.categories.length > 0 ? this.categories[0].id : '');
 
         const modal = new bootstrap.Modal(document.getElementById('editQuestionModal'));
         modal.show();
@@ -450,7 +457,7 @@ class QuestionsManager {
         return {
             question_number: parseInt(document.getElementById(isEdit ? 'editQuestionNumber' : 'questionNumber').value),
             question_text: document.getElementById(isEdit ? 'editQuestionText' : 'questionText').value,
-            category: document.getElementById(isEdit ? 'editQuestionCategory' : 'addQuestionCategory').value
+            category_id: parseInt(document.getElementById(isEdit ? 'editQuestionCategory' : 'addQuestionCategory').value)
         };
     }
 
@@ -466,12 +473,6 @@ class QuestionsManager {
         }
 
         return true;
-    }
-
-    getCategoryName(category) {
-        if (!category) return 'Belirtilmemiş';
-        const found = this.categories.find(c => c.name === category);
-        return found ? found.name : category;
     }
 
     truncateText(text, maxLength) {
