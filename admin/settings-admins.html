@@ -528,7 +528,7 @@
             try {
                 if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
 
-                const { error } = await window.PG_API.from('users').delete().eq('id', id);
+                const { error } = await window.PG_API.from('users').eq('id', id).delete();
                 if (error) throw error;
 
                 showToast('success', `${label} silindi.`);

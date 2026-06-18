@@ -331,8 +331,8 @@ class TaskDefinitionsManager {
                 try {
                     const { error } = await window.PG_API
                         .from('task_definitions')
-                        .update(formData)
-                        .eq('id', this.currentEditId);
+                        .eq('id', this.currentEditId)
+                        .update(formData);
                     
                     if (error) {
                         console.error('Database update error:', error);
@@ -386,8 +386,8 @@ class TaskDefinitionsManager {
                 try {
                     const { error } = await window.PG_API
                         .from('task_definitions')
-                        .delete()
-                        .eq('id', this.currentDeleteId);
+                        .eq('id', this.currentDeleteId)
+                        .delete();
                     
                     if (error) throw error;
                 } catch (dbError) {
@@ -425,8 +425,8 @@ class TaskDefinitionsManager {
                 try {
                     const { error } = await window.PG_API
                         .from('task_definitions')
-                        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
-                        .eq('id', taskId);
+                        .eq('id', taskId)
+                        .update({ is_active: newStatus, updated_at: new Date().toISOString() });
                     
                     if (error) throw error;
                 } catch (dbError) {

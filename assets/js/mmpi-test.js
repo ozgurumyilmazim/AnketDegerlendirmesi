@@ -720,8 +720,8 @@ class MMPITest {
                     // Mevcut test sonucunu güncelle
                     const result = await PG_API
                         .from('test_results')
-                        .update(PostgreSQLData)
-                        .eq('id', existingTest[0].id);
+                        .eq('id', existingTest[0].id)
+                        .update(PostgreSQLData);
                     
                     data = result.data;
                     error = result.error;
@@ -914,6 +914,7 @@ class MMPITest {
             // TC No ile kayıt bul ve güncelle
             const { data, error } = await PG_API
                 .from('participants')
+                .eq('tc_no', searchTcNo)
                 .update({
                     first_name: participantData.firstName,
                     last_name: participantData.lastName,
@@ -926,9 +927,7 @@ class MMPITest {
                     education: participantData.education,
                     marital_status: participantData.maritalStatus,
                     updated: new Date().toISOString()
-                })
-                .eq('tc_no', searchTcNo)
-                .select();
+                });
             
             if (error) {
                 throw error;

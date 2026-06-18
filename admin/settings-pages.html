@@ -697,8 +697,8 @@
             // Remove saved data from PG_API
             PG_API
                 .from('page_content')
-                .delete()
                 .eq('page_key', currentPage)
+                .delete()
                 .then(() => {
                     delete pageMemory[currentPage];
                     loadDefault(currentPage);

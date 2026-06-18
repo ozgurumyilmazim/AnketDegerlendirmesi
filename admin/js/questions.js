@@ -313,13 +313,13 @@ class QuestionsManager {
                 try {
                     const { error } = await window.PG_API
                         .from('questions')
-                        .update(formData)
-                        .eq('id', this.currentEditId);
+                        .eq('id', this.currentEditId)
+                        .update(formData);
                     
                     if (error) throw error;
                     savedToDb = true;
                 } catch (dbError) {
-                    this.showError('Veritabanı güncelleme hatası: ' + dbError.message);
+                    this.showError('Veritabanı güncelleme hatası: ' + (dbError.message || 'Bilinmeyen hata'));
                     return;
                 }
             }
@@ -351,12 +351,12 @@ class QuestionsManager {
                 try {
                     const { error } = await window.PG_API
                         .from('questions')
-                        .delete()
-                        .eq('id', this.currentDeleteId);
+                        .eq('id', this.currentDeleteId)
+                        .delete();
                     
                     if (error) throw error;
                 } catch (dbError) {
-                    this.showError('Veritabanından silinirken hata: ' + dbError.message);
+                    this.showError('Veritabanından silinirken hata: ' + (dbError.message || 'Bilinmeyen hata'));
                     return;
                 }
             }

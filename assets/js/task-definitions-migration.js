@@ -70,11 +70,11 @@ class TaskDefinitionsMigration {
             // Update the report
             const { error } = await window.PG_API
                 .from('reports')
+                .eq('id', report.id)
                 .update({
                     task_definitions_evaluation: migratedData,
                     updated_at: new Date().toISOString()
-                })
-                .eq('id', report.id);
+                });
 
             if (error) {
                 console.error(`Failed to migrate report ${report.id}:`, error);

@@ -1174,6 +1174,7 @@ async function savePsychologistEvaluation() {
         // PG_API'e yeni alanları kullanarak kaydet
         const { data, error } = await PG_API
             .from('reports')
+            .eq('id', reportData.report.id)
             .update({
                 psychologist_name: psychologistData.psychologist_name,
                 evaluation_date: psychologistData.evaluation_date,
@@ -1190,8 +1191,7 @@ async function savePsychologistEvaluation() {
                 data_usage_recommendations: psychologistData.data_usage_recommendations,
                 report_content: updatedReportContent,
                 updated: new Date().toISOString()
-            })
-            .eq('id', reportData.report.id);
+            });
 
         if (error) {
             throw error;
@@ -1640,11 +1640,11 @@ async function saveSummary() {
         // PG_API'e kaydet
         const { data, error } = await PG_API
             .from('reports')
+            .eq('id', reportData.report.id)
             .update({
                 report_content: updatedReportContent,
                 updated: new Date().toISOString()
-            })
-            .eq('id', reportData.report.id);
+            });
 
         if (error) {
             throw error;
@@ -1694,11 +1694,11 @@ async function saveReportResult() {
         // PG_API'e kaydet
         const { data, error } = await PG_API
             .from('reports')
+            .eq('id', reportData.report.id)
             .update({
                 report_content: updatedReportContent,
                 updated: new Date().toISOString()
-            })
-            .eq('id', reportData.report.id);
+            });
 
         if (error) {
             throw error;

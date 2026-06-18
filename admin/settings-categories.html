@@ -523,8 +523,8 @@
 
                 const { error } = await window.PG_API
                     .from('question_category')
-                    .update({ name, sort_order: sortOrder })
-                    .eq('id', id);
+                    .eq('id', id)
+                    .update({ name, sort_order: sortOrder });
 
                 if (error) throw error;
 
@@ -545,8 +545,8 @@
 
                 const { error } = await window.PG_API
                     .from('question_category')
-                    .delete()
-                    .eq('id', id);
+                    .eq('id', id)
+                    .delete();
 
                 if (error) throw error;
 

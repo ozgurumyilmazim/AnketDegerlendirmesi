@@ -943,8 +943,8 @@ async function deleteReport(reportId) {
     try {
         const { error } = await PG_API
             .from('reports')
-            .delete()
-            .eq('id', reportId);
+            .eq('id', reportId)
+            .delete();
         
         if (error) {
             console.error('Rapor silinirken hata:', error);
