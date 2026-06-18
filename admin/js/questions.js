@@ -4,12 +4,14 @@ class QuestionsManager {
         this.filteredQuestions = [];
         this.currentEditId = null;
         this.currentDeleteId = null;
+        this.categories = [];
         
         this.init();
     }
 
     async init() {
         await this.checkAuth();
+        await this.loadCategories();
         await this.loadQuestions();
         this.bindEvents();
         this.updateStatistics();
@@ -27,6 +29,43 @@ class QuestionsManager {
                 console.warn('Auth check failed, proceeding anyway:', e);
             }
         }
+    }
+
+    async loadCategories() {
+        if (!window.PG_API) return;
+        try {
+            const { data, error } = await window.PG_API
+                .from('question_category')
+                .select('*')
+                .order('sort_order', { ascending: true });
+            if (!error && data) this.categories = data;
+        } catch (e) {
+            console.warn('Kategoriler yüklenemedi:', e);
+        }
+        this.populateCategorySelects();
+    }
+
+    populateCategorySelects() {
+        const selects = ['categoryFilter', 'addQuestionCategory', 'editQuestionCategory'];
+        selects.forEach(id => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            const currentVal = sel.value;
+            sel.innerHTML = '';
+            if (id === 'categoryFilter') {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'Tüm Kategoriler';
+                sel.appendChild(opt);
+            }
+            this.categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name;
+                sel.appendChild(opt);
+            });
+            if (currentVal) sel.value = currentVal;
+        });
     }
 
     async loadQuestions() {
@@ -104,6 +143,17 @@ class QuestionsManager {
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         if (confirmDeleteBtn) {
             confirmDeleteBtn.addEventListener('click', () => this.deleteQuestion());
+        }
+
+        // Reset add form on modal show
+        const addModal = document.getElementById('addQuestionModal');
+        if (addModal) {
+            addModal.addEventListener('show.bs.modal', () => {
+                document.getElementById('addQuestionForm').reset();
+                if (this.categories.length > 0) {
+                    document.getElementById('addQuestionCategory').value = this.categories[0].name;
+                }
+            });
         }
     }
 
@@ -378,7 +428,7 @@ class QuestionsManager {
         document.getElementById('editQuestionId').value = q.id;
         document.getElementById('editQuestionNumber').value = q.question_number;
         document.getElementById('editQuestionText').value = q.question_text;
-        document.getElementById('editQuestionCategory').value = q.category || 'genel';
+        document.getElementById('editQuestionCategory').value = q.category || (this.categories.length > 0 ? this.categories[0].name : '');
 
         const modal = new bootstrap.Modal(document.getElementById('editQuestionModal'));
         modal.show();
@@ -419,16 +469,9 @@ class QuestionsManager {
     }
 
     getCategoryName(category) {
-        const categories = {
-            'genel': 'Genel',
-            'security': 'Güvenlik',
-            'maintenance': 'Bakım',
-            'customer': 'Müşteri Hizmetleri',
-            'hr': 'İnsan Kaynakları',
-            'finance': 'Finans',
-            'diger': 'Diğer'
-        };
-        return categories[category] || category || 'Belirtilmemiş';
+        if (!category) return 'Belirtilmemiş';
+        const found = this.categories.find(c => c.name === category);
+        return found ? found.name : category;
     }
 
     truncateText(text, maxLength) {

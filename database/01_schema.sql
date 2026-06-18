@@ -202,6 +202,17 @@ CREATE TABLE IF NOT EXISTS kvkk (
 );
 
 -- ============================================================
+-- QUESTION CATEGORIES TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS question_category (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================================
 -- TASK DEFINITIONS TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS task_definitions (
@@ -273,6 +284,8 @@ CREATE TRIGGER trg_mmpi_int_updated BEFORE UPDATE ON mmpi_interpretations
 CREATE TRIGGER trg_kvkk_updated BEFORE UPDATE ON kvkk
     FOR EACH ROW EXECUTE FUNCTION update_updated_column();
 CREATE TRIGGER trg_task_defs_updated BEFORE UPDATE ON task_definitions
+    FOR EACH ROW EXECUTE FUNCTION update_updated_column();
+CREATE TRIGGER trg_question_category_updated BEFORE UPDATE ON question_category
     FOR EACH ROW EXECUTE FUNCTION update_updated_column();
 CREATE TRIGGER trg_settings_updated BEFORE UPDATE ON settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_column();

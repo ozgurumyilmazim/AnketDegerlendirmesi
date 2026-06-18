@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soru Kategorileri - MMPI Test Sistemi</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.35);
+            color: white;
+        }
+
+        .categories-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+        .categories-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .categories-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .categories-table tbody tr:hover {
+            background: #eef0fc;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-edit {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .btn-icon-edit:hover {
+            background: #ffc107;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon-delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-icon-delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #eef0fc, #e8eaf6);
+            border-left: 4px solid #667eea;
+            border-radius: 0 10px 10px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .info-banner i {
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+
+        .sort-order-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eef0fc;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Soru Kategorileri</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-tags me-2" style="color:#667eea;"></i>Soru Kategorileri</h1>
+                <p class="page-subtitle">Test sorularında kullanılan kategorileri yönetin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Bilgi Notu -->
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            Bu ekrandan soru kategorilerini ekleyebilir, düzenleyebilir ve silebilirsiniz. Kategoriler soru yönetimi sayfasında filtreleme ve yeni soru ekleme işlemlerinde kullanılır.
+        </div>
+
+        <!-- Yeni Kategori Ekle -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-plus-circle me-2"></i>Yeni Kategori Ekle</h5>
+            </div>
+            <div class="panel-body">
+                <form id="addCategoryForm">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label" for="categoryName">Kategori Adı</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="Örn: Genel, Aile, Saglik" maxlength="100">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="categorySortOrder">Sıralama</label>
+                            <input type="number" class="form-control" id="categorySortOrder" placeholder="Sıra" min="0" value="1">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-add w-100" id="addCategoryBtn">
+                                <i class="fas fa-plus me-1"></i>Ekle
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Kategori Listesi -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-list me-2"></i>Mevcut Kategoriler</h5>
+                <span id="categoryCountBadge" class="badge bg-white text-dark">Yükleniyor...</span>
+            </div>
+            <div class="panel-body p-0">
+                <div id="loadingSpinner" class="empty-state">
+                    <div class="spinner-border text-secondary" style="width: 2rem; height: 2rem;"></div>
+                    <p class="mt-2 mb-0">Kategoriler yükleniyor...</p>
+                </div>
+                <div id="categoryTableWrapper" class="d-none">
+                    <div class="table-responsive">
+                        <table class="table categories-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Sıra</th>
+                                    <th style="width: 55%;">Kategori Adı</th>
+                                    <th style="width: 30%;" class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="emptyState" class="empty-state d-none">
+                    <i class="fas fa-tags"></i>
+                    <p>Henüz kategori tanımlanmamış.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Category Modal -->
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Kategori Düzenle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCategoryForm">
+                            <input type="hidden" id="editCategoryId">
+                            <div class="mb-3">
+                                <label for="editCategoryName" class="form-label">Kategori Adı</label>
+                                <input type="text" class="form-control" id="editCategoryName" maxlength="100">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCategorySortOrder" class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="editCategorySortOrder" min="0">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="button" class="btn btn-primary" id="updateCategoryBtn">
+                            <i class="fas fa-save"></i> Güncelle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">İşlem başarıyla tamamlandı!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <script>
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        async function loadCategories() {
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('categoryTableWrapper').classList.add('d-none');
+            document.getElementById('emptyState').classList.add('d-none');
+
+            try {
+                if (typeof window.PG_API === 'undefined') {
+                    throw new Error('Veritabanı bağlantısı bulunamadı.');
+                }
+
+                const { data, error } = await window.PG_API
+                    .from('question_category')
+                    .select('*')
+                    .order('sort_order', { ascending: true });
+
+                if (error) throw error;
+
+                renderCategories(data || []);
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Kategoriler yüklenirken hata:', msg);
+                showToast('error', 'Kategoriler yüklenemedi: ' + msg);
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('emptyState').classList.remove('d-none');
+            }
+        }
+
+        function renderCategories(categories) {
+            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('categoryCountBadge').textContent = categories.length + ' kategori';
+
+            if (categories.length === 0) {
+                document.getElementById('emptyState').classList.remove('d-none');
+                return;
+            }
+
+            const tbody = document.getElementById('categoryTableBody');
+            tbody.innerHTML = '';
+
+            categories.forEach(c => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <span class="sort-order-badge">${c.sort_order || c.id}</span>
+                    </td>
+                    <td><strong>${escapeHtml(c.name)}</strong></td>
+                    <td class="text-end">
+                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editCategory('${c.id}', '${escapeHtml(c.name)}', ${c.sort_order || 0})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteCategory('${c.id}', '${escapeHtml(c.name)}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('categoryTableWrapper').classList.remove('d-none');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('addCategoryBtn').addEventListener('click', async () => {
+            const name = document.getElementById('categoryName').value.trim();
+            const sortOrder = parseInt(document.getElementById('categorySortOrder').value) || 0;
+
+            if (!name) {
+                showToast('error', 'Kategori adı zorunludur.');
+                return;
+            }
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                const { error } = await window.PG_API
+                    .from('question_category')
+                    .insert([{ name, sort_order: sortOrder }]);
+
+                if (error) throw error;
+
+                showToast('success', `"${name}" kategorisi eklendi.`);
+                document.getElementById('addCategoryForm').reset();
+                document.getElementById('categorySortOrder').value = '1';
+                loadCategories();
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Kategori eklenirken hata:', msg);
+                showToast('error', 'Kategori eklenirken hata: ' + msg);
+            }
+        });
+
+        function editCategory(id, name, sortOrder) {
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = name;
+            document.getElementById('editCategorySortOrder').value = sortOrder;
+            new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+        }
+
+        document.getElementById('updateCategoryBtn').addEventListener('click', async () => {
+            const id = document.getElementById('editCategoryId').value;
+            const name = document.getElementById('editCategoryName').value.trim();
+            const sortOrder = parseInt(document.getElementById('editCategorySortOrder').value) || 0;
+
+            if (!name) {
+                showToast('error', 'Kategori adı zorunludur.');
+                return;
+            }
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                const { error } = await window.PG_API
+                    .from('question_category')
+                    .update({ name, sort_order: sortOrder })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showToast('success', 'Kategori güncellendi.');
+                bootstrap.Modal.getInstance(document.getElementById('editCategoryModal')).hide();
+                loadCategories();
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Kategori güncellenirken hata:', msg);
+                showToast('error', 'Kategori güncellenirken hata: ' + msg);
+            }
+        });
+
+        async function deleteCategory(id, name) {
+            if (!confirm(`"${name}" kategorisini silmek istediğinizden emin misiniz?`)) return;
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                const { error } = await window.PG_API
+                    .from('question_category')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showToast('success', `"${name}" silindi.`);
+                loadCategories();
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Silme işlemi başarısız:', msg);
+                showToast('error', 'Silme işlemi başarısız: ' + msg);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof window.AuthService !== 'undefined') {
+                const isAdmin = await window.AuthService.isAdmin();
+                if (!isAdmin) {
+                    showToast('error', 'Bu sayfaya erişim yetkiniz bulunmamaktadır.');
+                    setTimeout(() => { window.location.href = 'settings.html'; }, 2000);
+                    return;
+                }
+            }
+            loadCategories();
+        });
+    </script>
+</body>
+</html>

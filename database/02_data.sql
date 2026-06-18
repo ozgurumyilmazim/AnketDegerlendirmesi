@@ -9,6 +9,18 @@
 BEGIN;
 
 -- ============================================================
+-- 0. QUESTION CATEGORIES
+-- ============================================================
+INSERT INTO question_category (name, sort_order) VALUES
+    ('Genel', 1),
+    ('Aile', 2),
+    ('Saglik', 3),
+    ('Cinsellik', 4),
+    ('Duygusal', 5),
+    ('Sosyal', 6)
+ON CONFLICT (name) DO NOTHING;
+
+-- ============================================================
 -- 1. QUESTIONS (567 MMPI-2 questions)
 -- Source: dokumanlar/questions_insert.sql
 -- ============================================================
