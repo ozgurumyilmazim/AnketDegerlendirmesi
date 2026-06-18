@@ -78,7 +78,7 @@ CREATE INDEX idx_test_results_participant ON test_results(participant_id);
 -- QUESTIONS TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS questions (
-    id SERIAL PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     question_number INTEGER NOT NULL UNIQUE,
     question_text TEXT NOT NULL,
     category_id INTEGER REFERENCES question_category(id) ON DELETE SET NULL,

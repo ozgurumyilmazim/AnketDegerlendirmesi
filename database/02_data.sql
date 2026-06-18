@@ -14,7 +14,7 @@ BEGIN;
 INSERT INTO question_category (name, sort_order) VALUES
     ('Genel', 1),
     ('Aile', 2),
-    ('Saglik', 3),
+    ('Sağlık', 3),
     ('Cinsellik', 4),
     ('Duygusal', 5),
     ('Sosyal', 6)
