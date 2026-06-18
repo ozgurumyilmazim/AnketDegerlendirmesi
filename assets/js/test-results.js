@@ -1252,6 +1252,7 @@ async function generateReport(testId) {
             .from('reports')
             .insert({
                 test_result_id: testId,
+                participant_id: testResult.participant_id,
                 report_content: reportContent,
                 report_type: 'mmpi_standard',
                 generated_by: 'system'
