@@ -252,14 +252,14 @@ class QuestionsManager {
                         .from('questions')
                         .insert([newQuestion]);
                     
-                    if (error) throw error;
+                    if (error) throw new Error(error);
                     
                     if (data && data.length > 0) {
                         newQuestion = data[0];
                         savedToDb = true;
                     }
                 } catch (dbError) {
-                    this.showError('Veritabanına kaydetme hatası: ' + (dbError.message || 'Bilinmeyen hata'));
+                    this.showError('Veritabanına kaydetme hatası: ' + (dbError.message || dbError || 'Bilinmeyen hata'));
                     return;
                 }
             } else {
@@ -316,10 +316,10 @@ class QuestionsManager {
                         .eq('id', this.currentEditId)
                         .update(formData);
                     
-                    if (error) throw error;
+                    if (error) throw new Error(error);
                     savedToDb = true;
                 } catch (dbError) {
-                    this.showError('Veritabanı güncelleme hatası: ' + (dbError.message || 'Bilinmeyen hata'));
+                    this.showError('Veritabanı güncelleme hatası: ' + (dbError.message || dbError || 'Bilinmeyen hata'));
                     return;
                 }
             }
@@ -354,9 +354,9 @@ class QuestionsManager {
                         .eq('id', this.currentDeleteId)
                         .delete();
                     
-                    if (error) throw error;
+                    if (error) throw new Error(error);
                 } catch (dbError) {
-                    this.showError('Veritabanından silinirken hata: ' + (dbError.message || 'Bilinmeyen hata'));
+                    this.showError('Veritabanından silinirken hata: ' + (dbError.message || dbError || 'Bilinmeyen hata'));
                     return;
                 }
             }

@@ -30,7 +30,7 @@ class TaskDefinitionsManager {
                         .order('task_number', { ascending: true });
                     
                     if (error) {
-                        throw error;
+                        throw new Error(error);
                     }
                     
                     if (data && data.length > 0) {
@@ -251,7 +251,7 @@ class TaskDefinitionsManager {
                     
                     if (error) {
                         console.error('Database save error:', error);
-                        throw error;
+                        throw new Error(error);
                     }
                     
                     if (data && data.length > 0) {
@@ -336,7 +336,7 @@ class TaskDefinitionsManager {
                     
                     if (error) {
                         console.error('Database update error:', error);
-                        this.showError(`Veritabanı güncelleme hatası: ${error.message}`);
+                        this.showError(`Veritabanı güncelleme hatası: ${error.message || error}`);
                         return;
                     }
                     
@@ -389,7 +389,7 @@ class TaskDefinitionsManager {
                         .eq('id', this.currentDeleteId)
                         .delete();
                     
-                    if (error) throw error;
+                    if (error) throw new Error(error);
                 } catch (dbError) {
                     console.warn('Could not delete from database:', dbError);
                 }
@@ -428,7 +428,7 @@ class TaskDefinitionsManager {
                         .eq('id', taskId)
                         .update({ is_active: newStatus, updated_at: new Date().toISOString() });
                     
-                    if (error) throw error;
+                    if (error) throw new Error(error);
                 } catch (dbError) {
                     console.warn('Could not update in database:', dbError);
                 }
