@@ -33,10 +33,21 @@ services:
       # Veritabanı bağlantı dizesi
       PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
       # API olarak sunulacak PostgreSQL şeması
-      PGRST_DB_SCHEMA: ${PGRST_SCHEMA:-public}
       # Kimlik doğrulaması olmadan yapılacak istekler için varsayılan rol
       # Güvenlik uyarısı: Üretim ortamında buraya kısıtlı yetkili bir rol verilmelidir (Bkz: Kılavuz)
-      PGRST_DB_ANON_ROLE: ${PGRST_ANON_ROLE:-postgres}
+
+      #PGRST_DB_URI: "postgres://mmpi_user:${DB_PASSWORD}@db:5432/mmpi_db"
+      PGRST_DB_ANON_ROLE: "anon"
+      #PGRST_DB_ANON_ROLE: ${PGRST_ANON_ROLE:-postgres}
+      PGRST_DB_SCHEMAS: "api,public"
+      #PGRST_DB_SCHEMA: ${PGRST_SCHEMA:-public}
+      PGRST_JWT_SECRET: "${JWT_SECRET}"
+      PGRST_DB_PRE_REQUEST: "api.set_jwt_secret"
+      PGRST_SERVER_HOST: "0.0.0.0"
+      PGRST_SERVER_PORT: "3000"
+      PGRST_DB_POOL: "10"
+
+
     networks:
       - backend-network
     depends_on:
