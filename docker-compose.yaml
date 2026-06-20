@@ -12,7 +12,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       - pg_backups:/backups
     ports:
-      - "127.0.0.1:5432:5432" 
+      - "127.0.0.1:5432:5432"
     networks:
       - backend-network
     deploy:
@@ -24,23 +24,16 @@ services:
           cpus: '0.5'
           memory: 512MB
 
-# --- POSTGREST API SERVİSİ ---
+  # --- POSTGREST API SERVİSİ ---
   api:
-    image: postgrest/postgrest:v12.0.2 # Güncel ve kararlı PostgREST sürümü
+    image: postgrest/postgrest:v12.0.2
     container_name: selma_api
     restart: unless-stopped
     environment:
-      # Veritabanı bağlantı dizesi
+      # Veritabanı bağlantısı (Konteyner adı 'selma_db' olarak güncellendi)
       PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
-      # API olarak sunulacak PostgreSQL şeması
-      # Kimlik doğrulaması olmadan yapılacak istekler için varsayılan rol
-      # Güvenlik uyarısı: Üretim ortamında buraya kısıtlı yetkili bir rol verilmelidir (Bkz: Kılavuz)
-
-      #PGRST_DB_URI: "postgres://mmpi_user:${DB_PASSWORD}@db:5432/mmpi_db"
       PGRST_DB_ANON_ROLE: "anon"
-      #PGRST_DB_ANON_ROLE: ${PGRST_ANON_ROLE:-postgres}
       PGRST_DB_SCHEMAS: "api,public"
-      #PGRST_DB_SCHEMA: ${PGRST_SCHEMA:-public}
       PGRST_JWT_SECRET: "${JWT_SECRET}"
       PGRST_DB_PRE_REQUEST: "api.set_jwt_secret"
       PGRST_SERVER_HOST: "0.0.0.0"
@@ -64,7 +57,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-adminpassword123}
-      # Güvenlik için gelişmiş çerez koruması
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
@@ -75,7 +67,7 @@ services:
     depends_on:
       - db
 
-  # --- NGINX REVERSE PROXY SERVİSİ ---
+  # --- NGINX REVERSE PROXY & FRONTEND SERVİSİ ---
   nginx:
     image: nginx:alpine
     container_name: selma_onyuz
@@ -89,14 +81,15 @@ services:
       - backend-network
     depends_on:
       - pgadmin
+      - api
 
 # --- NETWORKS (AĞLAR) ---
 networks:
   backend-network:
-    driver: bridge # Servislerin birbirleriyle güvenli ve izole konuşmasını sağlar
+    driver: bridge
 
 # --- VOLUMES (HACİMLER) ---
 volumes:
-  pg_data: # PostgreSQL ana veri tabanı dosyaları
-  pg_backups: # 3. Madde: Yedeklemeler için ayrılmış kalıcı alan
-  pgadmin_data: # 2. Madde: pgAdmin ayarları ve sunucu bilgileri için kalıcı alan
+  pg_data:
+  pg_backups:
+  pgadmin_data:
