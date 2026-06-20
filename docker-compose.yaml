@@ -30,7 +30,7 @@ services:
 # --- POSTGREST API SERVİSİ ---
   api:
     image: postgrest/postgrest:v12.0.2 # Güncel ve kararlı PostgREST sürümü
-    container_name: selma-api
+    container_name: selma_api
     restart: unless-stopped
     environment:
       # Veritabanı bağlantı dizesi
