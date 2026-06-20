@@ -1,74 +1,75 @@
-
 services:
-  webServer:
-    image: nginx:latest
-    container_name: webServer
-    volumes:
-      - config:/etc/nginx
-      - /home/saysoft/web/AnketDegerlendirmesi:/usr/share/nginx/html
-    restart: unless-stopped
-    networks:
-      proxy:
-
+  # --- POSTGRESQL VERİTABANI SERVİSİ ---
   db:
-    image: postgres:16-alpine
-    container_name: postgres
+    image: postgres:15-alpine # Alpine imajı hem daha güvenli hem daha hafiftir
+    container_name: selma_db
     restart: unless-stopped
+    # 1. Madde: Güvenlik için şifreleri doğrudan buraya yazmak yerine .env dosyasından çekiyoruz
     environment:
-      POSTGRES_USER: admin_user
-      POSTGRES_PASSWORD: admin_passwd
-      POSTGRES_DB: postgres
-    networks:
-      proxy:
-        #    ports:
-        #      - "5432:5432"
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-securepassword123}
+      POSTGRES_DB: ${DB_NAME:-mydatabase}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      # Optional: Uncomment the next line to auto-run initialization scripts
-      # - ./initdb:/docker-entrypoint-initdb.d
-    shm_size: 128mb
+      - pg_data:/var/lib/postgresql/data
+      # 3. Madde: Yedekleme (backup) dosyalarını güvenle saklayacağımız volume
+      - pg_backups:/backups
+    ports:
+      - "127.0.0.1:5432:5432" # 1. Madde: Güvenlik için dış dünyaya kapatıp sadece localhost'a açıyoruz
+    networks:
+      - backend-network
+    # 1. Madde: Performans ve kararlılık için kaynak sınırlandırması (Resource Limits)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2GB
+        reservations:
+          cpus: '0.5'
+          memory: 512MB
 
+  # --- PGADMIN YÖNETİM PANELİ SERVİSİ ---
   pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
+    image: dpage/pgadmin4:8.5
+    container_name: pgadmin_container
     restart: unless-stopped
-    networks:
-      proxy:
-        #    ports:
-        #      - "9000:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: ozgur.yilmaz@icat.com.tr
-      PGADMIN_DEFAULT_PASSWORD: 0
-      CHECK_EMAIL_DELIVERABILITY: False
-      SCRIPT_NAME: "/pgadmin"
-
-  api:
-    image: postgrest/postgrest
-    container_name: postgrest
-    restart: unless-stopped
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-adminpassword123}
+      # Güvenlik için gelişmiş çerez koruması
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
+    volumes:
+      # 2. Madde: Kaydedilen sunucuların silinmemesi için kalıcı (persistent) volume
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "127.0.0.1:5050:80" # Güvenlik gerekçesiyle sadece localhost üzerinden erişim (Nginx arkasına alınabilir)
     networks:
-      proxy:
-        #    ports:
-        #      - "3000:3000"
-    environment:
-      PGRST_DB_URI: "postgres://mmpi_user:${DB_PASSWORD}@db:5432/mmpi_db"
-      PGRST_DB_ANON_ROLE: "anon"
-      PGRST_DB_SCHEMAS: "api,public"
-      PGRST_JWT_SECRET: "${JWT_SECRET}"
-      PGRST_DB_PRE_REQUEST: "api.set_jwt_secret"
-      PGRST_SERVER_HOST: "0.0.0.0"
-      PGRST_SERVER_PORT: "3000"
-      PGRST_DB_POOL: "10"
-
+      - backend-network
     depends_on:
       - db
 
+  # --- NGINX REVERSE PROXY SERVİSİ ---
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    volumes:
+      # 4. Madde: Tüm klasör yerine sadece default.conf dosyasını read-only (ro) olarak bağlıyoruz
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+#    ports:
+#      - "80:80"
+#      - "443:443"
+    networks:
+      - backend-network
+    depends_on:
+      - pgadmin
 
+# --- NETWORKS (AĞLAR) ---
 networks:
-  proxy:
-    external: true
+  backend-network:
+    driver: bridge # Servislerin birbirleriyle güvenli ve izole konuşmasını sağlar
 
+# --- VOLUMES (HACİMLER) ---
 volumes:
-  config:
-  postgres_data:
-    driver: local
+  pg_data: # PostgreSQL ana veri tabanı dosyaları
+  pg_backups: # 3. Madde: Yedeklemeler için ayrılmış kalıcı alan
+  pgadmin_data: # 2. Madde: pgAdmin ayarları ve sunucu bilgileri için kalıcı alan
