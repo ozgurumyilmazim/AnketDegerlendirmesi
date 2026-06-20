@@ -4,20 +4,17 @@ services:
     image: postgres:15-alpine # Alpine imajı hem daha güvenli hem daha hafiftir
     container_name: selma_db
     restart: unless-stopped
-    # 1. Madde: Güvenlik için şifreleri doğrudan buraya yazmak yerine .env dosyasından çekiyoruz
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-securepassword123}
       POSTGRES_DB: ${DB_NAME:-mydatabase}
     volumes:
       - pg_data:/var/lib/postgresql/data
-      # 3. Madde: Yedekleme (backup) dosyalarını güvenle saklayacağımız volume
       - pg_backups:/backups
     ports:
-      - "127.0.0.1:5432:5432" # 1. Madde: Güvenlik için dış dünyaya kapatıp sadece localhost'a açıyoruz
+      - "127.0.0.1:5432:5432" 
     networks:
       - backend-network
-    # 1. Madde: Performans ve kararlılık için kaynak sınırlandırması (Resource Limits)
     deploy:
       resources:
         limits:
@@ -61,10 +58,9 @@ services:
       # Güvenlik için gelişmiş çerez koruması
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
     volumes:
-      # 2. Madde: Kaydedilen sunucuların silinmemesi için kalıcı (persistent) volume
       - pgadmin_data:/var/lib/pgadmin
     ports:
-      - "127.0.0.1:5050:80" # Güvenlik gerekçesiyle sadece localhost üzerinden erişim (Nginx arkasına alınabilir)
+      - "127.0.0.1:5050:80" 
     networks:
       - backend-network
     depends_on:
@@ -76,8 +72,8 @@ services:
     container_name: selma_onyuz
     restart: unless-stopped
     volumes:
-      # 4. Madde: Tüm klasör yerine sadece default.conf dosyasını read-only (ro) olarak bağlıyoruz
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html
     ports:
       - "${APP_PORT:-80}:80"
     networks:
