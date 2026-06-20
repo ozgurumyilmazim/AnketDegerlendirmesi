@@ -27,10 +27,33 @@ services:
           cpus: '0.5'
           memory: 512MB
 
+# --- POSTGREST API SERVİSİ ---
+  api:
+    image: postgrest/postgrest:v12.0.2 # Güncel ve kararlı PostgREST sürümü
+    container_name: selma-api
+    restart: unless-stopped
+    environment:
+      # Veritabanı bağlantı dizesi
+      PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
+      # API olarak sunulacak PostgreSQL şeması
+      PGRST_DB_SCHEMA: ${PGRST_SCHEMA:-public}
+      # Kimlik doğrulaması olmadan yapılacak istekler için varsayılan rol
+      # Güvenlik uyarısı: Üretim ortamında buraya kısıtlı yetkili bir rol verilmelidir (Bkz: Kılavuz)
+      PGRST_DB_ANON_ROLE: ${PGRST_ANON_ROLE:-postgres}
+    networks:
+      - backend-network
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1GB
+
   # --- PGADMIN YÖNETİM PANELİ SERVİSİ ---
   pgadmin:
     image: dpage/pgadmin4:8.5
-    container_name: pgadmin_container
+    container_name: selma_pgadmin
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
@@ -50,7 +73,7 @@ services:
   # --- NGINX REVERSE PROXY SERVİSİ ---
   nginx:
     image: nginx:alpine
-    container_name: nginx_proxy
+    container_name: selma_onyuz
     restart: unless-stopped
     volumes:
       # 4. Madde: Tüm klasör yerine sadece default.conf dosyasını read-only (ro) olarak bağlıyoruz
