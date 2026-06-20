@@ -1,0 +1,74 @@
+
+services:
+  webServer:
+    image: nginx:latest
+    container_name: webServer
+    volumes:
+      - config:/etc/nginx
+      - /home/saysoft/web/AnketDegerlendirmesi:/usr/share/nginx/html
+    restart: unless-stopped
+    networks:
+      proxy:
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin_user
+      POSTGRES_PASSWORD: admin_passwd
+      POSTGRES_DB: postgres
+    networks:
+      proxy:
+        #    ports:
+        #      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: Uncomment the next line to auto-run initialization scripts
+      # - ./initdb:/docker-entrypoint-initdb.d
+    shm_size: 128mb
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    networks:
+      proxy:
+        #    ports:
+        #      - "9000:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ozgur.yilmaz@icat.com.tr
+      PGADMIN_DEFAULT_PASSWORD: 0
+      CHECK_EMAIL_DELIVERABILITY: False
+      SCRIPT_NAME: "/pgadmin"
+
+  api:
+    image: postgrest/postgrest
+    container_name: postgrest
+    restart: unless-stopped
+    networks:
+      proxy:
+        #    ports:
+        #      - "3000:3000"
+    environment:
+      PGRST_DB_URI: "postgres://mmpi_user:${DB_PASSWORD}@db:5432/mmpi_db"
+      PGRST_DB_ANON_ROLE: "anon"
+      PGRST_DB_SCHEMAS: "api,public"
+      PGRST_JWT_SECRET: "${JWT_SECRET}"
+      PGRST_DB_PRE_REQUEST: "api.set_jwt_secret"
+      PGRST_SERVER_HOST: "0.0.0.0"
+      PGRST_SERVER_PORT: "3000"
+      PGRST_DB_POOL: "10"
+
+    depends_on:
+      - db
+
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  config:
+  postgres_data:
+    driver: local
