@@ -58,7 +58,7 @@ services:
 
   # --- PGADMIN YÖNETİM PANELİ SERVİSİ ---
   pgadmin:
-    image: dpage/pgadmin4:8.5
+    image: dpage/pgadmin4:9.16
     container_name: selma_pgadmin
     restart: unless-stopped
     environment:
