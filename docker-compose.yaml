@@ -35,8 +35,13 @@ services:
     environment:
       # Kural: Sadece hassas ve dinamik (.env tabanlı) ayarları burada tutuyoruz.
       # Diğer tüm statik ayarlar (port, şema, havuz vb.) artık doğrudan 'postgrest.conf' içerisinden okunacak.
-      PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
+      # JWT signing secret'ı PostgreSQL connection options ile de iletiyoruz (api.login() içinde app.jwt_secret okunur)
+      PGRST_DB_URI: "postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}?options=-c%20app.jwt_secret%3D${JWT_SECRET}"
       PGRST_JWT_SECRET: "${JWT_SECRET}"
+      # Anonim (JWT'siz) istekler için kullanılacak PostgreSQL rolü
+      PGRST_DB_ANON_ROLE: "anon"
+      # API ve public şemaları (config dosyasındaki db-schemas geçersiz kılınır)
+      PGRST_DB_SCHEMAS: "api,public"
     networks:
       - backend-network
     depends_on:
