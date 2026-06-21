@@ -37,8 +37,10 @@ async function checkAuthentication() {
 
     try {
         // Önce PG_API session kontrolü
-        const session = await AuthService.getSession();
-        console.log('PG_API session object:', session);
+        const sessionData = await AuthService.getSession();
+        console.log('PG_API sessionData:', sessionData);
+        
+        const session = sessionData?.data?.session;
         
         if (session && session.user) {
             // PG_API session var, kullanıcı bilgilerini al
@@ -48,7 +50,7 @@ async function checkAuthentication() {
             currentUser = {
                 userId: session.user.id,
                 email: session.user.email,
-                name: session.user.user_metadata?.name || session.user.email,
+                name: session.user.name || session.user.email,
                 role: userRole,
                 isAdmin: isAdmin,
                 loginTime: new Date().toISOString()

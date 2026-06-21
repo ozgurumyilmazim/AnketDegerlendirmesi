@@ -202,7 +202,7 @@ async function handleLogin(e) {
 async function checkExistingLogin() {
     try {
         // PG_API session kontrolü
-        const session = await AuthService.getSession();
+        const { data: { session } } = await AuthService.getSession();
 
         if (session && session.user) {
             // Aktif session var, dashboard'a yönlendir

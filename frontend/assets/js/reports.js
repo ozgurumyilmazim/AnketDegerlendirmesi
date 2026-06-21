@@ -40,7 +40,7 @@ $(document).ready(async function() {
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
     try {
-        const session = await AuthService.getSession();
+        const { data: { session } } = await AuthService.getSession();
         
         if (session && session.user) {
             const userRole = await AuthService.getUserRole();
@@ -49,7 +49,7 @@ async function checkAuthentication() {
             currentUser = {
                 userId: session.user.id,
                 email: session.user.email,
-                name: session.user.user_metadata?.name || session.user.email,
+                name: session.user.name || session.user.email,
                 role: userRole,
                 isAdmin: isAdmin,
                 loginTime: new Date().toISOString()
