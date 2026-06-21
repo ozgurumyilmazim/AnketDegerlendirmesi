@@ -9,9 +9,10 @@ let filteredResults = [];
 let lastViewedTestId = null; // Detay modalında görüntülenen son test ID'si
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Kullanıcı kimlik doğrulaması
-    checkAuthentication();
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) return;
     
     // DataTable'ı başlat
     initializeDataTable();
@@ -29,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
     try {
-        const session = await AuthService.getSession();
+        // AuthService.getSession() returns { data: { session: { user: {...} } } }
+        const { data: { session } } = await AuthService.getSession();
         
         if (session && session.user) {
             const userRole = await AuthService.getUserRole();
@@ -38,41 +40,35 @@ async function checkAuthentication() {
             currentUser = {
                 userId: session.user.id,
                 email: session.user.email,
-                name: session.user.user_metadata?.name || session.user.email,
-                role: userRole,
+                name: session.user.name || session.user.email,
+                role: userRole || session.user.role,
                 isAdmin: isAdmin,
                 loginTime: new Date().toISOString()
             };
             
             updateUserInfo();
-            return;
+            return true;
         }
         
-        // Fallback: local storage kontrolü
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        // JWT token yok veya süresi dolmuş — tekrar giriş gerekiyor
+        console.warn('Session is null/expired, clearing login data and redirecting to login.html');
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
         
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
-        
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
     }
 }
 

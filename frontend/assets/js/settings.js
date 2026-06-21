@@ -75,9 +75,10 @@ E-posta: [E-posta adresi]</p>
 };
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Kullanıcı kimlik doğrulaması
-    checkAuthentication();
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) return;
     
     // Ayarları yükle
     loadSettings();
@@ -108,33 +109,27 @@ async function checkAuthentication() {
             };
             
             updateUserInfo();
-            return;
+            return true;
         }
         
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        console.warn('Session is null/expired, clearing login data and redirecting to login.html');
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
         
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
-        
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
     }
 }
 

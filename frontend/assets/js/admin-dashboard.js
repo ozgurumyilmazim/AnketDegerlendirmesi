@@ -7,9 +7,10 @@ let testTypesChart = null;
 let currentUser = null;
 
 // Sayfa yüklendiğinde
-$(document).ready(function() {
+$(document).ready(async function() {
     // Kullanıcı kimlik doğrulaması
-    checkAuthentication();
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) return;
     
     // Dashboard verilerini yükle
     loadDashboardData();
@@ -31,7 +32,7 @@ async function checkAuthentication() {
     const url = new URL(window.location);
     if (url.searchParams.has('debug')) {
         console.log('Debug mode enabled – skipping authentication redirects');
-        return; // skip further auth checks
+        return true; // skip further auth checks
     }
 
     try {
@@ -55,48 +56,31 @@ async function checkAuthentication() {
             
             // Kullanıcı bilgilerini güncelle
             updateUserInfo();
-            return;
+            return true;
         }
         
-        // PG_API session yok, local storage kontrolü (fallback)
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        console.log('sessionLogin storage:', sessionLogin);
-        console.log('localLogin storage:', localLogin);
-        
-        if (!sessionLogin && !localLogin) {
-            console.warn('No session and no stored login, redirecting to login.html');
-            if (!new URL(window.location).searchParams.has('debug')) {
-                setTimeout(() => { window.location.href = 'login.html'; }, 3000);
-            } else {
-                console.log('Debug mode – skipping redirect to login.html');
-            }
-            return;
+        console.warn('No session, clearing stored login and redirecting to login.html');
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        if (!new URL(window.location).searchParams.has('debug')) {
+            window.location.href = 'login.html';
+        }
+        return false;
         
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
-            // Show alert for debugging
-            alert('Authentication error: ' + (error?.message || error));
-            // Hata durumunda local storage kontrolü
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            console.warn('Redirecting to login after error handling');
-                if (!new URL(window.location).searchParams.has('debug')) {
-                    setTimeout(() => { window.location.href = 'login.html'; }, 3000);
-                } else {
-                    console.log('Debug mode – skipping redirect to login.html');
-                }
-                return;
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        if (!new URL(window.location).searchParams.has('debug')) {
+            window.location.href = 'login.html';
+        }
+        return false;
     }
 }
 

@@ -10,9 +10,10 @@ let currentParticipant = null;
 let editMode = false;
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Kullanıcı kimlik doğrulaması
-    checkAuthentication();
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) return;
     
     // DataTable'ı başlat
     initializeDataTable();
@@ -45,35 +46,27 @@ async function checkAuthentication() {
             };
             
             updateUserInfo();
-            return;
+            return true;
         }
         
-        // Fallback: local storage kontrolü
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        console.warn('Session is null/expired, clearing login data and redirecting to login.html');
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
         
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
-        
-        // Hata durumunda local storage kontrolü
-        const sessionLogin = sessionStorage.getItem('adminLogin');
-        const localLogin = localStorage.getItem('adminLogin');
-        
-        if (!sessionLogin && !localLogin) {
-            window.location.href = 'login.html';
-            return;
+        sessionStorage.removeItem('adminLogin');
+        localStorage.removeItem('adminLogin');
+        if (typeof AuthService !== 'undefined' && AuthService.setToken) {
+            AuthService.setToken(null);
         }
-        
-        currentUser = JSON.parse(sessionLogin || localLogin);
-        updateUserInfo();
+        window.location.href = 'login.html';
+        return false;
     }
 }
 

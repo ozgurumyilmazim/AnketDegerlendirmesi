@@ -95,7 +95,8 @@ let hasUnsavedChanges = false;
 // Sayfa yüklendiğinde çalıştır
 document.addEventListener('DOMContentLoaded', async function() {
     // Kimlik doğrulamasını kontrol et
-    await checkAuthentication();
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) return;
     
     // KVKK ayarlarını yükle
     await loadKvkkSettings();
@@ -106,10 +107,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Kimlik doğrulama kontrolü
 async function checkAuthentication() {
-    const { data: { user } } = await AuthService.getUser();
-    if (!user) {
+    try {
+        const { data: { user } } = await AuthService.getUser();
+        if (!user) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    } catch (e) {
+        console.error('Authentication control error:', e);
         window.location.href = 'login.html';
-        return;
+        return false;
     }
 }
 
