@@ -12,7 +12,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       - pg_backups:/backups
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:5432:5432" # Sadece yerel yönetim bağlantıları için güvenli port
     networks:
       - backend-network
     deploy:
@@ -30,17 +30,13 @@ services:
     container_name: selma_api
     restart: unless-stopped
     volumes:
+      # Statik ayarları barındıran dış dosyayı container içine bağlıyoruz
       - ./postgrest.conf:/etc/postgrest.conf:ro
     environment:
-      # Veritabanı bağlantısı (Konteyner adı 'selma_db' olarak güncellendi)
+      # Kural: Sadece hassas ve dinamik (.env tabanlı) ayarları burada tutuyoruz.
+      # Diğer tüm statik ayarlar (port, şema, havuz vb.) artık doğrudan 'postgrest.conf' içerisinden okunacak.
       PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
-      PGRST_DB_ANON_ROLE: "anon"
-      PGRST_DB_SCHEMAS: "api,public"
       PGRST_JWT_SECRET: "${JWT_SECRET}"
-      PGRST_DB_PRE_REQUEST: "api.set_jwt_secret"
-      PGRST_SERVER_HOST: "0.0.0.0"
-      PGRST_SERVER_PORT: "3000"
-      PGRST_DB_POOL: "10"
     networks:
       - backend-network
     depends_on:
