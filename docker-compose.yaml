@@ -29,6 +29,8 @@ services:
     image: postgrest/postgrest:v12.0.2
     container_name: selma_api
     restart: unless-stopped
+    volumes:
+      - ./postgrest.conf:/etc/postgrest.conf:ro
     environment:
       # Veritabanı bağlantısı (Konteyner adı 'selma_db' olarak güncellendi)
       PGRST_DB_URI: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}
