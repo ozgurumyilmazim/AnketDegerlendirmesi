@@ -75,6 +75,14 @@ CREATE INDEX idx_test_results_status ON test_results(status);
 CREATE INDEX idx_test_results_participant ON test_results(participant_id);
 
 -- ============================================================
+-- TEST RESULTS MIN VIEW (for duplicate test detection)
+-- ============================================================
+CREATE OR REPLACE VIEW public.test_results_min AS
+SELECT id, participant_id, status, created_at
+FROM public.test_results;
+GRANT SELECT ON public.test_results_min TO anon;
+
+-- ============================================================
 -- QUESTIONS TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS questions (

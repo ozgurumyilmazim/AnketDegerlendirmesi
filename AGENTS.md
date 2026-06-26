@@ -197,3 +197,40 @@ openssl rand -base64 48
 **Fix**: Added gender mapping before DB inserts in both files:
 - `personal-info.js:103-105` — `const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };`
 - `mmpi-test.js:651-653` — same mapping applied
+
+### 2024-06: PostgREST `anon` role missing permissions on `public` schema
+**Symptoms**: `401 Unauthorized` + `"permission denied for table participants"` (PG code 42501) when submitting personal-info form. Console shows `GET /api/participants?select=id&tc_no=eq.... 401 (Unauthorized)`.
+
+**Root cause**: `database/05_postgrest_setup.sql` granted the `anon` role only `USAGE ON SCHEMA api` and `EXECUTE ON FUNCTION api.login()`. The `public` schema tables (`participants`, `test_results`, `questions`, `reports`) had no grants for `anon`. Since PostgREST uses `db-anon-role = "anon"` for unauthenticated requests, all participant-facing CRUD operations failed.
+
+**Fix** (`database/05_postgrest_setup.sql:192-200`):
+- Added `GRANT USAGE ON SCHEMA public TO anon;`
+- Added `GRANT SELECT, INSERT, UPDATE` on `participants`, `test_results` to `anon`
+- Added `GRANT SELECT` on `questions`, `reports` to `anon`
+- Added `GRANT SELECT ON public.test_results_min TO anon;`
+- Added `GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;`
+- Added `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO anon;`
+
+**Related fix** (`database/01_schema.sql:77-81`):
+- Created `public.test_results_min` view (referenced by `mmpi-test.js:176` but missing from DB):
+  ```sql
+  CREATE OR REPLACE VIEW public.test_results_min AS
+  SELECT id, participant_id, status, created_at FROM public.test_results;
+  ```
+- Granted `SELECT ON public.test_results_min TO anon;`
+
+**To apply the fix to an existing database**:
+```bash
+docker exec -i selma_db psql -U postgres -d mydatabase <<'EOF'
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.participants TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.test_results TO anon;
+GRANT SELECT ON public.questions TO anon;
+GRANT SELECT ON public.reports TO anon;
+CREATE OR REPLACE VIEW public.test_results_min AS
+  SELECT id, participant_id, status, created_at FROM public.test_results;
+GRANT SELECT ON public.test_results_min TO anon;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO anon;
+EOF
+```

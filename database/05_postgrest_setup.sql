@@ -190,6 +190,19 @@ GRANT USAGE ON SCHEMA api TO anon;
 GRANT EXECUTE ON FUNCTION api.login(text, text) TO anon;
 
 -- ============================================================
+-- 10b. Grants for the anon role on public schema
+--      Needed for participant-facing front-end (personal-info, test pages)
+-- ============================================================
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.participants TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.test_results TO anon;
+GRANT SELECT ON public.questions TO anon;
+GRANT SELECT ON public.reports TO anon;
+GRANT SELECT ON public.test_results_min TO anon;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO anon;
+
+-- ============================================================
 -- 11. Grants for the authenticated role
 -- ============================================================
 GRANT USAGE ON SCHEMA public TO authenticated;
