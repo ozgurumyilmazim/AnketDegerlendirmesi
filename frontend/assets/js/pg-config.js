@@ -256,7 +256,11 @@ window.PG_API = {
                 } else {
                     const qs = _buildQuery();
                     const selectQs = _select !== '*' ? '?select=' + _select : '';
-                    result = await self._fetch('/' + table + selectQs + (selectQs && qs ? '&' : '') + (qs ? qs.substring(1) : ''));
+                    const qsPart = qs ? qs.substring(1) : '';
+                    const combinedQs = selectQs
+                        ? (qsPart ? selectQs + '&' + qsPart : selectQs)
+                        : (qsPart ? '?' + qsPart : '');
+                    result = await self._fetch('/' + table + combinedQs);
                 }
                 if (result.error) {
                     reject?.({ message: result.error });

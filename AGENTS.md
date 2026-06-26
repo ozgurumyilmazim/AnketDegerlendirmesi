@@ -219,6 +219,29 @@ ALTER TABLE reports RENAME COLUMN updated TO updated_at;
 NOTIFY pgrst, 'reload schema';
 ```
 
+### 2026-06: URL in `_buildQuery` missing `?` separator before filter params
+**Symptoms**: `404 Not Found` — `GET /api/kvkkid=eq.1` (table name and filter concatenated without `?`). Console shows `pg-config.js:139` fetch error.
+
+**Root cause**: `pg-config.js:259` URL construction bug. When `_select='*'` (default), `selectQs` is empty string but `qs` (from `_buildQuery()`) is `?id=eq.1`. The expression `(selectQs && qs ? '&' : '')` evaluates to `false` (since `selectQs` is falsy), then `qs.substring(1)` is appended directly — producing `/kvkkid=eq.1` instead of `/kvkk?id=eq.1`.
+
+**Fix** (`frontend/assets/js/pg-config.js:257-259`):
+- Rewrote URL construction to properly handle the case where `selectQs` is empty but `qs` has content
+- New logic: `combinedQs = selectQs ? (qsPart ? selectQs + '&' + qsPart : selectQs) : (qsPart ? '?' + qsPart : '')`
+- This correctly produces `/table`, `/table?filter=val`, `/table?select=cols`, and `/table?select=cols&filter=val`
+
+### 2026-06: `kvkk` table missing `SELECT` grant for `anon` role
+**Symptoms**: Unauthenticated users (test-takers) cannot view the KVKK consent text. PostgREST returns a permission error when `PG_API.from('kvkk').select('*')` is called on the consent page.
+
+**Root cause**: `database/05_postgrest_setup.sql` and `database/scripts/kvkk.sql` grant `kvkk` table access only to `authenticated` and `mmpi_user` roles, but not to `anon`. Since test-takers access the consent page before logging in, their requests use the `anon` role, which has no permissions on `kvkk`.
+
+**Fix** (`database/05_postgrest_setup.sql:200`):
+- Added `GRANT SELECT ON public.kvkk TO anon;`
+
+**To apply to an existing database**:
+```sql
+GRANT SELECT ON public.kvkk TO anon;
+```
+
 ### 2024-06: Gender value mismatch (`male/female` vs `erkek/kadin`)
 **Symptoms**: PostgREST `400 Bad Request` on INSERT/UPDATE to `participants` table — `gender` column has CHECK constraint: `gender IN ('erkek', 'kadin', 'other')`.
 
@@ -257,8 +280,9 @@ GRANT SELECT, INSERT, UPDATE ON public.participants TO anon;
 GRANT SELECT, INSERT, UPDATE ON public.test_results TO anon;
 GRANT SELECT ON public.questions TO anon;
 GRANT SELECT ON public.reports TO anon;
+GRANT SELECT ON public.kvkk TO anon;
 CREATE OR REPLACE VIEW public.test_results_min AS
-  SELECT id, participant_id, status, created_at FROM public.test_results;
+  SELECT id, participant_id, status, created FROM public.test_results;
 GRANT SELECT ON public.test_results_min TO anon;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO anon;
