@@ -20,3 +20,6 @@ Thumbs.db
 
 # Node.js (if any)
 node_modules/
+
+#Files of OpenCode
+opencode.config.json
