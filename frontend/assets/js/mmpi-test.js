@@ -648,11 +648,14 @@ class MMPITest {
                     console.log('Gender değeri:', personalInfo.gender);
                     
                     // Eğer participant_id yoksa, katılımcıyı participants tablosuna kaydet
+                    // Cinsiyet değerini veritabanı formatına çevir (male/female → erkek/kadin)
+                    const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };
+                    const dbGender = genderMap[personalInfo.gender] || personalInfo.gender;
                     const participantData = {
                         first_name: personalInfo.firstName,
                         last_name: personalInfo.lastName,
                         tc_no: personalInfo.tcNo,
-                        gender: personalInfo.gender,
+                        gender: dbGender,
                         age: personalInfo.age,
                         institution_code: personalInfo.institutionCode,
                         institution_name: personalInfo.institutionName,
@@ -707,7 +710,7 @@ class MMPITest {
                     total_questions: this.questions.length,
                     test_type: 'MMPI',
                     test_version: '1.0',
-                    created: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
                     status: 'completed'
                 };
                 

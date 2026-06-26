@@ -160,3 +160,40 @@ openssl rand -base64 48
 - Duplicate test detection: checks both `localStorage` (`mmpiCompletedTests`) and PostgREST (`participants` + `test_results`)
 - Debug helpers available in console: `window.mmpiDebug` (in test mode)
 - Report page (`report.html`) uses Chart.js for profile graph and jsPDF/html2canvas for PDF export
+
+## Known bug fixes & migration notes
+
+### 2024-06: `PG_API.from().insert().select()` chain broken
+**Symptoms**: `TypeError: PG_API.from(...).insert(...).select is not a function` on `personal-info.js:119`.
+
+**Root cause**: `pg-config.js`'s `insert()` method was `async` and returned a Promise, so `.select()` (and `.single()`) could not be chained after it.
+
+**Fix** (`assets/js/pg-config.js:274-279`):
+- Changed `insert()` from `async` to synchronous — stores insert data in `_insertData` and returns `this` (builder) for chaining.
+- Added `_operation` and `_insertData`/`_upsertData` state variables to the builder.
+- Modified `then()` to detect `_operation === 'insert'` and execute a `POST /table?select=cols` with `Prefer: return=representation` header instead of the default GET.
+- Applied same pattern to `upsert()` for consistency.
+- The `_buildQuery()` no longer includes `_select` params; instead `select` is handled separately in the URL for both GET and POST paths.
+
+**Files using `.insert().select()` (all fixed by the `pg-config.js` change)**:
+- `personal-info.js:108-123` — `.insert([...]).select()`
+- `mmpi-test.js:669-673` — `.insert([...]).select().single()`
+- `test-results.js:1247-1256` — `.insert({...}).select().single()`
+
+### 2024-06: Column name mismatch (`created` vs `created_at`)
+**Symptoms**: PostgREST returning `400 Bad Request` on INSERT to `participants` and `test_results` tables.
+
+**Root cause**: JS code sent `created` as column name, but the schema (`database/01_schema.sql`) defines the column as `created_at`.
+
+**Fix**: Changed all DB insert references from `created` to `created_at`:
+- `personal-info.js:34,121` — formData key and insert payload
+- `mmpi-test.js:713` — `test_results` insert payload
+
+### 2024-06: Gender value mismatch (`male/female` vs `erkek/kadin`)
+**Symptoms**: PostgREST `400 Bad Request` on INSERT/UPDATE to `participants` table — `gender` column has CHECK constraint: `gender IN ('erkek', 'kadin', 'other')`.
+
+**Root cause**: HTML form (`personal-info.html:47-48`) uses `male`/`female` as option values, but the DB schema (`database/01_schema.sql:39`) constrains to Turkish values `erkek`/`kadin`/`other`.
+
+**Fix**: Added gender mapping before DB inserts in both files:
+- `personal-info.js:103-105` — `const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };`
+- `mmpi-test.js:651-653` — same mapping applied

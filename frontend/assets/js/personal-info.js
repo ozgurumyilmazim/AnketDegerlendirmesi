@@ -31,7 +31,7 @@ $(document).ready(function() {
             profession: $('#profession').val(),
             education: $('#education').val(),
             maritalStatus: $('#maritalStatus').val(),
-            created: new Date().toISOString()
+            created_at: new Date().toISOString()
         };
         
         // TC Kimlik No kontrolü
@@ -100,6 +100,10 @@ async function saveParticipantToPostgreSQL(participantData) {
         
         console.log('Gender değeri:', participantData.gender);
         
+        // Cinsiyet değerini veritabanı formatına çevir (male/female → erkek/kadin)
+        const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };
+        const dbGender = genderMap[participantData.gender] || participantData.gender;
+        
         // Yeni katılımcı kaydet
         const { data, error } = await PG_API
             .from('participants')
@@ -107,14 +111,14 @@ async function saveParticipantToPostgreSQL(participantData) {
                 first_name: participantData.firstName,
                 last_name: participantData.lastName,
                 tc_no: participantData.tcNo,
-                gender: participantData.gender,
+                gender: dbGender,
                 age: participantData.age,
                 institution_code: participantData.institutionCode,
                 institution_name: participantData.institutionName,
                 profession: participantData.profession,
                 education: participantData.education,
                 marital_status: participantData.maritalStatus,
-                created: participantData.created
+                created_at: participantData.created_at
             }])
             .select();
         

@@ -185,10 +185,12 @@ window.PG_API = {
         let _orderDir = 'asc';
         let _limit = null;
         let _single = false;
+        let _insertData = null;
+        let _upsertData = null;
+        let _operation = 'select';
 
         const _buildQuery = () => {
             const params = new URLSearchParams();
-            if (_select !== '*') params.set('select', _select);
             _filters.forEach(f => {
                 if (f.type === 'in') {
                     params.set(f.field, 'in.(' + f.value.join(',') + ')');
@@ -234,7 +236,28 @@ window.PG_API = {
                 return this;
             },
             async then(resolve, reject) {
-                const result = await self._fetch('/' + table + _buildQuery());
+                let result;
+                if (_operation === 'insert' && _insertData) {
+                    const selectStr = _select !== '*' ? _select : '';
+                    const qs = selectStr ? '?select=' + selectStr : '';
+                    result = await self._fetch('/' + table + qs, {
+                        method: 'POST',
+                        body: JSON.stringify(_insertData),
+                        headers: { 'Prefer': 'return=representation' },
+                    });
+                } else if (_operation === 'upsert' && _upsertData) {
+                    const selectStr = _select !== '*' ? _select : '';
+                    const qs = '?on_conflict=id' + (selectStr ? '&select=' + selectStr : '');
+                    result = await self._fetch('/' + table + qs, {
+                        method: 'POST',
+                        body: JSON.stringify(_upsertData),
+                        headers: { 'Prefer': 'return=representation, resolution=merge-duplicates' },
+                    });
+                } else {
+                    const qs = _buildQuery();
+                    const selectQs = _select !== '*' ? '?select=' + _select : '';
+                    result = await self._fetch('/' + table + selectQs + (selectQs && qs ? '&' : '') + (qs ? qs.substring(1) : ''));
+                }
                 if (result.error) {
                     reject?.({ message: result.error });
                     return resolve?.({ data: null, error: result.error });
@@ -242,18 +265,17 @@ window.PG_API = {
                 let data = result.data || [];
                 if (!Array.isArray(data)) data = [data];
                 if (_single) data = data[0] || null;
+                _insertData = null;
+                _upsertData = null;
+                _operation = 'select';
                 resolve?.({ data, error: null });
                 return { data, error: null };
             },
-            async insert(items) {
+            insert(items) {
                 const arr = Array.isArray(items) ? items : [items];
-                const result = await self._fetch('/' + table, {
-                    method: 'POST',
-                    body: JSON.stringify(arr[0]),
-                });
-                if (result.error) return { data: null, error: result.error };
-                const data = Array.isArray(result.data) ? result.data : [result.data];
-                return { data, error: null };
+                _insertData = arr[0];
+                _operation = 'insert';
+                return this;
             },
             async update(values) {
                 const qs = _buildQuery();
@@ -272,15 +294,11 @@ window.PG_API = {
                 if (result.error) return { data: null, error: result.error };
                 return { data: result.data || null, error: null };
             },
-            async upsert(items) {
+            upsert(items) {
                 const arr = Array.isArray(items) ? items : [items];
-                const result = await self._fetch('/' + table + '?on_conflict=id', {
-                    method: 'POST',
-                    body: JSON.stringify(arr[0]),
-                    headers: { 'Prefer': 'resolution=merge-duplicates' },
-                });
-                if (result.error) return { data: null, error: result.error };
-                return { data: result.data, error: null };
+                _upsertData = arr[0];
+                _operation = 'upsert';
+                return this;
             },
         };
     },
