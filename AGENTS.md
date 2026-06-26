@@ -180,14 +180,44 @@ openssl rand -base64 48
 - `mmpi-test.js:669-673` — `.insert([...]).select().single()`
 - `test-results.js:1247-1256` — `.insert({...}).select().single()`
 
-### 2024-06: Column name mismatch (`created` vs `created_at`)
-**Symptoms**: PostgREST returning `400 Bad Request` on INSERT to `participants` and `test_results` tables.
+### 2026-06: Timestamp column naming: `created` vs `created_at`
+**Symptoms**: PostgREST `400` (PGRST204) — `"Column 'created_at' of relation 'participants' does not exist"` on `personal-info.js` form submit.
 
-**Root cause**: JS code sent `created` as column name, but the schema (`database/01_schema.sql`) defines the column as `created_at`.
+**Root cause**: Two parallel schema definition sources disagree on column names:
 
-**Fix**: Changed all DB insert references from `created` to `created_at`:
-- `personal-info.js:34,121` — formData key and insert payload
-- `mmpi-test.js:713` — `test_results` insert payload
+| File | participants | test_results | reports |
+|---|---|---|---|
+| `database/scripts/*.sql` (actual DB) | `created`, `updated` | `created`, `updated` | `created`, `updated` |
+| `database/01_schema.sql` (reference) | `created_at`, `updated_at` | `created_at`, `updated_at` | `created_at`, `updated_at` |
+
+The production database was built from `database/scripts/*.sql`, so the columns are named **`created`** and **`updated`** (no `_at` suffix). The JS code was sending `created_at` in INSERT payloads, which PostgREST rejected.
+
+**Fix (2026-06-26)**:
+1. **Removed timestamp columns from all INSERT payloads** — Let the DB handle timestamps via `DEFAULT now()`. This avoids column-name conflicts entirely.
+   - `frontend/assets/js/personal-info.js:34,121` — `created_at` removed from formData and insert
+   - `frontend/assets/js/mmpi-test.js:713` — `created_at` removed from test_results insert
+2. **Ensured all SELECT/ORDER BY clauses use `created`** (matching actual DB column name):
+   - `frontend/assets/js/personal-info.js:215,218,249` — duplicate test check
+   - `frontend/assets/js/reports.js:226,688-689` — report queries
+   - `frontend/assets/js/analytics.js:124,141` — analytics query
+   - `frontend/assets/js/test-results.js:255,322` — test results query
+   - `frontend/assets/js/admin-dashboard.js:169,180,265` — dashboard test references
+   - `frontend/assets/js/report.js:101,216,1996` — report page references (note: `report.js:101` maps DB's `report.created` → local `created_at` key — this is intentional)
+   - `frontend/assets/js/pdf-utils.js:358` — PDF export reference
+
+**Key lesson**: Never send timestamps from the client in INSERT payloads. Always let the database use `DEFAULT now()`.
+
+**If you need to sync `01_schema.sql` with the actual DB** (rename `created` → `created_at`):
+```sql
+ALTER TABLE participants RENAME COLUMN created TO created_at;
+ALTER TABLE participants RENAME COLUMN updated TO updated_at;
+ALTER TABLE test_results RENAME COLUMN created TO created_at;
+ALTER TABLE test_results RENAME COLUMN updated TO updated_at;
+ALTER TABLE reports RENAME COLUMN created TO created_at;
+ALTER TABLE reports RENAME COLUMN updated TO updated_at;
+-- Then reload PostgREST schema cache:
+NOTIFY pgrst, 'reload schema';
+```
 
 ### 2024-06: Gender value mismatch (`male/female` vs `erkek/kadin`)
 **Symptoms**: PostgREST `400 Bad Request` on INSERT/UPDATE to `participants` table — `gender` column has CHECK constraint: `gender IN ('erkek', 'kadin', 'other')`.
@@ -215,7 +245,7 @@ openssl rand -base64 48
 - Created `public.test_results_min` view (referenced by `mmpi-test.js:176` but missing from DB):
   ```sql
   CREATE OR REPLACE VIEW public.test_results_min AS
-  SELECT id, participant_id, status, created_at FROM public.test_results;
+  SELECT id, participant_id, status, created FROM public.test_results;
   ```
 - Granted `SELECT ON public.test_results_min TO anon;`
 

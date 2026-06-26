@@ -710,7 +710,6 @@ class MMPITest {
                     total_questions: this.questions.length,
                     test_type: 'MMPI',
                     test_version: '1.0',
-                    created_at: new Date().toISOString(),
                     status: 'completed'
                 };
                 

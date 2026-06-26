@@ -31,7 +31,6 @@ $(document).ready(function() {
             profession: $('#profession').val(),
             education: $('#education').val(),
             maritalStatus: $('#maritalStatus').val(),
-            created_at: new Date().toISOString()
         };
         
         // TC Kimlik No kontrolü
@@ -117,8 +116,7 @@ async function saveParticipantToPostgreSQL(participantData) {
                 institution_name: participantData.institutionName,
                 profession: participantData.profession,
                 education: participantData.education,
-                marital_status: participantData.maritalStatus,
-                created_at: participantData.created_at
+                marital_status: participantData.maritalStatus
             }])
             .select();
         
