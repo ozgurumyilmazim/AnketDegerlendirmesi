@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "E2E tests for MMPI Test System using Playwright",
   "scripts": {
-    "test": "npx playwright test",
-    "test:headed": "npx playwright test --headed",
-    "test:debug": "npx playwright test --debug",
+    "postinstall": "npx playwright install --with-deps chromium",
+    "test": "npm run postinstall && npx playwright test",
+    "test:headed": "npm run postinstall && npx playwright test --headed",
+    "test:debug": "npm run postinstall && npx playwright test --debug",
     "test:ui": "npx playwright test --ui",
     "report": "npx playwright show-report reports",
     "docker:test": "docker run --rm -v $(pwd):/app -w /app node:22-bookworm sh -c \"npx playwright install --with-deps chromium 2>&1 | tail -1 && npx playwright test --project=chromium\""
