@@ -69,5 +69,22 @@ In `pg-config.js:257-259`, when `_select='*'` (default) and filters exist, the `
 ## `postgrest.conf` — replace placeholders before production
 `db-uri`, `jwt-secret` in `postgrest.conf` are development placeholders. Use environment variables (`$(DB_PASSWORD)`, `$(JWT_SECRET)`) via `.env` (gitignored). See `env.example` and `docker-compose.yaml` for the working config.
 
-## No CI/CD, no tests, no linter, no formatter
-The only "tests" are browser-based manual checks via `frontend/tests/index.html`. Commit messages are short English.
+## E2E Tests (Playwright)
+- `tests/e2e/` — Playwright test suite (Chromium, headless)
+- `npm test` → runs full flow: user registration → MMPI test → admin verification
+- `npm run server` → starts test runner web UI at port 3099
+
+### Test Runner Web UI
+- Admin page: `https://selma.ozguryilmaz.com.tr/admin/test-runner.html`
+- API: `https://selma.ozguryilmaz.com.tr/test-runner/` (proxied via nginx → host:3099)
+- Start server: `cd tests/e2e && setsid node server.js > /tmp/test-runner.log 2>&1 &`
+- Rapor: `https://selma.ozguryilmaz.com.tr/test-reports/`
+
+### Host setup (npm not globally installed)
+- npm extracted from deb package to `/tmp/npm/usr/share/nodejs/`
+- Set `NODE_PATH=/tmp/npm/usr/share/nodejs` before running npm commands
+- Playwright CLI: `node node_modules/@playwright/test/cli.js test`
+- Systemd service (manual): `sudo mv /tmp/test-runner.service /etc/systemd/system/ && sudo systemctl enable --now test-runner`
+
+## No CI/CD, no linter, no formatter
+Commit messages are short English.
