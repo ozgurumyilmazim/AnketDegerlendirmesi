@@ -181,6 +181,282 @@ INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
 ('K', 461, 'Yanlis'), ('K', 502, 'Yanlis')
 ON CONFLICT (scale_name, question_number) DO NOTHING;
 
+-- Hs Scale (Hipokondriazis)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Hs', 23, 'Doğru'), ('Hs', 29, 'Doğru'), ('Hs', 43, 'Doğru'),
+('Hs', 62, 'Doğru'), ('Hs', 72, 'Doğru'), ('Hs', 108, 'Doğru'),
+('Hs', 114, 'Doğru'), ('Hs', 125, 'Doğru'), ('Hs', 161, 'Doğru'),
+('Hs', 189, 'Doğru'), ('Hs', 273, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Hs', 2, 'Yanlis'), ('Hs', 3, 'Yanlis'), ('Hs', 7, 'Yanlis'),
+('Hs', 9, 'Yanlis'), ('Hs', 18, 'Yanlis'), ('Hs', 51, 'Yanlis'),
+('Hs', 55, 'Yanlis'), ('Hs', 63, 'Yanlis'), ('Hs', 68, 'Yanlis'),
+('Hs', 103, 'Yanlis'), ('Hs', 130, 'Yanlis'), ('Hs', 153, 'Yanlis'),
+('Hs', 155, 'Yanlis'), ('Hs', 163, 'Yanlis'), ('Hs', 175, 'Yanlis'),
+('Hs', 188, 'Yanlis'), ('Hs', 190, 'Yanlis'), ('Hs', 192, 'Yanlis'),
+('Hs', 230, 'Yanlis'), ('Hs', 243, 'Yanlis'), ('Hs', 274, 'Yanlis'),
+('Hs', 281, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- D Scale (Depresyon)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('D', 5, 'Doğru'), ('D', 13, 'Doğru'), ('D', 23, 'Doğru'),
+('D', 32, 'Doğru'), ('D', 41, 'Doğru'), ('D', 43, 'Doğru'),
+('D', 52, 'Doğru'), ('D', 67, 'Doğru'), ('D', 86, 'Doğru'),
+('D', 104, 'Doğru'), ('D', 130, 'Doğru'), ('D', 138, 'Doğru'),
+('D', 142, 'Doğru'), ('D', 158, 'Doğru'), ('D', 159, 'Doğru'),
+('D', 182, 'Doğru'), ('D', 189, 'Doğru'), ('D', 193, 'Doğru'),
+('D', 236, 'Doğru'), ('D', 259, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('D', 2, 'Yanlis'), ('D', 8, 'Yanlis'), ('D', 9, 'Yanlis'),
+('D', 18, 'Yanlis'), ('D', 30, 'Yanlis'), ('D', 36, 'Yanlis'),
+('D', 39, 'Yanlis'), ('D', 46, 'Yanlis'), ('D', 51, 'Yanlis'),
+('D', 57, 'Yanlis'), ('D', 58, 'Yanlis'), ('D', 64, 'Yanlis'),
+('D', 80, 'Yanlis'), ('D', 88, 'Yanlis'), ('D', 89, 'Yanlis'),
+('D', 95, 'Yanlis'), ('D', 98, 'Yanlis'), ('D', 107, 'Yanlis'),
+('D', 122, 'Yanlis'), ('D', 131, 'Yanlis'), ('D', 145, 'Yanlis'),
+('D', 152, 'Yanlis'), ('D', 153, 'Yanlis'), ('D', 154, 'Yanlis'),
+('D', 155, 'Yanlis'), ('D', 160, 'Yanlis'), ('D', 178, 'Yanlis'),
+('D', 191, 'Yanlis'), ('D', 207, 'Yanlis'), ('D', 208, 'Yanlis'),
+('D', 233, 'Yanlis'), ('D', 241, 'Yanlis'), ('D', 242, 'Yanlis'),
+('D', 248, 'Yanlis'), ('D', 263, 'Yanlis'), ('D', 270, 'Yanlis'),
+('D', 271, 'Yanlis'), ('D', 272, 'Yanlis'), ('D', 285, 'Yanlis'),
+('D', 296, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Hy Scale (Histeri)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Hy', 10, 'Doğru'), ('Hy', 23, 'Doğru'), ('Hy', 32, 'Doğru'),
+('Hy', 43, 'Doğru'), ('Hy', 44, 'Doğru'), ('Hy', 47, 'Doğru'),
+('Hy', 76, 'Doğru'), ('Hy', 114, 'Doğru'), ('Hy', 179, 'Doğru'),
+('Hy', 186, 'Doğru'), ('Hy', 189, 'Doğru'), ('Hy', 238, 'Doğru'),
+('Hy', 253, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Hy', 2, 'Yanlis'), ('Hy', 3, 'Yanlis'), ('Hy', 6, 'Yanlis'),
+('Hy', 7, 'Yanlis'), ('Hy', 8, 'Yanlis'), ('Hy', 9, 'Yanlis'),
+('Hy', 12, 'Yanlis'), ('Hy', 26, 'Yanlis'), ('Hy', 30, 'Yanlis'),
+('Hy', 51, 'Yanlis'), ('Hy', 55, 'Yanlis'), ('Hy', 71, 'Yanlis'),
+('Hy', 89, 'Yanlis'), ('Hy', 93, 'Yanlis'), ('Hy', 103, 'Yanlis'),
+('Hy', 107, 'Yanlis'), ('Hy', 109, 'Yanlis'), ('Hy', 124, 'Yanlis'),
+('Hy', 128, 'Yanlis'), ('Hy', 129, 'Yanlis'), ('Hy', 136, 'Yanlis'),
+('Hy', 137, 'Yanlis'), ('Hy', 141, 'Yanlis'), ('Hy', 147, 'Yanlis'),
+('Hy', 153, 'Yanlis'), ('Hy', 160, 'Yanlis'), ('Hy', 162, 'Yanlis'),
+('Hy', 163, 'Yanlis'), ('Hy', 170, 'Yanlis'), ('Hy', 172, 'Yanlis'),
+('Hy', 174, 'Yanlis'), ('Hy', 175, 'Yanlis'), ('Hy', 180, 'Yanlis'),
+('Hy', 188, 'Yanlis'), ('Hy', 190, 'Yanlis'), ('Hy', 192, 'Yanlis'),
+('Hy', 201, 'Yanlis'), ('Hy', 213, 'Yanlis'), ('Hy', 230, 'Yanlis'),
+('Hy', 234, 'Yanlis'), ('Hy', 243, 'Yanlis'), ('Hy', 265, 'Yanlis'),
+('Hy', 267, 'Yanlis'), ('Hy', 274, 'Yanlis'), ('Hy', 279, 'Yanlis'),
+('Hy', 289, 'Yanlis'), ('Hy', 292, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Pd Scale (Psikopatik Sapma)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pd', 16, 'Doğru'), ('Pd', 21, 'Doğru'), ('Pd', 24, 'Doğru'),
+('Pd', 32, 'Doğru'), ('Pd', 33, 'Doğru'), ('Pd', 35, 'Doğru'),
+('Pd', 38, 'Doğru'), ('Pd', 42, 'Doğru'), ('Pd', 61, 'Doğru'),
+('Pd', 67, 'Doğru'), ('Pd', 84, 'Doğru'), ('Pd', 94, 'Doğru'),
+('Pd', 102, 'Doğru'), ('Pd', 106, 'Doğru'), ('Pd', 110, 'Doğru'),
+('Pd', 118, 'Doğru'), ('Pd', 127, 'Doğru'), ('Pd', 215, 'Doğru'),
+('Pd', 216, 'Doğru'), ('Pd', 224, 'Doğru'), ('Pd', 239, 'Doğru'),
+('Pd', 244, 'Doğru'), ('Pd', 245, 'Doğru'), ('Pd', 284, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pd', 8, 'Yanlis'), ('Pd', 20, 'Yanlis'), ('Pd', 37, 'Yanlis'),
+('Pd', 82, 'Yanlis'), ('Pd', 91, 'Yanlis'), ('Pd', 96, 'Yanlis'),
+('Pd', 107, 'Yanlis'), ('Pd', 134, 'Yanlis'), ('Pd', 137, 'Yanlis'),
+('Pd', 141, 'Yanlis'), ('Pd', 155, 'Yanlis'), ('Pd', 170, 'Yanlis'),
+('Pd', 171, 'Yanlis'), ('Pd', 173, 'Yanlis'), ('Pd', 180, 'Yanlis'),
+('Pd', 183, 'Yanlis'), ('Pd', 201, 'Yanlis'), ('Pd', 231, 'Yanlis'),
+('Pd', 235, 'Yanlis'), ('Pd', 237, 'Yanlis'), ('Pd', 248, 'Yanlis'),
+('Pd', 267, 'Yanlis'), ('Pd', 287, 'Yanlis'), ('Pd', 289, 'Yanlis'),
+('Pd', 294, 'Yanlis'), ('Pd', 296, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Mf_Male Scale (Maskülinite-Femininite - Erkek)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Mf_Male', 4, 'Doğru'), ('Mf_Male', 25, 'Doğru'), ('Mf_Male', 69, 'Doğru'),
+('Mf_Male', 70, 'Doğru'), ('Mf_Male', 74, 'Doğru'), ('Mf_Male', 77, 'Doğru'),
+('Mf_Male', 78, 'Doğru'), ('Mf_Male', 87, 'Doğru'), ('Mf_Male', 92, 'Doğru'),
+('Mf_Male', 126, 'Doğru'), ('Mf_Male', 132, 'Doğru'), ('Mf_Male', 134, 'Doğru'),
+('Mf_Male', 140, 'Doğru'), ('Mf_Male', 149, 'Doğru'), ('Mf_Male', 179, 'Doğru'),
+('Mf_Male', 187, 'Doğru'), ('Mf_Male', 203, 'Doğru'), ('Mf_Male', 204, 'Doğru'),
+('Mf_Male', 217, 'Doğru'), ('Mf_Male', 226, 'Doğru'), ('Mf_Male', 231, 'Doğru'),
+('Mf_Male', 239, 'Doğru'), ('Mf_Male', 261, 'Doğru'), ('Mf_Male', 278, 'Doğru'),
+('Mf_Male', 282, 'Doğru'), ('Mf_Male', 295, 'Doğru'), ('Mf_Male', 297, 'Doğru'),
+('Mf_Male', 299, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Mf_Male', 1, 'Yanlis'), ('Mf_Male', 19, 'Yanlis'), ('Mf_Male', 26, 'Yanlis'),
+('Mf_Male', 28, 'Yanlis'), ('Mf_Male', 79, 'Yanlis'), ('Mf_Male', 80, 'Yanlis'),
+('Mf_Male', 81, 'Yanlis'), ('Mf_Male', 89, 'Yanlis'), ('Mf_Male', 99, 'Yanlis'),
+('Mf_Male', 112, 'Yanlis'), ('Mf_Male', 115, 'Yanlis'), ('Mf_Male', 116, 'Yanlis'),
+('Mf_Male', 117, 'Yanlis'), ('Mf_Male', 120, 'Yanlis'), ('Mf_Male', 133, 'Yanlis'),
+('Mf_Male', 144, 'Yanlis'), ('Mf_Male', 176, 'Yanlis'), ('Mf_Male', 198, 'Yanlis'),
+('Mf_Male', 213, 'Yanlis'), ('Mf_Male', 214, 'Yanlis'), ('Mf_Male', 219, 'Yanlis'),
+('Mf_Male', 221, 'Yanlis'), ('Mf_Male', 223, 'Yanlis'), ('Mf_Male', 229, 'Yanlis'),
+('Mf_Male', 249, 'Yanlis'), ('Mf_Male', 254, 'Yanlis'), ('Mf_Male', 260, 'Yanlis'),
+('Mf_Male', 262, 'Yanlis'), ('Mf_Male', 264, 'Yanlis'), ('Mf_Male', 280, 'Yanlis'),
+('Mf_Male', 283, 'Yanlis'), ('Mf_Male', 300, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Mf_Female Scale (Maskülinite-Femininite - Kadın)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Mf_Female', 4, 'Doğru'), ('Mf_Female', 25, 'Doğru'), ('Mf_Female', 70, 'Doğru'),
+('Mf_Female', 74, 'Doğru'), ('Mf_Female', 77, 'Doğru'), ('Mf_Female', 78, 'Doğru'),
+('Mf_Female', 87, 'Doğru'), ('Mf_Female', 92, 'Doğru'), ('Mf_Female', 126, 'Doğru'),
+('Mf_Female', 132, 'Doğru'), ('Mf_Female', 133, 'Doğru'), ('Mf_Female', 134, 'Doğru'),
+('Mf_Female', 140, 'Doğru'), ('Mf_Female', 149, 'Doğru'), ('Mf_Female', 187, 'Doğru'),
+('Mf_Female', 203, 'Doğru'), ('Mf_Female', 204, 'Doğru'), ('Mf_Female', 217, 'Doğru'),
+('Mf_Female', 226, 'Doğru'), ('Mf_Female', 239, 'Doğru'), ('Mf_Female', 261, 'Doğru'),
+('Mf_Female', 278, 'Doğru'), ('Mf_Female', 282, 'Doğru'), ('Mf_Female', 295, 'Doğru'),
+('Mf_Female', 299, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Mf_Female', 1, 'Yanlis'), ('Mf_Female', 19, 'Yanlis'), ('Mf_Female', 26, 'Yanlis'),
+('Mf_Female', 28, 'Yanlis'), ('Mf_Female', 69, 'Yanlis'), ('Mf_Female', 79, 'Yanlis'),
+('Mf_Female', 80, 'Yanlis'), ('Mf_Female', 81, 'Yanlis'), ('Mf_Female', 89, 'Yanlis'),
+('Mf_Female', 99, 'Yanlis'), ('Mf_Female', 112, 'Yanlis'), ('Mf_Female', 115, 'Yanlis'),
+('Mf_Female', 116, 'Yanlis'), ('Mf_Female', 117, 'Yanlis'), ('Mf_Female', 120, 'Yanlis'),
+('Mf_Female', 144, 'Yanlis'), ('Mf_Female', 176, 'Yanlis'), ('Mf_Female', 179, 'Yanlis'),
+('Mf_Female', 198, 'Yanlis'), ('Mf_Female', 213, 'Yanlis'), ('Mf_Female', 214, 'Yanlis'),
+('Mf_Female', 219, 'Yanlis'), ('Mf_Female', 221, 'Yanlis'), ('Mf_Female', 223, 'Yanlis'),
+('Mf_Female', 229, 'Yanlis'), ('Mf_Female', 231, 'Yanlis'), ('Mf_Female', 249, 'Yanlis'),
+('Mf_Female', 254, 'Yanlis'), ('Mf_Female', 260, 'Yanlis'), ('Mf_Female', 262, 'Yanlis'),
+('Mf_Female', 264, 'Yanlis'), ('Mf_Female', 280, 'Yanlis'), ('Mf_Female', 283, 'Yanlis'),
+('Mf_Female', 297, 'Yanlis'), ('Mf_Female', 300, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Pa Scale (Paranoya)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pa', 15, 'Doğru'), ('Pa', 16, 'Doğru'), ('Pa', 22, 'Doğru'),
+('Pa', 24, 'Doğru'), ('Pa', 27, 'Doğru'), ('Pa', 35, 'Doğru'),
+('Pa', 110, 'Doğru'), ('Pa', 121, 'Doğru'), ('Pa', 123, 'Doğru'),
+('Pa', 127, 'Doğru'), ('Pa', 151, 'Doğru'), ('Pa', 157, 'Doğru'),
+('Pa', 158, 'Doğru'), ('Pa', 202, 'Doğru'), ('Pa', 275, 'Doğru'),
+('Pa', 284, 'Doğru'), ('Pa', 291, 'Doğru'), ('Pa', 293, 'Doğru'),
+('Pa', 299, 'Doğru'), ('Pa', 305, 'Doğru'), ('Pa', 317, 'Doğru'),
+('Pa', 338, 'Doğru'), ('Pa', 341, 'Doğru'), ('Pa', 364, 'Doğru'),
+('Pa', 365, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pa', 93, 'Yanlis'), ('Pa', 107, 'Yanlis'), ('Pa', 109, 'Yanlis'),
+('Pa', 111, 'Yanlis'), ('Pa', 117, 'Yanlis'), ('Pa', 124, 'Yanlis'),
+('Pa', 268, 'Yanlis'), ('Pa', 281, 'Yanlis'), ('Pa', 294, 'Yanlis'),
+('Pa', 313, 'Yanlis'), ('Pa', 316, 'Yanlis'), ('Pa', 319, 'Yanlis'),
+('Pa', 327, 'Yanlis'), ('Pa', 347, 'Yanlis'), ('Pa', 348, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Pt Scale (Psikasteni)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pt', 10, 'Doğru'), ('Pt', 15, 'Doğru'), ('Pt', 22, 'Doğru'),
+('Pt', 32, 'Doğru'), ('Pt', 41, 'Doğru'), ('Pt', 67, 'Doğru'),
+('Pt', 76, 'Doğru'), ('Pt', 86, 'Doğru'), ('Pt', 94, 'Doğru'),
+('Pt', 102, 'Doğru'), ('Pt', 106, 'Doğru'), ('Pt', 142, 'Doğru'),
+('Pt', 159, 'Doğru'), ('Pt', 182, 'Doğru'), ('Pt', 189, 'Doğru'),
+('Pt', 217, 'Doğru'), ('Pt', 238, 'Doğru'), ('Pt', 266, 'Doğru'),
+('Pt', 301, 'Doğru'), ('Pt', 304, 'Doğru'), ('Pt', 305, 'Doğru'),
+('Pt', 317, 'Doğru'), ('Pt', 321, 'Doğru'), ('Pt', 336, 'Doğru'),
+('Pt', 337, 'Doğru'), ('Pt', 340, 'Doğru'), ('Pt', 342, 'Doğru'),
+('Pt', 343, 'Doğru'), ('Pt', 344, 'Doğru'), ('Pt', 346, 'Doğru'),
+('Pt', 349, 'Doğru'), ('Pt', 351, 'Doğru'), ('Pt', 352, 'Doğru'),
+('Pt', 356, 'Doğru'), ('Pt', 357, 'Doğru'), ('Pt', 358, 'Doğru'),
+('Pt', 359, 'Doğru'), ('Pt', 360, 'Doğru'), ('Pt', 361, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Pt', 3, 'Yanlis'), ('Pt', 8, 'Yanlis'), ('Pt', 36, 'Yanlis'),
+('Pt', 122, 'Yanlis'), ('Pt', 152, 'Yanlis'), ('Pt', 164, 'Yanlis'),
+('Pt', 178, 'Yanlis'), ('Pt', 329, 'Yanlis'), ('Pt', 353, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Sc Scale (Şizofreni)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Sc', 15, 'Doğru'), ('Sc', 16, 'Doğru'), ('Sc', 21, 'Doğru'),
+('Sc', 22, 'Doğru'), ('Sc', 24, 'Doğru'), ('Sc', 32, 'Doğru'),
+('Sc', 33, 'Doğru'), ('Sc', 35, 'Doğru'), ('Sc', 38, 'Doğru'),
+('Sc', 40, 'Doğru'), ('Sc', 41, 'Doğru'), ('Sc', 47, 'Doğru'),
+('Sc', 52, 'Doğru'), ('Sc', 76, 'Doğru'), ('Sc', 97, 'Doğru'),
+('Sc', 104, 'Doğru'), ('Sc', 121, 'Doğru'), ('Sc', 156, 'Doğru'),
+('Sc', 157, 'Doğru'), ('Sc', 159, 'Doğru'), ('Sc', 168, 'Doğru'),
+('Sc', 179, 'Doğru'), ('Sc', 182, 'Doğru'), ('Sc', 194, 'Doğru'),
+('Sc', 202, 'Doğru'), ('Sc', 210, 'Doğru'), ('Sc', 212, 'Doğru'),
+('Sc', 238, 'Doğru'), ('Sc', 241, 'Doğru'), ('Sc', 251, 'Doğru'),
+('Sc', 259, 'Doğru'), ('Sc', 266, 'Doğru'), ('Sc', 273, 'Doğru'),
+('Sc', 282, 'Doğru'), ('Sc', 291, 'Doğru'), ('Sc', 297, 'Doğru'),
+('Sc', 301, 'Doğru'), ('Sc', 303, 'Doğru'), ('Sc', 305, 'Doğru'),
+('Sc', 307, 'Doğru'), ('Sc', 312, 'Doğru'), ('Sc', 320, 'Doğru'),
+('Sc', 324, 'Doğru'), ('Sc', 325, 'Doğru'), ('Sc', 332, 'Doğru'),
+('Sc', 334, 'Doğru'), ('Sc', 335, 'Doğru'), ('Sc', 339, 'Doğru'),
+('Sc', 341, 'Doğru'), ('Sc', 345, 'Doğru'), ('Sc', 349, 'Doğru'),
+('Sc', 350, 'Doğru'), ('Sc', 352, 'Doğru'), ('Sc', 354, 'Doğru'),
+('Sc', 355, 'Doğru'), ('Sc', 356, 'Doğru'), ('Sc', 360, 'Doğru'),
+('Sc', 363, 'Doğru'), ('Sc', 364, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Sc', 8, 'Yanlis'), ('Sc', 17, 'Yanlis'), ('Sc', 20, 'Yanlis'),
+('Sc', 37, 'Yanlis'), ('Sc', 65, 'Yanlis'), ('Sc', 103, 'Yanlis'),
+('Sc', 119, 'Yanlis'), ('Sc', 177, 'Yanlis'), ('Sc', 178, 'Yanlis'),
+('Sc', 187, 'Yanlis'), ('Sc', 192, 'Yanlis'), ('Sc', 196, 'Yanlis'),
+('Sc', 220, 'Yanlis'), ('Sc', 276, 'Yanlis'), ('Sc', 281, 'Yanlis'),
+('Sc', 306, 'Yanlis'), ('Sc', 309, 'Yanlis'), ('Sc', 322, 'Yanlis'),
+('Sc', 330, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Ma Scale (Hipomani)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Ma', 11, 'Doğru'), ('Ma', 13, 'Doğru'), ('Ma', 21, 'Doğru'),
+('Ma', 22, 'Doğru'), ('Ma', 59, 'Doğru'), ('Ma', 64, 'Doğru'),
+('Ma', 73, 'Doğru'), ('Ma', 97, 'Doğru'), ('Ma', 100, 'Doğru'),
+('Ma', 109, 'Doğru'), ('Ma', 127, 'Doğru'), ('Ma', 134, 'Doğru'),
+('Ma', 143, 'Doğru'), ('Ma', 156, 'Doğru'), ('Ma', 157, 'Doğru'),
+('Ma', 167, 'Doğru'), ('Ma', 181, 'Doğru'), ('Ma', 194, 'Doğru'),
+('Ma', 212, 'Doğru'), ('Ma', 222, 'Doğru'), ('Ma', 226, 'Doğru'),
+('Ma', 228, 'Doğru'), ('Ma', 232, 'Doğru'), ('Ma', 233, 'Doğru'),
+('Ma', 238, 'Doğru'), ('Ma', 240, 'Doğru'), ('Ma', 250, 'Doğru'),
+('Ma', 251, 'Doğru'), ('Ma', 263, 'Doğru'), ('Ma', 266, 'Doğru'),
+('Ma', 268, 'Doğru'), ('Ma', 271, 'Doğru'), ('Ma', 277, 'Doğru'),
+('Ma', 279, 'Doğru'), ('Ma', 298, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Ma', 101, 'Yanlis'), ('Ma', 105, 'Yanlis'), ('Ma', 111, 'Yanlis'),
+('Ma', 119, 'Yanlis'), ('Ma', 120, 'Yanlis'), ('Ma', 148, 'Yanlis'),
+('Ma', 166, 'Yanlis'), ('Ma', 171, 'Yanlis'), ('Ma', 180, 'Yanlis'),
+('Ma', 267, 'Yanlis'), ('Ma', 289, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
+-- Si Scale (Sosyal İçedönüklük)
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Si', 32, 'Doğru'), ('Si', 67, 'Doğru'), ('Si', 82, 'Doğru'),
+('Si', 111, 'Doğru'), ('Si', 117, 'Doğru'), ('Si', 124, 'Doğru'),
+('Si', 138, 'Doğru'), ('Si', 147, 'Doğru'), ('Si', 171, 'Doğru'),
+('Si', 172, 'Doğru'), ('Si', 180, 'Doğru'), ('Si', 201, 'Doğru'),
+('Si', 236, 'Doğru'), ('Si', 267, 'Doğru'), ('Si', 278, 'Doğru'),
+('Si', 292, 'Doğru'), ('Si', 304, 'Doğru'), ('Si', 316, 'Doğru'),
+('Si', 321, 'Doğru'), ('Si', 332, 'Doğru'), ('Si', 336, 'Doğru'),
+('Si', 342, 'Doğru'), ('Si', 357, 'Doğru'), ('Si', 377, 'Doğru'),
+('Si', 383, 'Doğru'), ('Si', 398, 'Doğru'), ('Si', 411, 'Doğru'),
+('Si', 427, 'Doğru'), ('Si', 436, 'Doğru'), ('Si', 455, 'Doğru'),
+('Si', 473, 'Doğru'), ('Si', 487, 'Doğru'), ('Si', 549, 'Doğru'),
+('Si', 564, 'Doğru')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+INSERT INTO scoring_keys (scale_name, question_number, scoring_answer) VALUES
+('Si', 25, 'Yanlis'), ('Si', 33, 'Yanlis'), ('Si', 57, 'Yanlis'),
+('Si', 91, 'Yanlis'), ('Si', 99, 'Yanlis'), ('Si', 119, 'Yanlis'),
+('Si', 126, 'Yanlis'), ('Si', 143, 'Yanlis'), ('Si', 193, 'Yanlis'),
+('Si', 208, 'Yanlis'), ('Si', 229, 'Yanlis'), ('Si', 231, 'Yanlis'),
+('Si', 254, 'Yanlis'), ('Si', 262, 'Yanlis'), ('Si', 281, 'Yanlis'),
+('Si', 296, 'Yanlis'), ('Si', 309, 'Yanlis'), ('Si', 353, 'Yanlis'),
+('Si', 359, 'Yanlis'), ('Si', 371, 'Yanlis'), ('Si', 391, 'Yanlis'),
+('Si', 400, 'Yanlis'), ('Si', 415, 'Yanlis'), ('Si', 440, 'Yanlis'),
+('Si', 446, 'Yanlis'), ('Si', 449, 'Yanlis'), ('Si', 450, 'Yanlis'),
+('Si', 451, 'Yanlis'), ('Si', 462, 'Yanlis'), ('Si', 469, 'Yanlis'),
+('Si', 479, 'Yanlis'), ('Si', 481, 'Yanlis'), ('Si', 482, 'Yanlis'),
+('Si', 505, 'Yanlis'), ('Si', 521, 'Yanlis'), ('Si', 547, 'Yanlis')
+ON CONFLICT (scale_name, question_number) DO NOTHING;
+
 -- ============================================================
 -- 3. T-SCORE PARAMS
 -- Source: dokumanlar/t_score_params_query.sql
