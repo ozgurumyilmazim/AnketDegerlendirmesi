@@ -156,6 +156,7 @@ function initializeDataTable() {
                     // Rapor butonunu dinamik olarak ayarlamak için setTimeout kullan
                     setTimeout(async () => {
                         const btn = document.getElementById(reportBtnId);
+                        const delBtn = document.getElementById(`reportDelBtn_${testId}`);
                         if (btn) {
                             try {
                                 const { data: existingReport, error: reportError } = await PG_API
@@ -166,24 +167,29 @@ function initializeDataTable() {
                                 
                                 if (reportError) {
                                     console.warn('Rapor kontrolü yapılamadı:', reportError);
-                                    // Hata durumunda varsayılan olarak rapor oluştur butonu göster
                                     btn.innerHTML = '<i class="fas fa-file-alt"></i>';
                                     btn.title = 'Rapor Oluştur';
                                     btn.onclick = () => generateReport(testId);
+                                    if (delBtn) delBtn.style.display = 'none';
                                 } else if (existingReport) {
                                     btn.innerHTML = '<i class="fas fa-eye"></i>';
                                     btn.title = 'Raporu Görüntüle';
                                     btn.onclick = () => window.open(`../report.html?id=${existingReport.id}`, '_blank');
+                                    if (delBtn) {
+                                        delBtn.style.display = '';
+                                        delBtn.onclick = () => deleteReport(existingReport.id, testId);
+                                    }
                                 } else {
                                     btn.innerHTML = '<i class="fas fa-file-alt"></i>';
                                     btn.title = 'Rapor Oluştur';
                                     btn.onclick = () => generateReport(testId);
+                                    if (delBtn) delBtn.style.display = 'none';
                                 }
                             } catch (error) {
-                                // Rapor yoksa varsayılan "Rapor Oluştur" olarak bırak
                                 btn.innerHTML = '<i class="fas fa-file-alt"></i>';
                                 btn.title = 'Rapor Oluştur';
                                 btn.onclick = () => generateReport(testId);
+                                if (delBtn) delBtn.style.display = 'none';
                             }
                         }
                     }, 100);
@@ -198,7 +204,9 @@ function initializeDataTable() {
                                     onclick="generateReport('${testId}')" title="Rapor Oluştur">
                                 <i class="fas fa-file-alt"></i>
                             </button>
-                         
+                            <button id="reportDelBtn_${testId}" class="btn btn-sm btn-outline-danger action-btn" 
+                                    style="display:none" title="Raporu Sil">
+                                <i class="fas fa-file-excel"></i>
                             </button>
                             ${currentUser && currentUser.role === 'admin' ? `
                                 <button class="btn btn-sm btn-outline-danger action-btn" 
@@ -683,14 +691,20 @@ async function viewTestDetail(testId) {
     
     // Rapor butonunu güncelle
     const reportBtn = document.getElementById('testDetailGenerateReportBtn');
+    const reportDelBtn = document.getElementById('testDetailDeleteReportBtn');
     if (hasReport) {
         reportBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Raporu Görüntüle';
         reportBtn.onclick = () => {
             window.open(`../report.html?id=${reportId}`, '_blank');
         };
+        if (reportDelBtn) {
+            reportDelBtn.style.display = '';
+            reportDelBtn.onclick = () => deleteReport(reportId, testId, true);
+        }
     } else {
         reportBtn.innerHTML = '<i class="fas fa-file-alt me-2"></i>Rapor Oluştur';
         reportBtn.onclick = () => generateReport();
+        if (reportDelBtn) reportDelBtn.style.display = 'none';
     }
     
     const modal = new bootstrap.Modal(document.getElementById('testDetailModal'));
@@ -1340,6 +1354,40 @@ function formatDate(dateString) {
 
 function formatDateForInput(date) {
     return date.toISOString().split('T')[0];
+}
+
+async function deleteReport(reportId, testId, closeModal) {
+    if (!confirm('Bu raporu silmek istediğinizden emin misiniz?')) return;
+
+    try {
+        const { error } = await PG_API
+            .from('reports')
+            .eq('id', reportId)
+            .delete();
+
+        if (error) throw error;
+
+        showNotification('Rapor başarıyla silindi.', 'success');
+
+        if (closeModal) {
+            const modalEl = document.getElementById('testDetailModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        // Tabloyu yenile
+        if (typeof updateTable === 'function') {
+            updateTable(allTestResults);
+        }
+
+        // DataTable'ı yeniden çiz
+        if (typeof dataTable !== 'undefined' && dataTable) {
+            dataTable.draw(false);
+        }
+    } catch (error) {
+        console.error('Rapor silinirken hata:', error);
+        showNotification('Rapor silinirken hata oluştu.', 'error');
+    }
 }
 
 function formatDateForFilename(date) {
