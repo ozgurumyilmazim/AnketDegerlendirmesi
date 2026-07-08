@@ -187,6 +187,7 @@ window.PG_API = {
         let _single = false;
         let _insertData = null;
         let _upsertData = null;
+        let _onConflict = 'id';
         let _operation = 'select';
 
         const _buildQuery = () => {
@@ -247,10 +248,11 @@ window.PG_API = {
                     });
                 } else if (_operation === 'upsert' && _upsertData) {
                     const selectStr = _select !== '*' ? _select : '';
-                    const qs = '?on_conflict=id' + (selectStr ? '&select=' + selectStr : '');
+                    const qs = '?on_conflict=' + _onConflict + (selectStr ? '&select=' + selectStr : '');
+                    const body = Array.isArray(_upsertData) ? _upsertData : [_upsertData];
                     result = await self._fetch('/' + table + qs, {
                         method: 'POST',
-                        body: JSON.stringify(_upsertData),
+                        body: JSON.stringify(body),
                         headers: { 'Prefer': 'return=representation, resolution=merge-duplicates' },
                     });
                 } else {
@@ -271,6 +273,7 @@ window.PG_API = {
                 if (_single) data = data[0] || null;
                 _insertData = null;
                 _upsertData = null;
+                _onConflict = 'id';
                 _operation = 'select';
                 resolve?.({ data, error: null });
                 return { data, error: null };
@@ -298,9 +301,9 @@ window.PG_API = {
                 if (result.error) return { data: null, error: result.error };
                 return { data: result.data || null, error: null };
             },
-            upsert(items) {
-                const arr = Array.isArray(items) ? items : [items];
-                _upsertData = arr[0];
+            upsert(items, options) {
+                _upsertData = Array.isArray(items) ? items : [items];
+                _onConflict = options?.onConflict || 'id';
                 _operation = 'upsert';
                 return this;
             },
