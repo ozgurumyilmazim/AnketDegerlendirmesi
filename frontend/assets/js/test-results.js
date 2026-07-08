@@ -147,16 +147,37 @@ function initializeDataTable() {
                 }
             },
             {
-                targets: [7], // İşlemler sütunu
+                targets: [7], // İşlemler sütunu (test işlemleri)
+                orderable: false,
+                render: function(data, type, row) {
+                    const testId = row[0];
+                    return `
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary action-btn" 
+                                    onclick="viewTestDetail('${testId}')" title="Detayları Görüntüle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${currentUser && currentUser.role === 'admin' ? `
+                                <button class="btn btn-sm btn-outline-danger action-btn" 
+                                        onclick="deleteResult('${testId}')" title="Testi Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+            },
+            {
+                targets: [8], // Rapor sütunu
                 orderable: false,
                 render: function(data, type, row) {
                     const testId = row[0];
                     const reportBtnId = `reportBtn_${testId}`;
+                    const reportDelBtnId = `reportDelBtn_${testId}`;
                     
-                    // Rapor butonunu dinamik olarak ayarlamak için setTimeout kullan
                     setTimeout(async () => {
                         const btn = document.getElementById(reportBtnId);
-                        const delBtn = document.getElementById(`reportDelBtn_${testId}`);
+                        const delBtn = document.getElementById(reportDelBtnId);
                         if (btn) {
                             try {
                                 const { data: existingReport, error: reportError } = await PG_API
@@ -196,24 +217,14 @@ function initializeDataTable() {
                     
                     return `
                         <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary action-btn" 
-                                    onclick="viewTestDetail('${testId}')" title="Detayları Görüntüle">
-                                <i class="fas fa-eye"></i>
-                            </button>
                             <button id="${reportBtnId}" class="btn btn-sm btn-outline-success action-btn" 
                                     onclick="generateReport('${testId}')" title="Rapor Oluştur">
                                 <i class="fas fa-file-alt"></i>
                             </button>
-                            <button id="reportDelBtn_${testId}" class="btn btn-sm btn-outline-danger action-btn" 
+                            <button id="${reportDelBtnId}" class="btn btn-sm btn-outline-danger action-btn" 
                                     style="display:none" title="Raporu Sil">
-                                <i class="fas fa-file-excel"></i>
+                                <i class="fas fa-trash"></i>
                             </button>
-                            ${currentUser && currentUser.role === 'admin' ? `
-                                <button class="btn btn-sm btn-outline-danger action-btn" 
-                                        onclick="deleteResult('${testId}')" title="Sil">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : ''}
                         </div>
                     `;
                 }
