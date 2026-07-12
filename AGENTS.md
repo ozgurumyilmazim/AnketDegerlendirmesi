@@ -48,6 +48,14 @@ python3 -m http.server 8000   # from frontend/
 - `admin`: full access, can manage psychologists
 - `psychologist`: restricted, cannot access "Psikolog Tanımları"
 
+## Page permissions system
+- Table `page_permissions` stores per-page access for `admin` and `psychologist` roles.
+- Every admin page loads `page-permissions.js` (after `pg-config.js`) and calls `checkPagePermission('page-name')` in its auth flow.
+- `showPagePermissionError()` handles error display and redirect to `dashboard.html`.
+- Management page: `/admin/settings-permissions.html` — **NOT in `page_permissions` table**, protected by hard-coded `AuthService.isAdmin()` check.
+- Default data in `database/scripts/page_permissions.sql`.
+- DB columns: `created`/`updated` (no `_at` suffix, matching live DB convention per ⚠️ note above).
+
 ## Scoring
 - `assets/js/mmpi-scoring.js` — `MMPIScoring` class, scales: VRIN, TRIN, F, F1, F2, L, K, Hs, D, Hy, Pd, Mf, Pa, Pt, Sc, Ma, Si
 - T = 50 + 10 × (raw − mean) / SD

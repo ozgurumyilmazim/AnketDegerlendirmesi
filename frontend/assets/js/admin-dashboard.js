@@ -12,6 +12,10 @@ $(document).ready(async function() {
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) return;
     
+    // Sayfa yetki kontrolü
+    const hasPermission = await checkPagePermission('dashboard');
+    if (!hasPermission) return;
+    
     // Dashboard verilerini yükle
     loadDashboardData();
     

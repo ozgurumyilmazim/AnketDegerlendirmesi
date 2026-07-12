@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayfa Yetkileri - MMPI Test Sistemi</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #f5576c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .permissions-table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+        .permissions-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .permissions-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .permissions-table tbody tr:hover {
+            background: #fdf2f4;
+        }
+
+        .form-switch.form-switch-lg {
+            padding-left: 3rem;
+        }
+
+        .form-switch.form-switch-lg .form-check-input {
+            width: 3rem;
+            height: 1.5rem;
+            margin-left: -3rem;
+            cursor: pointer;
+        }
+
+        .form-switch.form-switch-lg .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #fde8ec;
+            color: #c2185b;
+        }
+
+        .role-psychologist {
+            background: #e8eaf6;
+            color: #3949ab;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #fde8ec, #fce4ec);
+            border-left: 4px solid #f5576c;
+            border-radius: 0 10px 10px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #6b2737;
+        }
+
+        .info-banner i {
+            color: #f5576c;
+            margin-right: 0.5rem;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(245, 87, 108, 0.35);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Sayfa Yetkileri</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-lock me-2" style="color:#f5576c;"></i>Sayfa Yetkileri</h1>
+                <p class="page-subtitle">Rollere göre sayfa erişim izinlerini yönetin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Bilgi Notu -->
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            Bu ekrandan her bir admin sayfasına hangi rollerin erişebileceğini belirleyebilirsiniz.
+            Değişiklikler kaydedildikten sonra tüm kullanıcılar için geçerli olur.
+            Bu sayfa sadece Admin rolüne sahip kullanıcılar tarafından görüntülenebilir.
+        </div>
+
+        <!-- Yetki Tablosu -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-table me-2"></i>Sayfa Erişim İzinleri</h5>
+                <div>
+                    <button class="btn btn-sm btn-light me-2" onclick="toggleAllAdmin(true)">
+                        <i class="fas fa-check-circle me-1" style="color:#c2185b;"></i>Tümü Admin
+                    </button>
+                    <button class="btn btn-sm btn-light" onclick="toggleAllPsychologist(true)">
+                        <i class="fas fa-check-circle me-1" style="color:#3949ab;"></i>Tümü Psikolog
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body p-0">
+                <div id="loadingSpinner" class="text-center py-5">
+                    <div class="spinner-border text-secondary" style="width: 2rem; height: 2rem;"></div>
+                    <p class="mt-2 mb-0 text-muted">Yetkiler yükleniyor...</p>
+                </div>
+                <div id="permissionsTableWrapper" class="d-none">
+                    <div class="table-responsive">
+                        <table class="table permissions-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">Sayfa</th>
+                                    <th style="width: 30%;" class="text-center">
+                                        <i class="fas fa-crown me-1"></i>Admin
+                                    </th>
+                                    <th style="width: 30%;" class="text-center">
+                                        <i class="fas fa-user-md me-1"></i>Psikolog
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="emptyState" class="text-center py-5 d-none">
+                    <i class="fas fa-lock fa-3x mb-3" style="color:#d1d5db;"></i>
+                    <p class="text-muted">Henüz yetki tanımı bulunamadı.</p>
+                </div>
+            </div>
+            <div class="p-3 border-top text-end">
+                <button class="btn btn-save" id="savePermissionsBtn" onclick="savePermissions()">
+                    <i class="fas fa-save me-2"></i>Yetkileri Kaydet
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">Yetkiler başarıyla kaydedildi!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+    <script src="../assets/js/page-permissions.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <script>
+        let permissionsData = [];
+        let changedRows = new Set();
+
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        async function loadPermissions() {
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('permissionsTableWrapper').classList.add('d-none');
+            document.getElementById('emptyState').classList.add('d-none');
+
+            try {
+                if (typeof window.PG_API === 'undefined') {
+                    throw new Error('Veritabanı bağlantısı bulunamadı.');
+                }
+
+                const { data, error } = await window.PG_API
+                    .from('page_permissions')
+                    .select('*')
+                    .order('page_title', { ascending: true });
+
+                if (error) throw error;
+
+                permissionsData = data || [];
+                changedRows = new Set();
+                renderPermissions(permissionsData);
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Yetkiler yüklenirken hata:', msg);
+                showToast('error', 'Yetkiler yüklenemedi: ' + msg);
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('emptyState').classList.remove('d-none');
+            }
+        }
+
+        function renderPermissions(permissions) {
+            document.getElementById('loadingSpinner').classList.add('d-none');
+
+            if (permissions.length === 0) {
+                document.getElementById('emptyState').classList.remove('d-none');
+                return;
+            }
+
+            const tbody = document.getElementById('permissionsTableBody');
+            tbody.innerHTML = '';
+
+            permissions.forEach(p => {
+                const row = document.createElement('tr');
+                row.id = 'perm-row-' + p.id;
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-semibold">${escapeHtml(p.page_title)}</span>
+                            <small class="text-muted">(${escapeHtml(p.page_name)})</small>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="form-check form-switch form-switch-lg justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="admin-${p.id}"
+                                ${p.admin ? 'checked' : ''}
+                                onchange="markChanged('${p.id}')">
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="form-check form-switch form-switch-lg justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="psychologist-${p.id}"
+                                ${p.psychologist ? 'checked' : ''}
+                                onchange="markChanged('${p.id}')">
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('permissionsTableWrapper').classList.remove('d-none');
+        }
+
+        function markChanged(id) {
+            changedRows.add(id);
+            const row = document.getElementById('perm-row-' + id);
+            if (row) {
+                row.style.background = '#fffde7';
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function toggleAllAdmin(value) {
+            permissionsData.forEach(p => {
+                const checkbox = document.getElementById('admin-' + p.id);
+                if (checkbox) {
+                    checkbox.checked = value;
+                    markChanged(p.id);
+                }
+            });
+        }
+
+        function toggleAllPsychologist(value) {
+            permissionsData.forEach(p => {
+                const checkbox = document.getElementById('psychologist-' + p.id);
+                if (checkbox) {
+                    checkbox.checked = value;
+                    markChanged(p.id);
+                }
+            });
+        }
+
+        async function savePermissions() {
+            if (changedRows.size === 0) {
+                showToast('success', 'Değişiklik bulunmuyor.');
+                return;
+            }
+
+            const saveBtn = document.getElementById('savePermissionsBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Kaydediliyor...';
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const id of changedRows) {
+                    const adminChecked = document.getElementById('admin-' + id).checked;
+                    const psychologistChecked = document.getElementById('psychologist-' + id).checked;
+
+                    if (!adminChecked && !psychologistChecked) {
+                        showToast('error', '"' + getPageTitle(id) + '" sayfası en az bir rol için işaretlenmelidir.');
+                        continue;
+                    }
+
+                    const { error } = await window.PG_API
+                        .from('page_permissions')
+                        .eq('id', id)
+                        .update({
+                            admin: adminChecked,
+                            psychologist: psychologistChecked
+                        });
+
+                    if (error) {
+                        console.error('Güncelleme hatası:', error);
+                        errorCount++;
+                    } else {
+                        successCount++;
+                        // Update local data
+                        const perm = permissionsData.find(p => p.id === id);
+                        if (perm) {
+                            perm.admin = adminChecked;
+                            perm.psychologist = psychologistChecked;
+                        }
+                        // Remove highlight
+                        const row = document.getElementById('perm-row-' + id);
+                        if (row) {
+                            row.style.background = '';
+                        }
+                    }
+                }
+
+                changedRows.clear();
+
+                if (errorCount === 0) {
+                    showToast('success', successCount + ' sayfa yetkisi başarıyla güncellendi.');
+                } else {
+                    showToast('error', successCount + ' başarılı, ' + errorCount + ' hata oluştu.');
+                }
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Yetkiler kaydedilirken hata:', msg);
+                showToast('error', 'Yetkiler kaydedilirken hata: ' + msg);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Yetkileri Kaydet';
+            }
+        }
+
+        function getPageTitle(id) {
+            const perm = permissionsData.find(p => p.id === id);
+            return perm ? perm.page_title : id;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Hard-coded admin-only check (this page is NOT in page_permissions table)
+            if (typeof window.AuthService !== 'undefined') {
+                const isAdmin = await window.AuthService.isAdmin();
+                if (!isAdmin) {
+                    showToast('error', 'Bu sayfaya erişim yetkiniz bulunmamaktadır.');
+                    setTimeout(() => { window.location.href = 'settings.html'; }, 2000);
+                    return;
+                }
+            }
+            loadPermissions();
+        });
+    </script>
+</body>
+</html>

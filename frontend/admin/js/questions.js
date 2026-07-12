@@ -10,7 +10,12 @@ class QuestionsManager {
     }
 
     async init() {
-        await this.checkAuth();
+        try {
+            await this.checkAuth();
+        } catch (e) {
+            console.warn('Auth/permission check failed:', e);
+            return;
+        }
         await this.loadCategories();
         await this.loadQuestions();
         this.bindEvents();
@@ -27,6 +32,16 @@ class QuestionsManager {
                 }
             } catch (e) {
                 console.warn('Auth check failed, proceeding anyway:', e);
+            }
+        }
+        await this.checkPagePermission();
+    }
+
+    async checkPagePermission() {
+        if (typeof checkPagePermission === 'function') {
+            const hasPermission = await checkPagePermission('questions');
+            if (!hasPermission) {
+                throw new Error('Yetki reddedildi');
             }
         }
     }

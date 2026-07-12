@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) return;
     
+    // Sayfa yetki kontrolü
+    const hasPermission = await checkPagePermission('analytics');
+    if (!hasPermission) return;
+    
     // Analitik verilerini yükle
     loadAnalyticsData();
     

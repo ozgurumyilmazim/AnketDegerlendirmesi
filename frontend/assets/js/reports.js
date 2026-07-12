@@ -21,6 +21,10 @@ $(document).ready(async function() {
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) return;
     
+    // Sayfa yetki kontrolü
+    const hasPermission = await checkPagePermission('reports');
+    if (!hasPermission) return;
+    
     // Event listener'ları ayarla
     setupEventListeners();
     

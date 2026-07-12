@@ -12,10 +12,32 @@ class TaskDefinitionsManager {
 
     async init() {
         console.log('TaskDefinitionsManager init called');
+        const authenticated = await this.checkAuth();
+        if (!authenticated) return;
         await this.loadTasks();
         this.bindEvents();
         this.updateStatistics();
         console.log('TaskDefinitionsManager initialization complete');
+    }
+
+    async checkAuth() {
+        try {
+            if (window.AuthService) {
+                const { data: { session } } = await AuthService.getSession();
+                if (!session || !session.user) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+            }
+            if (typeof checkPagePermission === 'function') {
+                const hasPermission = await checkPagePermission('task-definitions');
+                if (!hasPermission) return false;
+            }
+            return true;
+        } catch (e) {
+            console.warn('Auth check failed:', e);
+            return true;
+        }
     }
 
     async loadTasks() {
