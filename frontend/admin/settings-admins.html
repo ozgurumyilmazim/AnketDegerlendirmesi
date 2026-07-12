@@ -67,7 +67,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Panel kartı */
         .panel-card {
             background: white;
             border-radius: 14px;
@@ -95,7 +94,6 @@
             padding: 1.5rem;
         }
 
-        /* Form */
         .form-label {
             font-weight: 600;
             font-size: 0.875rem;
@@ -134,7 +132,6 @@
             color: white;
         }
 
-        /* Kullanıcı tablosu */
         .users-table th {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
@@ -182,6 +179,26 @@
             color: #3949ab;
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .user-avatar-small {
             width: 36px;
             height: 36px;
@@ -217,6 +234,20 @@
         .btn-icon-edit:hover {
             background: #ffc107;
             color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon-toggle {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-icon-toggle.off {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-icon-toggle:hover {
             transform: scale(1.1);
         }
 
@@ -258,6 +289,36 @@
             margin-right: 0.5rem;
         }
 
+        .modal-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(245, 87, 108, 0.35);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
@@ -285,7 +346,7 @@
             <div>
                 <h1 class="page-title"><i class="fas fa-user-shield me-2" style="color:#f5576c;"></i>Psikolog Tanımları
                 </h1>
-                <p class="page-subtitle">Sisteme erişim yetkisi olan psikologları yönetin</p>
+                <p class="page-subtitle">Sisteme erişim yetkisi olan kullanıcıları yönetin</p>
             </div>
             <div>
                 <a href="settings.html" class="btn btn-outline-secondary">
@@ -297,18 +358,18 @@
         <!-- Bilgi Notu -->
         <div class="info-banner">
             <i class="fas fa-info-circle"></i>
-            Bu ekranda sisteme yeni psikolog ekleyebilirsiniz.
+            Bu ekranda yönetici ve psikolog ekleyebilir, düzenleyebilir, silebilir ve aktif/pasif durumlarını yönetebilirsiniz.
         </div>
 
-        <!-- Yeni Yönetici Ekle -->
+        <!-- Yeni Kullanıcı Ekle -->
         <div class="panel-card">
             <div class="panel-header">
-                <h5><i class="fas fa-user-plus me-2"></i>Yeni Psikolog Ekle</h5>
+                <h5><i class="fas fa-user-plus me-2"></i>Yeni Kullanıcı Ekle</h5>
             </div>
             <div class="panel-body">
                 <form id="addAdminForm">
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label" for="adminName">Ad Soyad</label>
                             <input type="text" class="form-control" id="adminName" placeholder="Ad Soyad">
                         </div>
@@ -316,9 +377,16 @@
                             <label class="form-label" for="adminEmail">E-posta Adresi</label>
                             <input type="email" class="form-control" id="adminEmail" placeholder="ornek@kurum.com">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label" for="adminPassword">Şifre</label>
                             <input type="password" class="form-control" id="adminPassword" placeholder="Şifre">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="adminRole">Rol</label>
+                            <select class="form-select" id="adminRole">
+                                <option value="psychologist" selected>Psikolog</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="button" class="btn btn-add w-100" id="addAdminBtn">
@@ -330,7 +398,7 @@
             </div>
         </div>
 
-        <!-- Yönetici Listesi -->
+        <!-- Kullanıcı Listesi -->
         <div class="panel-card">
             <div class="panel-header">
                 <h5><i class="fas fa-users me-2"></i>Mevcut Kullanıcılar</h5>
@@ -349,6 +417,7 @@
                                     <th>Kullanıcı</th>
                                     <th>E-posta</th>
                                     <th>Rol</th>
+                                    <th>Durum</th>
                                     <th>Son Giriş</th>
                                     <th class="text-end">İşlemler</th>
                                 </tr>
@@ -360,11 +429,65 @@
                 </div>
                 <div id="emptyState" class="empty-state d-none">
                     <i class="fas fa-users"></i>
-                    <p>Henüz psikolog tanımlanmamış.</p>
+                    <p>Henüz kullanıcı tanımlanmamış.</p>
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Kullanıcı Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="editUserName">Ad Soyad</label>
+                                <input type="text" class="form-control" id="editUserName" placeholder="Ad Soyad">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="editUserEmail">E-posta Adresi</label>
+                                <input type="email" class="form-control" id="editUserEmail" placeholder="ornek@kurum.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="editUserRole">Rol</label>
+                                <select class="form-select" id="editUserRole">
+                                    <option value="psychologist">Psikolog</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="editUserPassword">
+                                    Yeni Şifre
+                                    <small class="text-muted fw-normal">(boş bırakılırsa değişmez)</small>
+                                </label>
+                                <input type="password" class="form-control" id="editUserPassword" placeholder="Yeni şifre">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="editUserStatus">Durum</label>
+                                <select class="form-select" id="editUserStatus">
+                                    <option value="true">Aktif</option>
+                                    <option value="false">Pasif</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-save" id="updateUserBtn">
+                        <i class="fas fa-save me-1"></i>Güncelle
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Container -->
@@ -412,6 +535,13 @@
             return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         }
 
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function formatDate(iso) {
             if (!iso) return '—';
             return new Date(iso).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -434,8 +564,8 @@
                 renderAdmins(data || []);
             } catch (err) {
                 const msg = err?.message || err;
-                console.error('Yöneticiler yüklenirken hata:', msg);
-                showToast('error', 'Yöneticiler yüklenemedi: ' + msg);
+                console.error('Kullanıcılar yüklenirken hata:', msg);
+                showToast('error', 'Kullanıcılar yüklenemedi: ' + msg);
                 document.getElementById('loadingSpinner').classList.add('d-none');
                 document.getElementById('emptyState').classList.remove('d-none');
             }
@@ -455,26 +585,40 @@
 
             admins.forEach(u => {
                 const row = document.createElement('tr');
+                const isActive = u.is_active !== false;
+                const statusLabel = isActive ? 'Aktif' : 'Pasif';
+                const statusClass = isActive ? 'status-active' : 'status-inactive';
+                const statusIcon = isActive ? 'fa-check-circle' : 'fa-ban';
+
                 row.innerHTML = `
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <div class="user-avatar-small">${getInitials(u.name || u.email)}</div>
-                            <span>${u.name || '—'}</span>
+                            <span>${escapeHtml(u.name) || '—'}</span>
                         </div>
                     </td>
-                    <td>${u.email || '—'}</td>
+                    <td>${escapeHtml(u.email) || '—'}</td>
                     <td>
                         <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-psychologist'}">
                             <i class="fas ${u.role === 'admin' ? 'fa-crown' : 'fa-user-md'}"></i>
                             ${u.role === 'admin' ? 'Admin' : 'Psikolog'}
                         </span>
                     </td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas ${statusIcon}"></i>
+                            ${statusLabel}
+                        </span>
+                    </td>
                     <td>${formatDate(u.last_login)}</td>
                     <td class="text-end">
-                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editAdmin('${u.id}', '${u.name || ''}', '${u.role || 'admin'}')">
+                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="editAdmin('${u.id}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteAdmin('${u.id}', '${u.name || u.email}')">
+                        <button class="btn-icon btn-icon-toggle ${isActive ? '' : 'off'} me-1" title="${isActive ? 'Pasif Yap' : 'Aktif Yap'}" onclick="toggleUserStatus('${u.id}', '${isActive ? 'false' : 'true'}', '${escapeHtml(u.name || u.email)}')">
+                            <i class="fas ${isActive ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="deleteAdmin('${u.id}', '${escapeHtml(u.name || u.email)}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -489,7 +633,7 @@
             const name = document.getElementById('adminName').value.trim();
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
-            const role = 'psychologist';
+            const role = document.getElementById('adminRole').value;
 
             if (!name || !email || !password) {
                 showToast('error', 'Ad Soyad, E-posta ve Şifre alanları zorunludur.');
@@ -501,6 +645,11 @@
                 return;
             }
 
+            if (!email.includes('@')) {
+                showToast('error', 'Geçerli bir e-posta adresi giriniz.');
+                return;
+            }
+
             try {
                 if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
 
@@ -509,6 +658,7 @@
 
                 showToast('success', `${name} başarıyla eklendi.`);
                 document.getElementById('addAdminForm').reset();
+                document.getElementById('adminRole').value = 'psychologist';
                 loadAdmins();
             } catch (err) {
                 const msg = err?.message || err;
@@ -517,10 +667,94 @@
             }
         });
 
-        function editAdmin(id, name, role) {
-            document.getElementById('adminName').value = name;
-            document.getElementById('adminEmail').focus();
-            showToast('success', 'Düzenleme için bilgileri güncelleyip tekrar ekleyin.');
+        function editAdmin(id) {
+            // Find user in rendered data — we need to fetch fresh data
+            // We'll use the modal with a fresh fetch for the specific user
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editUserName').value = '';
+            document.getElementById('editUserEmail').value = '';
+            document.getElementById('editUserRole').value = 'psychologist';
+            document.getElementById('editUserPassword').value = '';
+            document.getElementById('editUserStatus').value = 'true';
+
+            // Fetch the user data to populate the modal
+            window.PG_API.from('users').select('*').eq('id', id).single()
+                .then(({ data, error }) => {
+                    if (error || !data) {
+                        showToast('error', 'Kullanıcı bilgileri alınamadı.');
+                        return;
+                    }
+                    document.getElementById('editUserName').value = data.name || '';
+                    document.getElementById('editUserEmail').value = data.email || '';
+                    document.getElementById('editUserRole').value = data.role || 'psychologist';
+                    document.getElementById('editUserStatus').value = data.is_active !== false ? 'true' : 'false';
+                    new bootstrap.Modal(document.getElementById('editUserModal')).show();
+                })
+                .catch(err => {
+                    showToast('error', 'Kullanıcı bilgileri alınamadı: ' + (err?.message || err));
+                });
+        }
+
+        document.getElementById('updateUserBtn').addEventListener('click', async () => {
+            const id = document.getElementById('editUserId').value;
+            const name = document.getElementById('editUserName').value.trim();
+            const email = document.getElementById('editUserEmail').value.trim();
+            const role = document.getElementById('editUserRole').value;
+            const password = document.getElementById('editUserPassword').value;
+            const isActive = document.getElementById('editUserStatus').value === 'true';
+
+            if (!name || !email) {
+                showToast('error', 'Ad Soyad ve E-posta alanları zorunludur.');
+                return;
+            }
+
+            if (password && password.length < 6) {
+                showToast('error', 'Şifre en az 6 karakter olmalıdır.');
+                return;
+            }
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                const params = { user_id: id, name, email, role, is_active: isActive };
+                if (password) {
+                    params.password = password;
+                }
+
+                const { error } = await window.PG_API.rpc('update_user', params);
+                if (error) throw error;
+
+                showToast('success', 'Kullanıcı başarıyla güncellendi.');
+                bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                loadAdmins();
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Kullanıcı güncellenirken hata:', msg);
+                showToast('error', 'Kullanıcı güncellenirken hata: ' + msg);
+            }
+        });
+
+        async function toggleUserStatus(id, newStatus, label) {
+            const action = newStatus === 'true' ? 'aktifleştirmek' : 'pasif yapmak';
+            if (!confirm(`"${label}" kullanıcısını ${action} istediğinizden emin misiniz?`)) return;
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+
+                const { error } = await window.PG_API.rpc('update_user', {
+                    user_id: id,
+                    is_active: newStatus === 'true'
+                });
+
+                if (error) throw error;
+
+                showToast('success', `"${label}" durumu güncellendi.`);
+                loadAdmins();
+            } catch (err) {
+                const msg = err?.message || err;
+                console.error('Durum güncellenirken hata:', msg);
+                showToast('error', 'Durum güncellenirken hata: ' + msg);
+            }
         }
 
         async function deleteAdmin(id, label) {

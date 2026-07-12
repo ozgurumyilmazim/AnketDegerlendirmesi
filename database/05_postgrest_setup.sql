@@ -165,6 +165,55 @@ $$;
 GRANT EXECUTE ON FUNCTION public.create_user(text, text, text, text) TO authenticated;
 
 -- ============================================================
+-- 8. Update user function — updates name, email, role, password, is_active
+-- ============================================================
+-- Called by admin panel: POST /rpc/update_user
+-- Body: { "user_id": "...", "name": "...", "email": "...", "role": "...", "password": "...", "is_active": true|false }
+-- All fields except user_id are optional (only provided fields are updated)
+-- Returns the updated user (without password_hash)
+
+CREATE OR REPLACE FUNCTION public.update_user(
+    user_id uuid,
+    name text DEFAULT NULL,
+    email text DEFAULT NULL,
+    role text DEFAULT NULL,
+    password text DEFAULT NULL,
+    is_active boolean DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  user_record public.users%ROWTYPE;
+BEGIN
+  UPDATE public.users SET
+    name = COALESCE(update_user.name, public.users.name),
+    email = COALESCE(update_user.email, public.users.email),
+    role = COALESCE(update_user.role, public.users.role),
+    password_hash = CASE WHEN update_user.password IS NOT NULL THEN crypt(update_user.password, gen_salt('bf')) ELSE public.users.password_hash END,
+    is_active = COALESCE(update_user.is_active, public.users.is_active),
+    updated_at = NOW()
+  WHERE id = update_user.user_id
+  RETURNING * INTO user_record;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'User not found';
+  END IF;
+
+  RETURN jsonb_build_object(
+    'id', user_record.id,
+    'name', user_record.name,
+    'email', user_record.email,
+    'role', user_record.role,
+    'is_active', user_record.is_active
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.update_user(uuid, text, text, text, text, boolean) TO authenticated;
+
+-- ============================================================
 -- 9. Pre-request function: set JWT secret for api.login()
 -- ============================================================
 -- PostgREST calls this before every request (via db-pre-request config).
