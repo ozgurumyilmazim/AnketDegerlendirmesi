@@ -11,6 +11,8 @@ class MMPITest {
         this.endTime = null;
         this.questions = [];
         this.isLoading = true;
+        this.sessionCode = null;
+        this.autoSaveTimer = null;
         
         // DOM elementleri (jQuery ile)
         this.$questionText = $('#questionText');
@@ -23,6 +25,7 @@ class MMPITest {
         this.$prevBtn = $('#prevBtn');
         this.$nextBtn = $('#nextBtn');
         this.$finishBtn = $('#finishBtn');
+        this.$saveExitBtn = $('#saveExitBtn');
 
         // Test başlat
         this.initializeTest();
@@ -176,6 +179,7 @@ class MMPITest {
                             .from('test_results_min')
                             .select('id')
                             .eq('participant_id', participantData[0].id)
+                            .eq('status', 'completed')
                             .limit(1);
                         
                         if (error) {
@@ -250,15 +254,22 @@ class MMPITest {
     async initializeTest() {
         console.log('initializeTest başladı');
         
-        // Önce kişinin daha önce test yapıp yapmadığını kontrol et
-        const hasCompletedTest = await this.checkPreviousTest();
-        if (hasCompletedTest) {
-            return; // Test durduruldu
+        // Kaydedilmiş oturumdan devam etme kontrolü
+        const isResume = this.loadSavedSession();
+        
+        if (!isResume) {
+            // Önce kişinin daha önce test yapıp yapmadığını kontrol et
+            const hasCompletedTest = await this.checkPreviousTest();
+            if (hasCompletedTest) {
+                return; // Test durduruldu
+            }
         }
         
         // Test başlangıç zamanını kaydet
-        this.startTime = new Date().toISOString();
-        localStorage.setItem('mmpiTestStartTime', this.startTime);
+        if (!this.startTime) {
+            this.startTime = new Date().toISOString();
+            localStorage.setItem('mmpiTestStartTime', this.startTime);
+        }
         
         // Bilmiyorum sayacını başlangıçta güncelle
         this.updateDontKnowCounter();
@@ -279,11 +290,14 @@ class MMPITest {
             // Loading gizle
             this.hideLoading();
             
-            // İlk soruyu göster
+            // İlk soruyu göster (veya kaldığı yerden devam et)
             this.isLoading = false;
             this.displayQuestion();
             this.updateProgress();
             this.updateDontKnowCounter();
+            
+            // Otomatik kaydetme zamanlayıcısını başlat
+            this.startAutoSave();
             
             console.log('Test başarıyla başlatıldı');
         } catch (error) {
@@ -311,6 +325,10 @@ class MMPITest {
         
         this.$finishBtn.on('click', () => {
             this.finishTest();
+        });
+
+        this.$saveExitBtn.on('click', () => {
+            this.saveAndExit();
         });
         
         // Klavye kısayolları
@@ -542,6 +560,11 @@ class MMPITest {
         
         // beforeunload event listener'ını kaldır
         this.removeBeforeUnloadListener();
+
+        // Oturum bilgilerini temizle (test tamamlandı)
+        localStorage.removeItem('mmpiSessionCode');
+        localStorage.removeItem('mmpiTestProgress');
+        localStorage.removeItem('mmpiResumeInfo');
         
         // Loading modal göster
         const $loadingModal = $('#loadingModal');
@@ -566,6 +589,199 @@ class MMPITest {
         });
     }
     
+    loadSavedSession() {
+        // Önce devam-et sayfasından gelen resume bilgisini kontrol et
+        const resumeInfo = localStorage.getItem('mmpiResumeInfo');
+        if (resumeInfo) {
+            try {
+                const data = JSON.parse(resumeInfo);
+                if (data.answers && Object.keys(data.answers).length > 0) {
+                    this.currentQuestionIndex = data.currentQuestionIndex || 0;
+                    this.answers = data.answers;
+                    this.dontKnowCount = data.dontKnowCount || 0;
+                    this.startTime = data.startTime || new Date().toISOString();
+                    this.sessionCode = data.saveCode;
+                    console.log('Devam etme bilgisi yüklendi:', data.saveCode);
+                    return true;
+                }
+            } catch (e) {
+                console.error('Devam etme bilgisi yüklenirken hata:', e);
+            }
+            return false;
+        }
+
+        // Sonra localStorage'daki kayıtlı oturumu kontrol et
+        const savedProgress = localStorage.getItem('mmpiTestProgress');
+        const sessionCode = localStorage.getItem('mmpiSessionCode');
+
+        if (!savedProgress || !sessionCode) {
+            return false;
+        }
+
+        try {
+            const progress = JSON.parse(savedProgress);
+            if (progress.answers && Object.keys(progress.answers).length > 0) {
+                this.currentQuestionIndex = progress.currentQuestionIndex || 0;
+                this.answers = progress.answers || {};
+                this.dontKnowCount = progress.dontKnowCount || 0;
+                this.startTime = progress.startTime || new Date().toISOString();
+                this.sessionCode = sessionCode;
+                console.log('Kaydedilmiş oturum yüklendi:', sessionCode);
+                return true;
+            }
+        } catch (e) {
+            console.error('Kaydedilmiş oturum yüklenirken hata:', e);
+        }
+
+        return false;
+    }
+
+    generateSessionCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = '';
+        for (let i = 0; i < 11; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    async saveToDb(isComplete = false) {
+        if (typeof PG_API === 'undefined' || !PG_API) {
+            console.warn('PG_API mevcut değil, sadece localStorage kaydedildi.');
+            return;
+        }
+
+        try {
+            const personalInfo = JSON.parse(localStorage.getItem('mmpiPersonalInfo') || '{}');
+            let participantId = localStorage.getItem('mmpiParticipantId');
+
+            if (!participantId && personalInfo.tcNo) {
+                const { data: participants, error: pErr } = await PG_API
+                    .from('participants')
+                    .select('id')
+                    .eq('tc_no', personalInfo.tcNo)
+                    .limit(1);
+                if (!pErr && participants && participants.length > 0) {
+                    participantId = participants[0].id;
+                    localStorage.setItem('mmpiParticipantId', participantId);
+                }
+            }
+
+            if (!participantId) {
+                console.warn('Katılımcı ID bulunamadı, DB kaydı atlandı.');
+                return;
+            }
+
+            const status = isComplete ? 'completed' : 'in_progress';
+
+            // Mevcut test kaydını bul
+            const { data: existingTests, error: searchErr } = await PG_API
+                .from('test_results')
+                .select('id, session_code')
+                .eq('participant_id', participantId)
+                .in('status', ['started', 'in_progress'])
+                .order('created', { ascending: false })
+                .limit(1);
+
+            if (searchErr) {
+                console.error('Mevcut test sorgu hatası:', searchErr);
+                return;
+            }
+
+            const testData = {
+                test_answers: this.answers,
+                start_time: this.startTime,
+                dont_know_count: this.dontKnowCount,
+                completed_questions: Object.keys(this.answers).length,
+                total_questions: this.questions.length || 567,
+                status: status,
+                current_index: this.currentQuestionIndex
+            };
+
+            if (isComplete) {
+                testData.end_time = new Date().toISOString();
+            }
+
+            if (existingTests && existingTests.length > 0) {
+                const existing = existingTests[0];
+                testData.session_code = existing.session_code || this.sessionCode;
+                await PG_API
+                    .from('test_results')
+                    .eq('id', existing.id)
+                    .update(testData);
+                console.log('Test kaydı güncellendi:', existing.id);
+            } else {
+                testData.session_code = this.sessionCode;
+                testData.participant_id = participantId;
+                testData.test_type = 'MMPI-2';
+                testData.test_version = '1.0';
+                const { data: insertResult, error: insertErr } = await PG_API
+                    .from('test_results')
+                    .insert([testData])
+                    .select();
+                if (insertErr) {
+                    console.error('Test kaydı ekleme hatası:', insertErr);
+                } else {
+                    console.log('Test kaydı oluşturuldu:', insertResult);
+                }
+            }
+        } catch (e) {
+            console.error('DB kaydetme hatası:', e);
+        }
+    }
+
+    async saveAndExit() {
+        if (this.isLoading) return;
+
+        // Son cevabı kaydet
+        this.handleAnswerChange();
+
+        // Oturum kodu oluştur
+        this.sessionCode = this.generateSessionCode();
+        localStorage.setItem('mmpiSessionCode', this.sessionCode);
+
+        // İlerlemeyi localStorage'a kaydet
+        this.saveProgress();
+
+        // Veritabanına kaydet
+        await this.saveToDb(false);
+
+        // Otomatik kaydetme zamanlayıcısını durdur
+        this.stopAutoSave();
+
+        // beforeunload olayını kaldır
+        this.removeBeforeUnloadListener();
+
+        // Oturum kodunu göster
+        $('#sessionCodeDisplay').text(this.sessionCode);
+        const modal = new bootstrap.Modal($('#sessionCodeModal')[0]);
+        modal.show();
+    }
+
+    startAutoSave() {
+        const interval = testConfig?.autoSaveInterval || 30000;
+        if (this.autoSaveTimer) {
+            clearInterval(this.autoSaveTimer);
+        }
+        this.autoSaveTimer = setInterval(() => {
+            if (this.sessionCode) {
+                this.saveProgress();
+                this.saveToDb(false);
+            } else {
+                this.saveProgress();
+            }
+        }, interval);
+        console.log('Otomatik kaydetme başlatıldı:', interval, 'ms');
+    }
+
+    stopAutoSave() {
+        if (this.autoSaveTimer) {
+            clearInterval(this.autoSaveTimer);
+            this.autoSaveTimer = null;
+            console.log('Otomatik kaydetme durduruldu');
+        }
+    }
+
     saveProgress() {
         const progress = {
             currentQuestionIndex: this.currentQuestionIndex,
@@ -710,7 +926,9 @@ class MMPITest {
                     total_questions: this.questions.length,
                     test_type: 'MMPI',
                     test_version: '1.0',
-                    status: 'completed'
+                    status: 'completed',
+                    session_code: this.sessionCode || localStorage.getItem('mmpiSessionCode'),
+                    current_index: this.currentQuestionIndex
                 };
                 
                 console.log('Test sonucu verisi hazırlandı:', PostgreSQLData);
@@ -798,6 +1016,7 @@ class MMPITest {
     
     // beforeunload event listener'ını kaldır
     removeBeforeUnloadListener() {
+        this.stopAutoSave();
         if (this.beforeUnloadHandler) {
             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
         }
@@ -962,7 +1181,7 @@ $(document).ready(function() {
         if (window.mmpiTest && window.mmpiTest.endTime) {
             return;
         }
-        const confirmationMessage = 'Test devam ediyor. Sayfayı kapatırsanız ilerlemeniz kaybedebilir.';
+        const confirmationMessage = 'Test devam ediyor. İlerlemenizi kaydetmek için "Kaydet ve Çık" butonunu kullanın.';
         e.returnValue = confirmationMessage;
         return confirmationMessage;
     };

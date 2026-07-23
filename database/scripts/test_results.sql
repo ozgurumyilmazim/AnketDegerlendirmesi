@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS public.test_results
     test_type character varying(50) COLLATE pg_catalog."default" DEFAULT 'MMPI-2'::character varying,
     test_version character varying(20) COLLATE pg_catalog."default" DEFAULT '1.0'::character varying,
     status character varying(20) COLLATE pg_catalog."default" DEFAULT 'completed'::character varying,
+    session_code character varying(11) COLLATE pg_catalog."default",
+    current_index integer DEFAULT 0,
     created timestamp with time zone DEFAULT now(),
     updated timestamp with time zone DEFAULT now(),
     CONSTRAINT test_results_pkey PRIMARY KEY (id),
@@ -56,6 +58,15 @@ CREATE INDEX IF NOT EXISTS idx_test_results_participant
 CREATE INDEX IF NOT EXISTS idx_test_results_status
     ON public.test_results USING btree
     (status COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Index: idx_test_results_session_code
+
+-- DROP INDEX IF EXISTS public.idx_test_results_session_code;
+
+CREATE INDEX IF NOT EXISTS idx_test_results_session_code
+    ON public.test_results USING btree
+    (session_code COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
 
 -- Trigger: trg_test_results_updated

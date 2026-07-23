@@ -93,6 +93,13 @@
                             </button>
                         </div>
                     </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-outline-warning btn-mobile w-100" id="saveExitBtn">
+                                <i class="fas fa-save"></i> Kaydet ve Çık
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Test Bilgileri -->
@@ -138,10 +145,16 @@
     <script>
         // Sayfa yüklendiğinde erişim kontrolü yap
         $(document).ready(function () {
+            // Devam etme kontrolü - devam-et sayfasından geliniyorsa normal kontrolleri atla
+            const resumeInfo = localStorage.getItem('mmpiResumeInfo');
+            if (resumeInfo) {
+                // Resume modu: bilgiler devam-et.js tarafından ayarlanmıştır
+                return;
+            }
+
             // KVKK onayı kontrolü
             const kvkkConsent = localStorage.getItem('kvkkConsent');
             if (!kvkkConsent || kvkkConsent !== 'true') {
-                //alert('Bu sayfaya erişmek için önce KVKK sözleşmesini kabul etmelisiniz.');
                 window.location.href = 'index.html';
                 return;
             }
@@ -149,7 +162,6 @@
             // Kişisel bilgiler kontrolü
             const personalInfo = localStorage.getItem('mmpiPersonalInfo');
             if (!personalInfo) {
-                //alert('Bu sayfaya erişmek için önce kişisel bilgilerinizi girmelisiniz.');
                 window.location.href = 'index.html';
                 return;
             }
@@ -174,6 +186,40 @@
             }
         });
     </script>
+
+    <!-- Oturum Kodu Modal -->
+    <div class="modal fade" id="sessionCodeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Testiniz Kaydedildi</h4>
+                    <p class="text-muted mb-3">
+                        Testinize kaldığınız yerden devam etmek için aşağıdaki oturum kodunu saklayın.
+                        Bu kodu ve TC Kimlik Numaranızı kullanarak teste devam edebilirsiniz.
+                    </p>
+                    <div class="bg-light rounded p-3 mb-3" style="border: 2px dashed #667eea;">
+                        <div class="text-muted small mb-1">Oturum Kodunuz</div>
+                        <div id="sessionCodeDisplay" class="text-primary fw-bold"
+                            style="font-size: 2.2rem; letter-spacing: 6px; font-family: monospace;">
+                        </div>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle"></i>
+                        Bu kod, testinize devam edebilmeniz için benzersizdir.
+                        Kodu bir yere not almanız önerilir.
+                    </div>
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='index.html'">
+                            <i class="fas fa-home"></i> Ana Sayfaya Dön
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Kişisel Bilgileri Düzenle Modal -->
     <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
