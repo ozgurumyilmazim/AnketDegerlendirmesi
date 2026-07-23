@@ -68,13 +68,13 @@ python3 -m http.server 8000   # from frontend/
 
 ## Save & Resume feature
 - User clicks "Kaydet ve Çık" → 11-char random code (A-Z, 2-9, no 0/1/O/I) generated → progress saved to DB with `status='in_progress'` → code shown in modal
-- Resume: `devam-et.html` → enter TC No + session code → lookup by `participants.tc_no` + `test_results.session_code` where `status IN ('started','in_progress')` → restore to localStorage → redirect to `mmpi-test.html?resume=1`
-- `mmpi-test.js` `loadSavedSession()` reads `mmpiResumeInfo` (from devam-et path) or `mmpiTestProgress` + `mmpiSessionCode` (direct resume on same browser) from localStorage and restores `currentQuestionIndex`, `answers`, `dontKnowCount`
+- Resume: `test-devam.html` → enter TC No + session code → lookup by `participants.tc_no` + `test_results.session_code` where `status IN ('started','in_progress')` → restore to localStorage → redirect to `mmpi-test.html?resume=1`
+- `mmpi-test.js` `loadSavedSession()` reads `mmpiTestProgress` + `mmpiSessionCode` from localStorage and restores `currentQuestionIndex`, `answers`, `dontKnowCount`
 - Auto-save every 30s: saves to localStorage always; saves to DB via `saveToDb()` only when `sessionCode` is set
 - DB columns: `test_results.session_code VARCHAR(11)`, `test_results.current_index INTEGER DEFAULT 0` (added in `add_save_code_column.sql`)
-- On test completion (`finishTest()`): session code and progress are cleared from localStorage (`mmpiSessionCode`, `mmpiTestProgress`, `mmpiResumeInfo`); `saveTestResults()` sets status='completed'
-- `devam-et.js` looks up participant by TCKN, then test_results by participant_id + session_code, stores resume data in `mmpiResumeInfo`
-- Page flow for resume: `index.html → devam-et.html → mmpi-test.html?resume=true` (bypasses personal-info and kvkk-consent pages)
+- On test completion (`finishTest()`): session code and progress are cleared from localStorage (`mmpiSessionCode`, `mmpiTestProgress`); `saveTestResults()` sets status='completed'
+- `test-devam.html` looks up participant by TCKN, then test_results by participant_id + session_code, restores progress to `mmpiTestProgress` and `mmpiSessionCode`
+- Page flow for resume: `index.html → test-devam.html → mmpi-test.html?resume=1` (bypasses personal-info and kvkk-consent pages)
 
 ## ⚠️ DB schema quirks (most common bugs)
 1. **Column names**: `database/scripts/*.sql` (the actual DB) uses `created`/`updated` (no `_at` suffix) on `participants`, `test_results`, `reports`. The reference file `01_schema.sql` uses `created_at`/`updated_at`. **JS code must use `created`/`updated`** in SELECT/ORDER BY for these tables.

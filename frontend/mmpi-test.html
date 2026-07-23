@@ -145,13 +145,6 @@
     <script>
         // Sayfa yüklendiğinde erişim kontrolü yap
         $(document).ready(function () {
-            // Devam etme kontrolü - devam-et sayfasından geliniyorsa normal kontrolleri atla
-            const resumeInfo = localStorage.getItem('mmpiResumeInfo');
-            if (resumeInfo) {
-                // Resume modu: bilgiler devam-et.js tarafından ayarlanmıştır
-                return;
-            }
-
             // KVKK onayı kontrolü
             const kvkkConsent = localStorage.getItem('kvkkConsent');
             if (!kvkkConsent || kvkkConsent !== 'true') {

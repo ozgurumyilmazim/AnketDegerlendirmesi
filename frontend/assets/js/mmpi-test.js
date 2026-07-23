@@ -564,7 +564,6 @@ class MMPITest {
         // Oturum bilgilerini temizle (test tamamlandı)
         localStorage.removeItem('mmpiSessionCode');
         localStorage.removeItem('mmpiTestProgress');
-        localStorage.removeItem('mmpiResumeInfo');
         
         // Loading modal göster
         const $loadingModal = $('#loadingModal');
@@ -590,27 +589,6 @@ class MMPITest {
     }
     
     loadSavedSession() {
-        // Önce devam-et sayfasından gelen resume bilgisini kontrol et
-        const resumeInfo = localStorage.getItem('mmpiResumeInfo');
-        if (resumeInfo) {
-            try {
-                const data = JSON.parse(resumeInfo);
-                if (data.answers && Object.keys(data.answers).length > 0) {
-                    this.currentQuestionIndex = data.currentQuestionIndex || 0;
-                    this.answers = data.answers;
-                    this.dontKnowCount = data.dontKnowCount || 0;
-                    this.startTime = data.startTime || new Date().toISOString();
-                    this.sessionCode = data.saveCode;
-                    console.log('Devam etme bilgisi yüklendi:', data.saveCode);
-                    return true;
-                }
-            } catch (e) {
-                console.error('Devam etme bilgisi yüklenirken hata:', e);
-            }
-            return false;
-        }
-
-        // Sonra localStorage'daki kayıtlı oturumu kontrol et
         const savedProgress = localStorage.getItem('mmpiTestProgress');
         const sessionCode = localStorage.getItem('mmpiSessionCode');
 

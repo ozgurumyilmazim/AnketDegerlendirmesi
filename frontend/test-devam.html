@@ -135,7 +135,7 @@
             // Devam etmekte olan testi oturum kodu ile bul
             const { data: tests, error: tErr } = await PG_API
                 .from('test_results')
-                .select('id, test_answers, current_index, dont_know_count, start_time, status, completed_questions')
+                .select('id, test_answers, current_index, dont_know_count, start_time, status, session_code, completed_questions')
                 .eq('participant_id', participant.id)
                 .eq('session_code', sessionCode)
                 .in('status', ['started', 'in_progress'])
@@ -196,7 +196,7 @@
             localStorage.setItem('mmpiTestProgress', JSON.stringify(progress));
 
             // Oturum kodunu localStorage'a kaydet
-            localStorage.setItem('mmpiSessionCode', t.id + '_' + (t.session_code || ''));
+            localStorage.setItem('mmpiSessionCode', t.session_code || '');
 
             // Başlangıç zamanını ayarla
             localStorage.setItem('mmpiTestStartTime', startTime);
