@@ -199,31 +199,7 @@ async function loadIncompleteTests() {
 
         const { data, error } = await PG_API
             .from('test_results')
-            .select(`
-                id,
-                session_code,
-                current_index,
-                completed_questions,
-                dont_know_count,
-                status,
-                created,
-                updated,
-                start_time,
-                test_answers,
-                participant_id,
-                participants (
-                    first_name,
-                    last_name,
-                    tc_no,
-                    age,
-                    gender,
-                    institution_code,
-                    institution_name,
-                    profession,
-                    education,
-                    marital_status
-                )
-            `)
+            .select('id, session_code, current_index, completed_questions, dont_know_count, status, created, updated, start_time, test_answers, participant_id, participants(first_name, last_name, tc_no, age, gender, institution_code, institution_name, profession, education, marital_status)')
             .in('status', ['started', 'in_progress'])
             .order('updated', { ascending: false });
 
