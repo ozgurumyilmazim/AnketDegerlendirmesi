@@ -1134,7 +1134,9 @@ class MMPITest {
             
             if (data && data.length > 0) {
                 console.log('Katılımcı bilgileri başarıyla güncellendi:', data[0]);
-                return data[0];
+                                                    participantId = data[0].id;
+                                                    localStorage.setItem('mmpiParticipantId', participantId);
+                                                    return data[0];
             } else {
                 console.log('Güncellenecek kayıt bulunamadı.');
             }
