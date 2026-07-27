@@ -94,6 +94,7 @@ async function saveParticipantToPostgreSQL(participantData) {
         
         if (existingParticipant) {
             console.log('Bu TC No ile zaten kayıt mevcut.');
+            localStorage.setItem('mmpiParticipantId', existingParticipant.id);
             return existingParticipant;
         }
         

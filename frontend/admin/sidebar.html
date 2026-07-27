@@ -25,6 +25,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="incomplete-tests.html" id="nav-incomplete-tests">
+                    <i class="fas fa-user-clock me-2"></i>
+                    <span class="sidebar-text">Tamamlanmamış Testler</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="reports.html" id="nav-reports">
                     <i class="fas fa-file-alt me-2"></i>
                     <span class="sidebar-text">Raporlar</span>
@@ -77,10 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mevcut sayfaya göre active class ekle
     switch(currentPage) {
         case 'dashboard.html':
-            document.getElementById('nav-dashboard').classList.add('active');
+            document.getElementById('nav-dashboard')?.classList.add('active');
             break;
         case 'test-results.html':
-            document.getElementById('nav-test-results').classList.add('active');
+            document.getElementById('nav-test-results')?.classList.add('active');
+            break;
+        case 'incomplete-tests.html':
+            document.getElementById('nav-incomplete-tests')?.classList.add('active');
             break;
         case 'reports.html':
             document.getElementById('nav-reports').classList.add('active');
