@@ -601,108 +601,85 @@ async function viewTestDetail(testId) {
     if (reportError) {
         console.warn('Rapor kontrolü yapılamadı:', reportError);
     }
-    
+
+    const answers = test.testAnswers || {};
+    let trueCount = 0, falseCount = 0, dontKnowCount = test.dontKnowCount || 0;
+
+    Object.values(answers).forEach(val => {
+        if (val === 'Doğru') trueCount++;
+        else if (val === 'Yanlış') falseCount++;
+        else if (val === 'Bilmiyorum') dontKnowCount++;
+    });
+
+    const p = test.personalInfo || {};
     const modalContent = document.getElementById('testDetailContent');
     modalContent.innerHTML = `
-        <div class="row">
+        <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <h6 class="text-primary">Katılımcı Bilgileri</h6>
-                <table class="table table-sm">
-                    <tr><td><strong>Ad Soyad:</strong></td><td>${test.participantName}</td></tr>
-                    <tr><td><strong>TC No:</strong></td><td>${test.personalInfo ? test.personalInfo.tcNo || 'Bilinmiyor' : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Yaş:</strong></td><td>${test.personalInfo ? test.personalInfo.age || 'Bilinmiyor' : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Cinsiyet:</strong></td><td>${test.personalInfo && test.personalInfo.gender ? (test.personalInfo.gender === 'male' ? 'Erkek' : 'Kadın') : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Eğitim:</strong></td><td>${test.personalInfo ? test.personalInfo.education || 'Bilinmiyor' : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Meslek:</strong></td><td>${test.personalInfo ? (test.personalInfo.profession || 'Bilinmiyor') : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Medeni Durum:</strong></td><td>${test.personalInfo ? (test.personalInfo.maritalStatus || 'Bilinmiyor') : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Kurum Kodu:</strong></td><td>${test.personalInfo ? (test.personalInfo.institutionCode || 'Bilinmiyor') : 'Bilinmiyor'}</td></tr>
-                    <tr><td><strong>Kurum Adı:</strong></td><td>${test.personalInfo ? (test.personalInfo.institutionName || 'Bilinmiyor') : 'Bilinmiyor'}</td></tr>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-primary">Test Bilgileri</h6>
-                <table class="table table-sm">
-                    <tr><td><strong>Test ID:</strong></td><td>${test.id}</td></tr>
-                    <tr><td><strong>Test Türü:</strong></td><td>${test.testType}</td></tr>
-                    <tr><td><strong>Tarih:</strong></td><td>${formatDate(test.completedAt)}</td></tr>
-                    <tr><td><strong>Durum:</strong></td><td><span class="status-badge status-${test.status}">${getStatusText(test.status)}</span></td></tr>
-                    <tr><td><strong>Süre:</strong></td><td>${test.duration}</td></tr>
-                    <tr><td><strong>Puan:</strong></td><td>${test.score || 'N/A'}</td></tr>
-                </table>
-            </div>
-        </div>
-        
-        ${test.status === 'completed' ? `
-            <div class="mt-3">
-                <h6 class="text-primary">Test Sonuçları</h6>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Detaylı analiz ve yorumlar için rapor oluşturun.
+                <div class="card bg-light border-0 p-3 h-100">
+                    <h6 class="text-primary fw-bold mb-3"><i class="fas fa-id-card me-2"></i>Katılımcı Bilgileri</h6>
+                    <p class="mb-1"><strong>Ad Soyad:</strong> ${escapeHtml(test.participantName || '')}</p>
+                    <p class="mb-1"><strong>TC No:</strong> ${escapeHtml(p.tcNo || '-')}</p>
+                    <p class="mb-1"><strong>Yaş / Cinsiyet:</strong> ${p.age || '-'} / ${p.gender === 'male' ? 'Erkek' : (p.gender === 'female' ? 'Kadın' : '-')}</p>
+                    <p class="mb-1"><strong>Meslek / Eğitim:</strong> ${escapeHtml(p.profession || '-')} / ${escapeHtml(p.education || '-')}</p>
+                    <p class="mb-0"><strong>Kurum:</strong> ${escapeHtml(p.institutionName || '-')} (${escapeHtml(p.institutionCode || '-')})</p>
                 </div>
             </div>
-        ` : ''}
-        
-        ${test.testAnswers ? `
-            <div class="mt-3">
-                <h6 class="text-primary">Test Cevapları</h6>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>Tamamlanan Sorular:</strong> ${test.completedQuestions || 0}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Toplam Sorular:</strong> ${test.totalQuestions || 0}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Tamamlanma Oranı:</strong> ${test.completedQuestions && test.totalQuestions ? Math.round((test.completedQuestions / test.totalQuestions) * 100) : 0}%
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="answers-container" style="max-height: 300px; overflow-y: auto;">
-                            ${Object.entries(test.testAnswers)
-                                .map(([key, answer]) => {
-                                    // key artık question_number (string) bekleniyor; sayıya çevir
-                                    const qNum = parseInt(key, 10);
-                                    const question = test.questionsMap && test.questionsMap[qNum];
-                                    return {
-                                        questionId: key,
-                                        answer,
-                                        question,
-                                        questionNumber: question ? question.question_number : (isNaN(qNum) ? 999999 : qNum)
-                                    };
-                                })
-                                .sort((a, b) => a.questionNumber - b.questionNumber)
-                                .map(({questionId, answer, question}) => {
-                                    const questionText = question ? question.question_text : `Soru ${questionId}`;
-                                    // Artık cevaplar doğrudan 'Doğru' | 'Yanlış' | 'Bilmiyorum'
-                                    const answerText = answer;
-                                    const badgeColor = answer === 'Doğru' ? 'success' : 
-                                                     answer === 'Yanlış' ? 'danger' : 'secondary';
-                                    return `
-                                        <div class="answer-item mb-3 p-3 border rounded">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <strong>Soru ${question ? question.question_number : questionId}:</strong>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <div class="question-text mb-2">${questionText}</div>
-                                                </div>
-                                                <div class="col-md-2 text-end">
-                                                    <span class="badge bg-${badgeColor}">
-                                                        ${answerText}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                        </div>
+            <div class="col-md-6">
+                <div class="card bg-light border-0 p-3 h-100">
+                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-clock me-2"></i>Test Oturum Bilgileri</h6>
+                    <p class="mb-1"><strong>Durum:</strong> <span class="status-badge status-${test.status}">${getStatusText(test.status)}</span></p>
+                    <p class="mb-1"><strong>Test Türü:</strong> ${test.testType || 'MMPI'}</p>
+                    <p class="mb-1"><strong>Tamamlanma Tarihi:</strong> ${formatDate(test.completedAt)}</p>
+                    <p class="mb-0"><strong>Geçen Süre:</strong> ${test.duration || '-'}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm p-3 mb-3">
+            <h6 class="fw-bold mb-3"><i class="fas fa-chart-pie me-2"></i>Cevap Dağılımı ve Puan Bilgisi</h6>
+            <div class="row text-center">
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="p-2 border rounded bg-success bg-opacity-10">
+                        <span class="d-block text-success fw-bold fs-4">${trueCount}</span>
+                        <small class="text-muted">Doğru</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="p-2 border rounded bg-danger bg-opacity-10">
+                        <span class="d-block text-danger fw-bold fs-4">${falseCount}</span>
+                        <small class="text-muted">Yanlış</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="p-2 border rounded bg-warning bg-opacity-10">
+                        <span class="d-block text-warning fw-bold fs-4">${dontKnowCount}</span>
+                        <small class="text-muted">Bilmiyorum</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="p-2 border rounded bg-primary bg-opacity-10">
+                        <span class="d-block text-primary fw-bold fs-4">${test.score || 'N/A'}</span>
+                        <small class="text-muted">Puan</small>
                     </div>
                 </div>
             </div>
-        ` : ''}
+        </div>
     `;
+
+    // Test Cevaplarını Göster butonunu ayarla
+    const viewAnswersBtn = document.getElementById('testDetailViewAnswersBtn');
+    if (viewAnswersBtn) {
+        viewAnswersBtn.style.display = 'inline-block';
+        viewAnswersBtn.onclick = function() {
+            const detailModalEl = document.getElementById('testDetailModal');
+            const detailModalInstance = bootstrap.Modal.getInstance(detailModalEl);
+            if (detailModalInstance) {
+                detailModalInstance.hide();
+            }
+            openAnswersModal(test);
+        };
+    }
     
     // Rapor butonunu güncelle
     const reportBtn = document.getElementById('testDetailGenerateReportBtn');
@@ -718,7 +695,7 @@ async function viewTestDetail(testId) {
         }
     } else {
         reportBtn.innerHTML = '<i class="fas fa-file-alt me-2"></i>Rapor Oluştur';
-        reportBtn.onclick = () => generateReport();
+        reportBtn.onclick = () => generateReport(testId);
         if (reportDelBtn) reportDelBtn.style.display = 'none';
     }
     

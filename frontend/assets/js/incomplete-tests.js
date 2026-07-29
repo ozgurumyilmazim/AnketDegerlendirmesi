@@ -337,6 +337,7 @@ function viewTestDetail(testId) {
                             ${item.session_code ? `<button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="copySessionCode('${item.session_code}')"><i class="fas fa-copy me-1"></i>Kopyala</button>` : ''}
                         </div>
                     </div>
+                    <p class="mb-1"><strong>Durum:</strong> ${item.status === 'in_progress' ? '<span class="badge bg-warning text-dark">Devam Ediyor</span>' : (item.status === 'started' ? '<span class="badge bg-info text-dark">Başlatıldı</span>' : `<span class="badge bg-secondary">${item.status}</span>`)}</p>
                     <p class="mb-1"><strong>Kaldığı Soru İndeksi:</strong> ${item.current_index || 0} / 567</p>
                     <p class="mb-1"><strong>Son Güncelleme:</strong> ${item.updated ? new Date(item.updated).toLocaleString('tr-TR') : '-'}</p>
                     <p class="mb-0"><strong>Test Başlangıcı:</strong> ${item.start_time ? new Date(item.start_time).toLocaleString('tr-TR') : '-'}</p>
@@ -345,24 +346,30 @@ function viewTestDetail(testId) {
         </div>
 
         <div class="card border-0 shadow-sm p-3 mb-3">
-            <h6 class="fw-bold mb-3"><i class="fas fa-chart-pie me-2"></i>Cevap Dağılım Özeti</h6>
-            <div class="row text-center">
-                <div class="col-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-chart-pie me-2"></i>Cevap Dağılımı ve Puan Bilgisi</h6>
+            <div class="row text-center mb-3">
+                <div class="col-md-3 col-6 mb-2">
                     <div class="p-2 border rounded bg-success bg-opacity-10">
                         <span class="d-block text-success fw-bold fs-4">${trueCount}</span>
                         <small class="text-muted">Doğru</small>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-md-3 col-6 mb-2">
                     <div class="p-2 border rounded bg-danger bg-opacity-10">
                         <span class="d-block text-danger fw-bold fs-4">${falseCount}</span>
                         <small class="text-muted">Yanlış</small>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-md-3 col-6 mb-2">
                     <div class="p-2 border rounded bg-warning bg-opacity-10">
                         <span class="d-block text-warning fw-bold fs-4">${dontKnowCount}</span>
                         <small class="text-muted">Bilmiyorum</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="p-2 border rounded bg-secondary bg-opacity-10">
+                        <span class="d-block text-secondary fw-bold fs-4">N/A</span>
+                        <small class="text-muted">Puan</small>
                     </div>
                 </div>
             </div>

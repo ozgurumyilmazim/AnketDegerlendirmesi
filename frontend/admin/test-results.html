@@ -318,6 +318,9 @@
                     <!-- Test detayları buraya yüklenecek -->
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary me-auto" id="testDetailViewAnswersBtn" style="display:none">
+                        <i class="fas fa-list-check me-1"></i>Test Cevaplarını Göster
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Kapat
                     </button>
@@ -331,6 +334,68 @@
                         <i class="fas fa-trash me-2"></i>
                         Raporu Sil
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Answers View Modal -->
+    <div class="modal fade" id="answersViewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="answersModalTitle">
+                        <i class="fas fa-tasks me-2"></i>Test Cevapları Detayı
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <!-- Filter and stats bar -->
+                    <div class="card border-0 shadow-sm p-3 mb-3">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="answersSearchInput" placeholder="Soru no veya soru metninde ara...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="answersFilterSelect">
+                                    <option value="all">Tüm Sorular (567 Soru)</option>
+                                    <option value="Doğru">Sadece Doğru Cevaplar</option>
+                                    <option value="Yanlış">Sadece Yanlış Cevaplar</option>
+                                    <option value="Bilmiyorum">Sadece Bilmiyorum Cevapları</option>
+                                    <option value="unanswered">Cevaplanmamış Sorular</option>
+                                    <option value="answered">Cevaplanmış Sorular</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <span class="badge bg-secondary fs-6" id="visibleAnswersCount">567 Soru Gösteriliyor</span>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1"><i class="fas fa-check me-1"></i>Doğru: <strong id="ansStatTrue">0</strong></span>
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1"><i class="fas fa-times me-1"></i>Yanlış: <strong id="ansStatFalse">0</strong></span>
+                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1"><i class="fas fa-question me-1"></i>Bilmiyorum: <strong id="ansStatDontKnow">0</strong></span>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-2 py-1"><i class="fas fa-minus me-1"></i>Cevapsız: <strong id="ansStatUnanswered">0</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Answers Grid -->
+                    <div id="answersGridContainer">
+                        <div class="text-center py-5 text-muted" id="answersLoadingSpinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <p class="mt-2">Sorular ve cevaplar yükleniyor...</p>
+                        </div>
+                        <div class="row row-cols-1 row-cols-md-2 g-3" id="answersGridList" style="display: none;">
+                            <!-- Dynamic question-answer cards -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
                 </div>
             </div>
         </div>
