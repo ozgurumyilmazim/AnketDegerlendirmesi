@@ -347,6 +347,7 @@ async function getTestResults() {
                 score: score,
                 duration: duration,
                 testAnswers: test.test_answers,
+                sessionCode: test.session_code,
                 completedQuestions: test.completed_questions,
                 totalQuestions: test.total_questions,
                 questionsMap: questionsMap,
@@ -480,6 +481,7 @@ function applyFilters() {
     const dateTo = document.getElementById('filterDateTo').value;
     const institutionCode = (document.getElementById('filterInstitutionCode')?.value || '').trim().toLowerCase();
     const institutionName = (document.getElementById('filterInstitutionName')?.value || '').trim().toLowerCase();
+    const status = document.getElementById('filterStatus')?.value;
     
     filteredResults = allTestResults.filter(result => {
         // Ad soyad filtresi - gelişmiş arama
@@ -508,6 +510,12 @@ function applyFilters() {
             const name = (result.personalInfo?.institutionName || '').toLowerCase();
             if (!name.includes(institutionName)) return false;
         }
+        
+        // Test Durumu filtresi
+        if (status) {
+            if (result.status !== status) return false;
+        }
+        
         return true;
     });
     
@@ -524,6 +532,7 @@ function clearFilters() {
     document.getElementById('filterDateTo').value = '';
     if (document.getElementById('filterInstitutionCode')) document.getElementById('filterInstitutionCode').value = '';
     if (document.getElementById('filterInstitutionName')) document.getElementById('filterInstitutionName').value = '';
+    if (document.getElementById('filterStatus')) document.getElementById('filterStatus').value = '';
     
     updateTable(allTestResults);
     updateResultsCount(allTestResults.length);
@@ -610,6 +619,10 @@ async function viewTestDetail(testId) {
         else if (val === 'Yanlış') falseCount++;
         else if (val === 'Bilmiyorum') dontKnowCount++;
     });
+    
+    const totalQuestions = 567; // MMPI için standart
+    const answeredCount = trueCount + falseCount + dontKnowCount;
+    const unansweredCount = totalQuestions - answeredCount;
 
     const p = test.personalInfo || {};
     const modalContent = document.getElementById('testDetailContent');
@@ -629,6 +642,13 @@ async function viewTestDetail(testId) {
                 <div class="card bg-light border-0 p-3 h-100">
                     <h6 class="text-success fw-bold mb-3"><i class="fas fa-clock me-2"></i>Test Oturum Bilgileri</h6>
                     <p class="mb-1"><strong>Durum:</strong> <span class="status-badge status-${test.status}">${getStatusText(test.status)}</span></p>
+                    ${(test.status === 'in_progress' || test.status === 'started') ? `
+                        <p class="mb-1"><strong>Oturum Kodu:</strong> 
+                            <span id="sessionCodeSpan" style="filter: blur(4px); user-select: none;">${escapeHtml(test.sessionCode || '-')}</span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="document.getElementById('sessionCodeSpan').style.filter='none'; this.style.display='none';">Kodu Gör</button>
+                        </p>
+                        <p class="mb-1 text-danger"><strong>Cevaplanmayan Soru:</strong> ${unansweredCount}</p>
+                    ` : ''}
                     <p class="mb-1"><strong>Test Türü:</strong> ${test.testType || 'MMPI'}</p>
                     <p class="mb-1"><strong>Tamamlanma Tarihi:</strong> ${formatDate(test.completedAt)}</p>
                     <p class="mb-0"><strong>Geçen Süre:</strong> ${test.duration || '-'}</p>

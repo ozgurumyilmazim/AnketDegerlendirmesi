@@ -246,8 +246,14 @@
                         <input type="text" class="form-control" id="filterInstitutionName"
                             placeholder="Örn: Test Kurumu">
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <small class="text-muted">İçeren arama; büyük/küçük harf duyarsız</small>
+                    <div class="col-md-4">
+                        <label for="filterStatus" class="form-label">Test Durumu</label>
+                        <select class="form-select" id="filterStatus">
+                            <option value="">Tümü</option>
+                            <option value="completed">Tamamlandı</option>
+                            <option value="in_progress">Devam Ediyor</option>
+                            <option value="started">Başlandı</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row mt-3">
