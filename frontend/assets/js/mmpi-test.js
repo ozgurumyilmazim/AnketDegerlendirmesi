@@ -1110,6 +1110,10 @@ class MMPITest {
             // Arama için kullanılacak TC No (orijinal varsa onu kullan, yoksa yeni TC No)
             const searchTcNo = originalTcNo || participantData.tcNo;
             
+            // Cinsiyet değerini veritabanı formatına çevir (male/female → erkek/kadin)
+            const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };
+            const dbGender = genderMap[participantData.gender] || participantData.gender;
+
             // TC No ile kayıt bul ve güncelle
             const { data, error } = await PG_API
                 .from('participants')
@@ -1118,14 +1122,13 @@ class MMPITest {
                     first_name: participantData.firstName,
                     last_name: participantData.lastName,
                     tc_no: participantData.tcNo, // Yeni TC No'yu da güncelle
-                    gender: participantData.gender,
+                    gender: dbGender,
                     age: participantData.age,
                     institution_code: participantData.institutionCode || null,
                     institution_name: participantData.institutionName || null,
                     profession: participantData.profession || null,
                     education: participantData.education,
-                    marital_status: participantData.maritalStatus,
-                    updated: new Date().toISOString()
+                    marital_status: participantData.maritalStatus
                 });
             
             if (error) {

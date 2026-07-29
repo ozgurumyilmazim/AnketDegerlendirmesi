@@ -267,7 +267,14 @@ CREATE INDEX idx_sessions_user ON sessions(user_id);
 CREATE OR REPLACE FUNCTION update_updated_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = NOW();
+    BEGIN
+        NEW.updated = NOW();
+    EXCEPTION WHEN undefined_column THEN
+    END;
+    BEGIN
+        NEW.updated_at = NOW();
+    EXCEPTION WHEN undefined_column THEN
+    END;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
