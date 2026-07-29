@@ -1441,3 +1441,154 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+
+// --- TEST CEVAPLARI MODALI İŞLEMLERİ ---
+
+let cachedQuestions = null;
+
+async function fetchAllQuestions() {
+    if (cachedQuestions) return cachedQuestions;
+    try {
+        const { data, error } = await PG_API
+            .from('questions')
+            .select('id, question_number, question_text')
+            .order('question_number', { ascending: true });
+        
+        if (error) {
+            console.error('Sorular yüklenirken hata:', error);
+            return [];
+        }
+        cachedQuestions = data || [];
+        return cachedQuestions;
+    } catch (err) {
+        console.error('Questions fetch exception:', err);
+        return [];
+    }
+}
+
+async function openAnswersModal(test) {
+    const fullName = test.participantName || 'İsimsiz Katılımcı';
+    
+    document.getElementById('answersModalTitle').innerHTML = `
+        <i class="fas fa-tasks me-2"></i>Test Cevapları: <span class="text-warning">${escapeHtml(fullName)}</span>
+    `;
+
+    document.getElementById('answersLoadingSpinner').style.display = 'block';
+    document.getElementById('answersGridList').style.display = 'none';
+
+    const answersModal = new bootstrap.Modal(document.getElementById('answersViewModal'));
+    answersModal.show();
+
+    // Reset filters & search
+    document.getElementById('answersSearchInput').value = '';
+    document.getElementById('answersFilterSelect').value = 'all';
+
+    const questions = await fetchAllQuestions();
+    renderAnswersGrid(questions, test.testAnswers || {});
+    setupAnswersFilterEvents(questions, test.testAnswers || {});
+}
+
+function renderAnswersGrid(questions, userAnswers) {
+    const spinner = document.getElementById('answersLoadingSpinner');
+    const gridList = document.getElementById('answersGridList');
+    
+    spinner.style.display = 'none';
+    gridList.style.display = 'flex';
+
+    let trueCount = 0, falseCount = 0, dontKnowCount = 0, unansweredCount = 0;
+
+    // Filter values
+    const searchVal = (document.getElementById('answersSearchInput').value || '').toLowerCase().trim();
+    const filterVal = document.getElementById('answersFilterSelect').value;
+
+    gridList.innerHTML = '';
+    let visibleCount = 0;
+
+    questions.forEach(q => {
+        const qNum = q.question_number;
+        const qText = q.question_text || '';
+        const answer = userAnswers[qNum] || userAnswers[String(qNum)];
+
+        if (answer === 'Doğru') trueCount++;
+        else if (answer === 'Yanlış') falseCount++;
+        else if (answer === 'Bilmiyorum') dontKnowCount++;
+        else unansweredCount++;
+
+        // Apply filters
+        let matchesSearch = !searchVal || String(qNum).includes(searchVal) || qText.toLowerCase().includes(searchVal);
+        let matchesFilter = true;
+
+        if (filterVal === 'Doğru' || filterVal === 'Yanlış' || filterVal === 'Bilmiyorum') {
+            matchesFilter = (answer === filterVal);
+        } else if (filterVal === 'unanswered') {
+            matchesFilter = !answer;
+        } else if (filterVal === 'answered') {
+            matchesFilter = !!answer;
+        }
+
+        if (matchesSearch && matchesFilter) {
+            visibleCount++;
+            let badgeClass = 'bg-secondary bg-opacity-20 text-dark border-secondary';
+            let badgeIcon = 'fa-minus';
+            let answerText = 'Cevaplanmadı';
+
+            if (answer === 'Doğru') {
+                badgeClass = 'bg-success bg-opacity-10 text-success border-success';
+                badgeIcon = 'fa-check';
+                answerText = 'Doğru';
+            } else if (answer === 'Yanlış') {
+                badgeClass = 'bg-danger bg-opacity-10 text-danger border-danger';
+                badgeIcon = 'fa-times';
+                answerText = 'Yanlış';
+            } else if (answer === 'Bilmiyorum') {
+                badgeClass = 'bg-warning bg-opacity-20 text-dark border-warning';
+                badgeIcon = 'fa-question';
+                answerText = 'Bilmiyorum';
+            }
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col';
+            colDiv.innerHTML = `
+                <div class="card h-100 border-0 shadow-sm p-3 position-relative" style="border-left: 4px solid ${answer === 'Doğru' ? '#198754' : answer === 'Yanlış' ? '#dc3545' : answer === 'Bilmiyorum' ? '#ffc107' : '#6c757d'} !important;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-dark text-white fw-bold">Soru #${qNum}</span>
+                        <span class="badge border px-2 py-1 ${badgeClass} fw-bold">
+                            <i class="fas ${badgeIcon} me-1"></i>${answerText}
+                        </span>
+                    </div>
+                    <p class="card-text text-dark mb-0 fs-6 fw-normal">${escapeHtml(qText)}</p>
+                </div>
+            `;
+            gridList.appendChild(colDiv);
+        }
+    });
+
+    // Update statistics header
+    document.getElementById('ansStatTrue').textContent = trueCount;
+    document.getElementById('ansStatFalse').textContent = falseCount;
+    document.getElementById('ansStatDontKnow').textContent = dontKnowCount;
+    document.getElementById('ansStatUnanswered').textContent = unansweredCount;
+    document.getElementById('visibleAnswersCount').textContent = `${visibleCount} / ${questions.length} Soru Gösteriliyor`;
+
+    if (visibleCount === 0) {
+        gridList.innerHTML = `
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="fas fa-search fa-3x mb-3 text-secondary opacity-50"></i>
+                <p class="fs-5">Kriterlere uygun soru bulunamadı.</p>
+            </div>
+        `;
+    }
+}
+
+function setupAnswersFilterEvents(questions, userAnswers) {
+    const searchInput = document.getElementById('answersSearchInput');
+    const filterSelect = document.getElementById('answersFilterSelect');
+
+    const updateView = () => renderAnswersGrid(questions, userAnswers);
+
+    searchInput.removeEventListener('input', updateView);
+    filterSelect.removeEventListener('change', updateView);
+
+    searchInput.addEventListener('input', updateView);
+    filterSelect.addEventListener('change', updateView);
+}
