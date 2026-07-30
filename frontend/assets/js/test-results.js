@@ -760,6 +760,15 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         });
     });
     
+    // Cevapları normalize etmek için yardımcı fonksiyon (Türkçe karakter sorununu çözer)
+    const normalizeAnswer = (ans) => {
+        if (!ans) return '';
+        return ans.toString().toLowerCase()
+            .replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
+            .trim();
+    };
+
     // Ham puanları hesapla
     const rawScores = {};
     if (typeof debugLog === 'function') debugLog('Ham puan hesaplaması başlatıldı');
@@ -770,8 +779,11 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         
         scaleKeys[scaleName].forEach(item => {
             const userAnswer = answersMap[item.question];
-            // Hem orijinal halini hem de olası hataları görmek için kontrol
-            const isMatch = userAnswer === item.scoringAnswer;
+            const normUser = normalizeAnswer(userAnswer);
+            const normExpected = normalizeAnswer(item.scoringAnswer);
+            
+            // Normalize edilmiş hallerini karşılaştır
+            const isMatch = (normUser === normExpected) && normUser !== '';
             
             detailedCheck.push({
                 soru: item.question,
