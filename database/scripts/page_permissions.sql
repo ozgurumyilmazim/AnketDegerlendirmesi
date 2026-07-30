@@ -55,5 +55,6 @@ INSERT INTO public.page_permissions (page_name, page_title, admin, psychologist)
     ('settings-letters', 'Mektup Şablonları', true, true),
     ('settings-pages', 'Sayfa Yönetimi', true, true),
     ('settings-admins', 'Psikolog Tanımları', true, false),
-    ('settings-categories', 'Soru Kategorileri', true, false)
+    ('settings-categories', 'Soru Kategorileri', true, false),
+    ('settings-debug', 'Debug Ayarları', true, false)
 ON CONFLICT (page_name) DO NOTHING;

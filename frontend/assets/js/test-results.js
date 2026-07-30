@@ -762,15 +762,24 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
     
     // Ham puanları hesapla
     const rawScores = {};
+    if (typeof debugLog === 'function') debugLog('Ham puan hesaplaması başlatıldı');
     Object.keys(scaleKeys).forEach(scaleName => {
         let score = 0;
+        const correctAnswers = []; // Debug için
         scaleKeys[scaleName].forEach(item => {
             const userAnswer = answersMap[item.question];
             if (userAnswer === item.scoringAnswer) {
                 score++;
+                correctAnswers.push(item.question);
             }
         });
         rawScores[scaleName] = score;
+        if (typeof debugLog === 'function') {
+            debugLog(`Ölçek [${scaleName}] ham puanı: ${score}`, { 
+                beklenenCevapSayisi: scaleKeys[scaleName].length, 
+                eslesenSorular: correctAnswers 
+            });
+        }
     });
     
     // Cinsiyet normalizasyonu (TR/EN)
@@ -812,7 +821,13 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
             };
             Object.keys(kCorrections).forEach(scale => {
                 if (kCorrectedScores[scale] !== undefined) {
-                    kCorrectedScores[scale] += Math.round(kScore * kCorrections[scale]);
+                    const addition = Math.round(kScore * kCorrections[scale]);
+                    kCorrectedScores[scale] += addition;
+                    if (typeof debugLog === 'function') {
+                        debugLog(`K düzeltmesi (varsayılan) uygulandı: [${scale}]`, {
+                            katsayi: kCorrections[scale], eklenen: addition, yeniPuan: kCorrectedScores[scale]
+                        });
+                    }
                 }
             });
         } else {
@@ -821,7 +836,13 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
                 const scale = param.scale_name;
                 const kCoef = Number(param.k_correction || 0);
                 if (kCorrectedScores[scale] !== undefined && kCoef !== 0) {
-                    kCorrectedScores[scale] += Math.round(kScore * kCoef);
+                    const addition = Math.round(kScore * kCoef);
+                    kCorrectedScores[scale] += addition;
+                    if (typeof debugLog === 'function') {
+                        debugLog(`K düzeltmesi (DB) uygulandı: [${scale}]`, {
+                            katsayi: kCoef, eklenen: addition, yeniPuan: kCorrectedScores[scale]
+                        });
+                    }
                 }
             });
         }
@@ -837,7 +858,13 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         };
         Object.keys(kCorrections).forEach(scale => {
             if (kCorrectedScores[scale] !== undefined) {
-                kCorrectedScores[scale] += Math.round(kScore * kCorrections[scale]);
+                const addition = Math.round(kScore * kCorrections[scale]);
+                kCorrectedScores[scale] += addition;
+                if (typeof debugLog === 'function') {
+                    debugLog(`K düzeltmesi (hata/varsayılan) uygulandı: [${scale}]`, {
+                        katsayi: kCorrections[scale], eklenen: addition, yeniPuan: kCorrectedScores[scale]
+                    });
+                }
             }
         });
     }
@@ -874,18 +901,22 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
     }
 
     function applyParamsToTScores(paramsByScale) {
+        if (typeof debugLog === 'function') debugLog('T-skor hesaplaması (Parametrik) başlatıldı');
         Object.keys(kCorrectedScores).forEach(scale => {
             const raw = kCorrectedScores[scale];
             const p = paramsByScale && paramsByScale[scale];
             if (p && p.sd && Number(p.sd) !== 0) {
                 tScores[scale] = calcTScore(raw, Number(p.mean_m), Number(p.sd));
+                if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (DB): ${tScores[scale]}`, { raw, mean: p.mean_m, sd: p.sd });
             } else {
                 const fallback = FALLBACK_T_PARAMS[genderKey] && FALLBACK_T_PARAMS[genderKey][scale];
                 if (fallback) {
                     tScores[scale] = calcTScore(raw, fallback.mean, fallback.sd);
+                    if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (Varsayılan): ${tScores[scale]}`, { raw, mean: fallback.mean, sd: fallback.sd });
                 } else {
                     console.warn(`${scale} için T-skor parametresi bulunamadı, raw: ${raw}`);
                     tScores[scale] = 50;
+                    if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (BULUNAMADI): 50`, { raw });
                 }
             }
         });
@@ -920,6 +951,7 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
                     const raw = kCorrectedScores[scale];
                     if (normsMap[scale] && normsMap[scale][raw] !== undefined) {
                         tScores[scale] = normsMap[scale][raw];
+                        if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (Norm Tablosu, Tam Eşleşme): ${tScores[scale]}`, { raw });
                     } else if (normsMap[scale]) {
                         const keys = Object.keys(normsMap[scale]);
                         let closest = keys[0];
@@ -929,9 +961,11 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
                             if (d < minDiff) { minDiff = d; closest = r; }
                         });
                         tScores[scale] = normsMap[scale][closest];
+                        if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (Norm Tablosu, Yakın Eşleşme): ${tScores[scale]}`, { raw, bulunanEnYakin: closest });
                     } else {
                         const fb = FALLBACK_T_PARAMS[genderKey] && FALLBACK_T_PARAMS[genderKey][scale];
                         tScores[scale] = fb ? calcTScore(raw, fb.mean, fb.sd) : 50;
+                        if (typeof debugLog === 'function') debugLog(`T-skor [${scale}] (Norm Tablosunda Yok, Fallback): ${tScores[scale]}`, { raw });
                     }
                 });
             } else {
