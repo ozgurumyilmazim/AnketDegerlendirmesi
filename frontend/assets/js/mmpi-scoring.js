@@ -10,7 +10,7 @@ const MMPI_SCALES = {
         items: []
     },
     TRIN: { // True Response Inconsistency
-        name: "Doğru Yanıt Tutarsızlığı", 
+        name: "Doğru Yanıt Tutarsızlığı",
         description: "Evet/hayır yanıt eğilimini ölçer",
         items: []
     },
@@ -32,14 +32,14 @@ const MMPI_SCALES = {
     L: { // Lie
         name: "Yalan",
         description: "Sosyal istenirlik eğilimini ölçer",
-        items: [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 195]
+        items: [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 195, 225, 255, 285]
     },
     K: { // Correction
         name: "Düzeltme",
         description: "Savunma mekanizmalarını ölçer",
         items: [30, 39, 71, 89, 124, 129, 134, 138, 142, 148, 160, 167, 181, 183]
     },
-    
+
     // Temel Klinik Ölçekler
     Hs: { // Hypochondriasis
         name: "Hipokondriazis",
@@ -134,14 +134,14 @@ class MMPIScoring {
         this.scales = MMPI_SCALES;
         this.tScoreTables = T_SCORE_TABLES;
     }
-    
+
     // Ana puanlama fonksiyonu
     calculateScores(answers, personalInfo) {
         const rawScores = this.calculateRawScores(answers);
         const kCorrectedScores = this.applyKCorrection(rawScores);
         const tScores = this.convertToTScores(kCorrectedScores, personalInfo.gender);
         const interpretation = this.interpretScores(tScores);
-        
+
         return {
             rawScores,
             kCorrectedScores,
@@ -151,15 +151,15 @@ class MMPIScoring {
             profile: this.generateProfile(tScores)
         };
     }
-    
+
     // Ham puanları hesapla
     calculateRawScores(answers) {
         const rawScores = {};
-        
+
         Object.keys(this.scales).forEach(scaleName => {
             const scale = this.scales[scaleName];
             let score = 0;
-            
+
             scale.items.forEach(itemNumber => {
                 const answer = answers[itemNumber - 1]; // 0-indexed
                 if (answer !== undefined && answer !== null) {
@@ -169,38 +169,38 @@ class MMPIScoring {
                     }
                 }
             });
-            
+
             rawScores[scaleName] = score;
         });
-        
+
         return rawScores;
     }
-    
+
     // K düzeltmesi uygula
     applyKCorrection(rawScores) {
         const correctedScores = { ...rawScores };
         const kScore = rawScores.K || 0;
-        
+
         Object.keys(this.scales).forEach(scaleName => {
             const scale = this.scales[scaleName];
             if (scale.kCorrection) {
                 correctedScores[scaleName] = rawScores[scaleName] + (kScore * scale.kCorrection);
             }
         });
-        
+
         return correctedScores;
     }
-    
+
     // T-skorlarına dönüştür
     convertToTScores(correctedScores, gender) {
         const tScores = {};
         const genderNorms = this.tScoreTables[gender] || this.tScoreTables.male;
-        
+
         Object.keys(correctedScores).forEach(scaleName => {
             if (genderNorms[scaleName]) {
                 const norm = genderNorms[scaleName];
                 const rawScore = correctedScores[scaleName];
-                
+
                 // T-skoru hesaplama: T = 50 + 10 * (X - M) / SD
                 const tScore = 50 + 10 * (rawScore - norm.mean) / norm.sd;
                 tScores[scaleName] = Math.round(tScore);
@@ -208,10 +208,10 @@ class MMPIScoring {
                 tScores[scaleName] = correctedScores[scaleName];
             }
         });
-        
+
         return tScores;
     }
-    
+
     // Soru anahtarlama kontrolü
     isKeyed(scaleName, itemNumber, answer) {
         // Çoğu soru için 'true' yanıtı puanlanır
@@ -220,14 +220,14 @@ class MMPIScoring {
             L: [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 195],
             K: [30, 39, 71, 89, 124, 129, 134, 138, 142, 148, 160, 167, 181, 183]
         };
-        
+
         if (reverseKeyedItems[scaleName] && reverseKeyedItems[scaleName].includes(itemNumber)) {
             return answer === false;
         }
-        
+
         return answer === true;
     }
-    
+
     // Geçerlilik değerlendirmesi
     assessValidity(rawScores, answers) {
         const validity = {
@@ -235,25 +235,25 @@ class MMPIScoring {
             warnings: [],
             recommendations: []
         };
-        
+
         // F ölçeği kontrolü
         if (rawScores.F > 20) {
             validity.isValid = false;
             validity.warnings.push("Yüksek F skoru - Test geçersiz olabilir");
             validity.recommendations.push("Testi tekrar uygulayın");
         }
-        
+
         // L ölçeği kontrolü
         if (rawScores.L > 10) {
             validity.warnings.push("Yüksek L skoru - Sosyal istenirlik eğilimi");
             validity.recommendations.push("Sonuçları dikkatli yorumlayın");
         }
-        
+
         // K ölçeği kontrolü
         if (rawScores.K > 15) {
             validity.warnings.push("Yüksek K skoru - Savunma mekanizmaları aktif");
         }
-        
+
         // Yanıtsız soru kontrolü
         const unansweredCount = answers.filter(answer => answer === null || answer === undefined).length;
         if (unansweredCount > 30) {
@@ -261,22 +261,22 @@ class MMPIScoring {
             validity.warnings.push(`Çok fazla yanıtsız soru: ${unansweredCount}`);
             validity.recommendations.push("Eksik soruları tamamlayın");
         }
-        
+
         return validity;
     }
-    
+
     // Skorları yorumla
     interpretScores(tScores) {
         const interpretation = {};
-        
+
         Object.keys(tScores).forEach(scaleName => {
             const tScore = tScores[scaleName];
             const scale = this.scales[scaleName];
-            
+
             if (!scale) return;
-            
+
             let level, description;
-            
+
             if (tScore < 30) {
                 level = "Çok Düşük";
                 description = "Klinik olarak anlamlı düşük düzey";
@@ -296,7 +296,7 @@ class MMPIScoring {
                 level = "Kritik";
                 description = "Kritik düzeyde yüksek";
             }
-            
+
             interpretation[scaleName] = {
                 name: scale.name,
                 description: scale.description,
@@ -306,10 +306,10 @@ class MMPIScoring {
                 clinicalSignificance: tScore >= 65
             };
         });
-        
+
         return interpretation;
     }
-    
+
     // Profil oluştur
     generateProfile(tScores) {
         const profile = {
@@ -318,10 +318,10 @@ class MMPIScoring {
             normalScales: [],
             lowScales: []
         };
-        
+
         Object.keys(tScores).forEach(scaleName => {
             const tScore = tScores[scaleName];
-            
+
             if (tScore >= 65) {
                 profile.elevatedScales.push({ scale: scaleName, score: tScore });
             } else if (tScore <= 35) {
@@ -330,27 +330,27 @@ class MMPIScoring {
                 profile.normalScales.push({ scale: scaleName, score: tScore });
             }
         });
-        
+
         // Sırala
         profile.elevatedScales.sort((a, b) => b.score - a.score);
         profile.lowScales.sort((a, b) => a.score - b.score);
-        
+
         return profile;
     }
-    
+
     // Kod tipi belirle
     determineCodeType(tScores) {
         const clinicalScales = ['Hs', 'D', 'Hy', 'Pd', 'Mf', 'Pa', 'Pt', 'Sc', 'Ma', 'Si'];
         const elevatedScales = [];
-        
+
         clinicalScales.forEach(scale => {
             if (tScores[scale] >= 65) {
                 elevatedScales.push({ scale, score: tScores[scale] });
             }
         });
-        
+
         elevatedScales.sort((a, b) => b.score - a.score);
-        
+
         if (elevatedScales.length === 0) {
             return "Normal Profil";
         } else if (elevatedScales.length === 1) {
@@ -360,7 +360,7 @@ class MMPIScoring {
             return `${topTwo} Kod Tipi`;
         }
     }
-    
+
     // Rapor oluştur
     generateReport(scores, personalInfo) {
         const report = {
@@ -372,10 +372,10 @@ class MMPIScoring {
             recommendations: this.generateRecommendations(scores),
             profile: scores.profile
         };
-        
+
         return report;
     }
-    
+
     // Özet oluştur
     generateSummary(scores) {
         const summary = {
@@ -384,13 +384,13 @@ class MMPIScoring {
             riskFactors: [],
             strengths: []
         };
-        
+
         // Yüksek skorları analiz et
         scores.profile.elevatedScales.forEach(item => {
             const scale = this.scales[item.scale];
             if (scale) {
                 summary.keyFindings.push(`${scale.name} yüksek (T=${item.score})`);
-                
+
                 // Risk faktörleri
                 if (item.scale === 'D' && item.score >= 70) {
                     summary.riskFactors.push("Depresif belirtiler");
@@ -403,7 +403,7 @@ class MMPIScoring {
                 }
             }
         });
-        
+
         // Düşük skorları analiz et (güçlü yönler)
         scores.profile.lowScales.forEach(item => {
             const scale = this.scales[item.scale];
@@ -416,7 +416,7 @@ class MMPIScoring {
                 }
             }
         });
-        
+
         // Genel değerlendirme
         if (scores.profile.elevatedScales.length === 0) {
             summary.overallAssessment = "Normal psikolojik profil";
@@ -425,20 +425,20 @@ class MMPIScoring {
         } else {
             summary.overallAssessment = "Çoklu psikolojik belirtiler";
         }
-        
+
         return summary;
     }
-    
+
     // Öneriler oluştur
     generateRecommendations(scores) {
         const recommendations = [];
-        
+
         // Geçerlilik kontrolü
         if (!scores.validity.isValid) {
             recommendations.push("Test geçersiz - Yeniden uygulama önerilir");
             return recommendations;
         }
-        
+
         // Klinik öneriler
         scores.profile.elevatedScales.forEach(item => {
             if (item.score >= 80) {
@@ -447,16 +447,16 @@ class MMPIScoring {
                 recommendations.push(`${this.scales[item.scale]?.name} için klinik takip`);
             }
         });
-        
+
         // Genel öneriler
         if (scores.profile.elevatedScales.length > 3) {
             recommendations.push("Kapsamlı psikolojik değerlendirme önerilir");
         }
-        
+
         if (recommendations.length === 0) {
             recommendations.push("Rutin takip yeterli");
         }
-        
+
         return recommendations;
     }
 }

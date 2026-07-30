@@ -194,9 +194,11 @@ window.PG_API = {
             const params = new URLSearchParams();
             _filters.forEach(f => {
                 if (f.type === 'in') {
-                    params.set(f.field, 'in.(' + f.value.join(',') + ')');
+                    params.append(f.field, 'in.(' + f.value.join(',') + ')');
+                } else if (f.type) {
+                    params.append(f.field, f.type + '.' + f.value);
                 } else {
-                    params.set(f.field, 'eq.' + f.value);
+                    params.append(f.field, 'eq.' + f.value);
                 }
             });
             if (_orderBy) params.set('order', _orderBy + '.' + (_orderDir === 'asc' ? 'asc' : 'desc'));
@@ -212,6 +214,38 @@ window.PG_API = {
             },
             eq(field, value) {
                 _filters.push({ field, value, type: 'eq' });
+                return this;
+            },
+            neq(field, value) {
+                _filters.push({ field, value, type: 'neq' });
+                return this;
+            },
+            gt(field, value) {
+                _filters.push({ field, value, type: 'gt' });
+                return this;
+            },
+            gte(field, value) {
+                _filters.push({ field, value, type: 'gte' });
+                return this;
+            },
+            lt(field, value) {
+                _filters.push({ field, value, type: 'lt' });
+                return this;
+            },
+            lte(field, value) {
+                _filters.push({ field, value, type: 'lte' });
+                return this;
+            },
+            like(field, pattern) {
+                _filters.push({ field, value: pattern, type: 'like' });
+                return this;
+            },
+            ilike(field, pattern) {
+                _filters.push({ field, value: pattern, type: 'ilike' });
+                return this;
+            },
+            is(field, value) {
+                _filters.push({ field, value, type: 'is' });
                 return this;
             },
             in(field, values) {
