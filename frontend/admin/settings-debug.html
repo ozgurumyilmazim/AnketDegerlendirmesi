@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Ayarları - MMPI Test Sistemi</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav { margin-bottom: 1.5rem; }
+        .breadcrumb-nav a {
+            color: #7c3aed;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .breadcrumb-nav a:hover { text-decoration: underline; }
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+        .page-subtitle { color: #6b7280; margin: 0; }
+        .header-section { margin-bottom: 2rem; }
+
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+        }
+        .panel-header h5 { margin: 0; font-weight: 600; font-size: 1.05rem; }
+        .panel-header p { margin: 0.25rem 0 0; font-size: 0.85rem; opacity: 0.85; }
+
+        .panel-body { padding: 1.75rem 1.5rem; }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            background: #fafafa;
+            transition: border-color 0.25s, background 0.25s;
+            margin-bottom: 1.25rem;
+        }
+        .toggle-row.active {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+        }
+
+        .toggle-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .toggle-info { flex: 1; }
+        .toggle-info strong { display: block; color: #1a1d2e; font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .toggle-info p { color: #6b7280; font-size: 0.83rem; margin: 0; line-height: 1.5; }
+
+        /* Bootstrap form-switch overrides */
+        .form-check-input:checked {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+        }
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(124,58,237,0.25);
+            border-color: #7c3aed;
+        }
+        .form-switch .form-check-input { width: 2.75em; height: 1.5em; cursor: pointer; }
+
+        /* Status banner */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+        .status-banner.off { background: #f3f4f6; color: #6b7280; }
+        .status-banner.on  { background: #ede9fe; color: #5b21b6; }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-banner.off .status-dot { background: #9ca3af; }
+        .status-banner.on  .status-dot {
+            background: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.25);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 3px rgba(124,58,237,0.25); }
+            50%      { box-shadow: 0 0 0 6px rgba(124,58,237,0.10); }
+        }
+
+        /* Log table */
+        .log-list { list-style: none; padding: 0; margin: 0; }
+        .log-list li {
+            padding: 0.55rem 0.75rem;
+            border-left: 3px solid #7c3aed;
+            background: #f9fafb;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 0.45rem;
+            font-size: 0.82rem;
+            color: #374151;
+            font-family: 'Consolas', monospace;
+        }
+        .log-list li .step-num { color: #7c3aed; font-weight: 700; margin-right: 0.4rem; }
+
+        .info-alert {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            font-size: 0.87rem;
+            color: #1e40af;
+        }
+        .info-alert i { margin-right: 0.4rem; }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Sistem Ayarları</a>
+            <span>›</span>
+            <span class="current">Debug Ayarları</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="header-section">
+            <h1 class="page-title">
+                <i class="fas fa-bug me-2" style="color:#7c3aed;"></i>Debug Ayarları
+            </h1>
+            <p class="page-subtitle">Hata ayıklama modunu etkinleştirerek tarayıcı konsolunda ayrıntılı işlem loglarını izleyin.</p>
+        </div>
+
+        <!-- Debug Toggle Card -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="fas fa-toggle-on me-2"></i>Debug Modu</h5>
+                <p>Rapor oluşturma sürecinin her adımını konsola yazdırır.</p>
+            </div>
+            <div class="panel-body">
+
+                <div class="toggle-row" id="debugToggleRow">
+                    <div class="toggle-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="toggle-info">
+                        <strong>Rapor Oluşturma Debug Logları</strong>
+                        <p>
+                            Aktif olduğunda <code>generateReport()</code> fonksiyonunun her adımı
+                            (DB sorguları, cevap dönüşümü, skor hesaplama, INSERT) zaman damgasıyla
+                            tarayıcı konsoluna yazdırılır. Logları görmek için F12 → Console sekmesini açın.
+                        </p>
+                    </div>
+                    <div class="form-check form-switch align-self-center ms-2">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               id="debugModeToggle" onchange="onDebugToggle(this)">
+                    </div>
+                </div>
+
+                <!-- Durum banneri -->
+                <div class="status-banner off" id="statusBanner">
+                    <div class="status-dot"></div>
+                    <span id="statusText">Debug modu kapalı</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Adımlar Referans Kartı -->
+        <div class="panel-card">
+            <div class="panel-header" style="background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);">
+                <h5><i class="fas fa-list-ol me-2"></i>Loglanacak Adımlar — <code>generateReport()</code></h5>
+                <p>Debug modu açıkken aşağıdaki adımlar konsola yazılır.</p>
+            </div>
+            <div class="panel-body">
+                <ul class="log-list">
+                    <li><span class="step-num">BAŞLANGIÇ</span> Fonksiyon çağrısı — testId ve lastViewedTestId değerleri</li>
+                    <li><span class="step-num">1</span> allTestResults dizisinde test arama sonucu</li>
+                    <li><span class="step-num">2</span> Test durumu kontrolü (status === 'completed' doğrulaması)</li>
+                    <li><span class="step-num">3</span> reports tablosu — mevcut rapor sorgusu (maybeSingle)</li>
+                    <li><span class="step-num">4</span> test_results tablosu — test_answers ve participant_id sorgusu</li>
+                    <li><span class="step-num">5</span> test_answers JSONB → dizi dönüşümü (cevap sayısı + ilk 5 cevap)</li>
+                    <li><span class="step-num">6</span> participants tablosu — cinsiyet sorgusu</li>
+                    <li><span class="step-num">7</span> scoring_keys tablosu — puanlama anahtarları sorgusu</li>
+                    <li><span class="step-num">8</span> calculateMMPIScores() — T-skorları ve raw skorlar</li>
+                    <li><span class="step-num">9</span> generateSummaryData() + generateResultData() çıktıları</li>
+                    <li><span class="step-num">10</span> reports tablosuna INSERT sonucu (rapor ID veya hata)</li>
+                    <li><span class="step-num">CATCH</span> Beklenmeyen hata detayı (message + stack trace)</li>
+                </ul>
+
+                <div class="info-alert mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>İpucu:</strong> Loglar tarayıcı konsolunda <span style="color:#7c3aed;font-weight:600;">[DEBUG HH:MM:SS.mmm]</span>
+                    formatında gösterilir. Detaylı veriyi görmek için log satırının yanındaki ▶ okuna tıklayın.
+                    Bu ayar <strong>yalnızca bu tarayıcı oturumu</strong> için geçerlidir
+                    (localStorage'da saklanır, sunucuya gönderilmez).
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /main-content -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+    <script src="../assets/js/page-permissions.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(err => console.error('Sidebar yüklenemedi:', err));
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const hasPermission = await checkPagePermission('settings-debug');
+            if (!hasPermission) return;
+
+            // Mevcut durumu oku
+            const isDebug = localStorage.getItem('debugMode') === 'true';
+            applyDebugState(isDebug, false);
+        });
+
+        function onDebugToggle(checkbox) {
+            const enabled = checkbox.checked;
+            localStorage.setItem('debugMode', enabled ? 'true' : 'false');
+            applyDebugState(enabled, true);
+        }
+
+        function applyDebugState(enabled, showToast) {
+            const toggle     = document.getElementById('debugModeToggle');
+            const row        = document.getElementById('debugToggleRow');
+            const banner     = document.getElementById('statusBanner');
+            const statusText = document.getElementById('statusText');
+
+            toggle.checked = enabled;
+            row.classList.toggle('active', enabled);
+
+            if (enabled) {
+                banner.className = 'status-banner on';
+                statusText.textContent = 'Debug modu aktif — konsol logları yazılıyor';
+            } else {
+                banner.className = 'status-banner off';
+                statusText.textContent = 'Debug modu kapalı';
+            }
+
+            if (showToast) {
+                const msg = enabled
+                    ? 'Debug modu açıldı. F12 → Console ile logları izleyin.'
+                    : 'Debug modu kapatıldı.';
+                showToastNotification(msg, enabled ? 'success' : 'info');
+            }
+        }
+
+        function showToastNotification(message, type) {
+            // Basit toast (Bootstrap alert olarak)
+            const existing = document.getElementById('debugToast');
+            if (existing) existing.remove();
+
+            const colorMap = { success: '#6d28d9', info: '#0369a1', error: '#dc2626' };
+            const iconMap  = { success: 'check-circle', info: 'info-circle', error: 'times-circle' };
+
+            const toast = document.createElement('div');
+            toast.id = 'debugToast';
+            toast.style.cssText = `
+                position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+                background: white; border-left: 4px solid ${colorMap[type] || '#6b7280'};
+                border-radius: 10px; padding: 0.9rem 1.25rem;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+                display: flex; align-items: center; gap: 0.75rem;
+                font-size: 0.88rem; color: #1a1d2e; max-width: 360px;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.innerHTML = `
+                <i class="fas fa-${iconMap[type] || 'info-circle'}" style="color:${colorMap[type]};font-size:1.1rem;"></i>
+                <span>${message}</span>
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to   { transform: translateY(0);    opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+        }
+    </script>
+</body>
+</html>

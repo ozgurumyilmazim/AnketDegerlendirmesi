@@ -8,6 +8,22 @@ let allTestResults = [];
 let filteredResults = [];
 let lastViewedTestId = null; // Detay modalında görüntülenen son test ID'si
 
+// ─── Debug Yardımcısı ────────────────────────────────────────────────────────
+// Admin ayarlar sayfasından (settings-debug.html) localStorage üzerinden
+// kontrol edilir. Anahtar: 'debugMode'  Değer: 'true' | 'false'
+function debugLog(label, data) {
+    if (localStorage.getItem('debugMode') !== 'true') return;
+    const ts = new Date().toISOString().substring(11, 23); // HH:MM:SS.mmm
+    if (data !== undefined) {
+        console.groupCollapsed(`%c[DEBUG ${ts}] ${label}`, 'color:#7c3aed;font-weight:bold;');
+        console.log(data);
+        console.groupEnd();
+    } else {
+        console.log(`%c[DEBUG ${ts}] ${label}`, 'color:#7c3aed;font-weight:bold;');
+    }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', async function() {
     // Kullanıcı kimlik doğrulaması
@@ -1170,54 +1186,83 @@ async function getInterpretationFromDatabase(scale, tScore, gender = null) {
 async function generateReport(testId) {
     // Parametre yoksa, detay modalında en son görüntülenen testi kullan
     if (!testId) testId = lastViewedTestId;
+
+    debugLog('generateReport() BAŞLADI', { testId, lastViewedTestId });
+
     const test = allTestResults.find(t => t.id == testId);
-    
+    debugLog('1. allTestResults içinde test arandı', { bulunanTest: test || 'BULUNAMADI', toplamKayıt: allTestResults.length });
+
     if (!test) {
+        debugLog('HATA: Test allTestResults dizisinde yok');
         showNotification('Test bulunamadı.', 'error');
         return;
     }
-    
+
+    debugLog('2. Test durumu kontrolü', { status: test.status, beklenen: 'completed' });
     if (test.status !== 'completed') {
+        debugLog('UYARI: Test tamamlanmamış, rapor oluşturulamaz');
         showNotification('Sadece tamamlanmış testler için rapor oluşturulabilir.', 'warning');
         return;
     }
-    
+
     try {
         // Önce bu test için rapor var mı kontrol et
+        debugLog('3. Mevcut rapor sorgusu başlıyor', { test_result_id: testId });
         const { data: existingReport, error: checkError } = await PG_API
             .from('reports')
             .select('id')
             .eq('test_result_id', testId)
             .maybeSingle();
-        
+
+        debugLog('3. Mevcut rapor sorgusu tamamlandı', { existingReport, checkError });
+
+        if (checkError) {
+            debugLog('HATA: Mevcut rapor kontrolünde PostgREST hatası', checkError);
+        }
+
         if (existingReport) {
+            debugLog('Mevcut rapor bulundu, yönlendiriliyor', { raporId: existingReport.id });
             showNotification('Bu test için rapor zaten mevcut. Rapor görüntüleniyor...', 'info');
             window.open(`../report.html?id=${existingReport.id}`, '_blank');
             return;
         }
-        
+
         showNotification('Rapor oluşturuluyor...', 'info');
-    
+
         // Test cevaplarını al (test_results tablosundan)
+        debugLog('4. test_results sorgusu başlıyor', { testId });
         const { data: testResult, error: answersError } = await PG_API
             .from('test_results')
             .select('test_answers, participant_id')
             .eq('id', testId)
             .single();
-        
+
+        debugLog('4. test_results sorgusu tamamlandı', {
+            answersError,
+            participant_id: testResult?.participant_id,
+            test_answers_tip: typeof testResult?.test_answers,
+            cevapSayisi: testResult?.test_answers ? Object.keys(testResult.test_answers).length : 0
+        });
+
         if (answersError || !testResult) {
+            debugLog('HATA: test_results sorgusu başarısız', { answersError, testResult });
             console.error('Test sonucu alınırken hata:', answersError);
             showNotification('Test sonucu alınırken hata oluştu.', 'error');
             return;
         }
-        
+
         // JSONB formatındaki test_answers'ı dönüştür
         const testAnswers = Object.entries(testResult.test_answers || {}).map(([questionNumber, answer]) => ({
             question_number: questionNumber,
             answer: answer
         }));
-        
+        debugLog('5. test_answers dönüştürüldü', {
+            toplamCevap: testAnswers.length,
+            ilk5Cevap: testAnswers.slice(0, 5)
+        });
+
         // Cinsiyet bilgisini participants tablosundan al
+        debugLog('6. participants sorgusu başlıyor', { participant_id: testResult.participant_id });
         let gender = null;
         try {
             const { data: p } = await PG_API
@@ -1226,37 +1271,58 @@ async function generateReport(testId) {
                 .eq('id', testResult.participant_id)
                 .single();
             gender = p?.gender || null;
-        } catch (_) {}
-        
+            debugLog('6. participants sorgusu tamamlandı', { gender, ham: p });
+        } catch (genderErr) {
+            debugLog('UYARI: participants sorgusu başarısız (gender null kullanılacak)', genderErr);
+        }
+
         // Scoring keys'leri al
+        debugLog('7. scoring_keys sorgusu başlıyor');
         const { data: scoringKeys, error: keysError } = await PG_API
             .from('scoring_keys')
             .select('scale_name, question_number, scoring_answer');
-        
+
+        debugLog('7. scoring_keys sorgusu tamamlandı', {
+            keysError,
+            anahtarSayisi: scoringKeys?.length ?? 0
+        });
+
         if (keysError) {
+            debugLog('HATA: scoring_keys sorgusu başarısız', keysError);
             console.error('Puanlama anahtarları alınırken hata:', keysError);
             showNotification('Puanlama anahtarları alınırken hata oluştu.', 'error');
             return;
         }
 
         if (!scoringKeys || scoringKeys.length === 0) {
+            debugLog('HATA: scoring_keys tablosu boş veya erişilemiyor');
             console.error('Puanlama anahtarları tablosu boş.');
             showNotification('Veritabanında puanlama anahtarları bulunamadı. Lütfen sistem yöneticinize başvurun.', 'error');
             return;
         }
-        
+
         // MMPI puanlarını hesapla
+        debugLog('8. calculateMMPIScores() çağrılıyor', { gender, testAnswersSayisi: testAnswers.length, scoringKeysSayisi: scoringKeys.length });
         const scores = await calculateMMPIScores(testAnswers, scoringKeys, gender);
-        
+        debugLog('8. calculateMMPIScores() tamamlandı', {
+            tScoreAnahtarlari: Object.keys(scores.tScores || {}),
+            rawScores: scores.rawScores,
+            validityAssessment: scores.validityAssessment
+        });
+
         if (Object.keys(scores.tScores).length === 0) {
+            debugLog('HATA: T-skor hesaplanamadı', { rawScores: scores.rawScores });
             console.error('T-skor hesaplanamadı. Raw skorlar:', scores.rawScores);
             showNotification('Skor hesaplamada bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'error');
             return;
         }
 
         // Özet ve rapor hesaplamalarını yap
+        debugLog('9. generateSummaryData() ve generateResultData() çağrılıyor', { gender });
         const summaryData = await generateSummaryData(scores.tScores, gender);
         const resultData = await generateResultData(scores.tScores, scores.interpretations, gender);
+        debugLog('9. Özet veriler hazırlandı', { summaryData, resultData });
+
         // Raporu veritabanına kaydet (mevcut reports tablosunu kullan)
         const reportContent = {
             raw_scores: scores.rawScores,
@@ -1269,7 +1335,8 @@ async function generateReport(testId) {
             result_data: resultData,
             generated_at: new Date().toISOString()
         };
-        
+        debugLog('10. reports tablosuna INSERT başlıyor', { test_result_id: testId, report_type: 'mmpi_standard' });
+
         const { data: reportData, error: reportError } = await PG_API
             .from('reports')
             .insert({
@@ -1280,19 +1347,24 @@ async function generateReport(testId) {
             })
             .select()
             .single();
-        
+
+        debugLog('10. reports INSERT tamamlandı', { reportData, reportError });
+
         if (reportError) {
+            debugLog('HATA: reports INSERT başarısız', reportError);
             console.error('Rapor kaydedilirken hata:', reportError);
             showNotification('Rapor kaydedilirken hata oluştu.', 'error');
             return;
         }
-        
+
+        debugLog('generateReport() BAŞARIYLA TAMAMLANDI', { raporId: reportData.id });
         showNotification('Rapor başarıyla oluşturuldu.', 'success');
-        
+
         // Rapor sayfasını aç
         window.open(`../report.html?id=${reportData.id}`, '_blank');
-        
+
     } catch (error) {
+        debugLog('HATA: generateReport() beklenmeyen hata (catch bloğu)', { message: error.message, stack: error.stack });
         console.error('Rapor oluşturulurken hata:', error);
         showNotification('Rapor oluşturulurken beklenmeyen bir hata oluştu.', 'error');
     }

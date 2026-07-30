@@ -92,6 +92,7 @@
         .card-pages::after { background: linear-gradient(90deg, #f093fb, #f5576c); }
         .card-categories::after { background: linear-gradient(90deg, #667eea, #764ba2); }
         .card-permissions::after { background: linear-gradient(90deg, #f093fb, #f5576c); }
+        .card-debug::after { background: linear-gradient(90deg, #7c3aed, #4f46e5); }
 
         .card-icon-wrap {
             padding: 2rem 2rem 1rem;
@@ -117,6 +118,7 @@
         .icon-pages   { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
         .icon-categories { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .icon-permissions { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .icon-debug   { background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); color: white; }
 
         .card-info {
             flex: 1;
@@ -189,6 +191,7 @@
         .link-pages   { color: #f5576c; }
         .link-categories { color: #667eea; }
         .link-permissions { color: #f5576c; }
+        .link-debug   { color: #7c3aed; }
 
         .card-footer-link i {
             transition: transform 0.25s ease;
@@ -365,6 +368,30 @@
                     </ul>
                 </div>
                 <div class="card-footer-link link-categories">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Debug Ayarları -->
+            <a href="settings-debug.html" class="settings-card card-debug">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-debug">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Debug Ayarları</h3>
+                        <p>Rapor oluşturma sürecinin konsol loglarını açın veya kapatın.</p>
+                    </div>
+                </div>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check" style="color:#7c3aed;"></i> Adım adım konsol logları</li>
+                        <li><i class="fas fa-check" style="color:#7c3aed;"></i> Tek tıkla aç/kapat</li>
+                        <li><i class="fas fa-check" style="color:#7c3aed;"></i> DB sorgusu ve skor detayları</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-debug">
                     <span>Ayarlara Git</span>
                     <i class="fas fa-arrow-right"></i>
                 </div>
