@@ -1,6 +1,6 @@
 -- ============================================================
 -- MMPI PostgreSQL Schema Migration
--- Phase 1: Full database schema for MMPI-2 Test System
+-- Phase 1: Full database schema for MMPI Test System
 -- ============================================================
 
 -- Run as superuser once: createdb mmpi_db

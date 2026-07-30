@@ -16,27 +16,27 @@ let reportsPerPage = 10;
 let filteredReports = [];
 
 // Sayfa yüklendiğinde
-$(document).ready(async function() {
+$(document).ready(async function () {
     // Kullanıcı kimlik doğrulaması
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) return;
-    
+
     // Sayfa yetki kontrolü
     const hasPermission = await checkPagePermission('reports');
     if (!hasPermission) return;
-    
+
     // Event listener'ları ayarla
     setupEventListeners();
-    
+
     // Varsayılan tarihleri ayarla
     setDefaultDates();
-    
+
     // Rapor verilerini yükle
     loadReportData();
-    
+
     // Grafikleri başlat
     initializeCharts();
-    
+
     // Bireysel raporları yükle
     loadIndividualReports();
 });
@@ -45,11 +45,11 @@ $(document).ready(async function() {
 async function checkAuthentication() {
     try {
         const { data: { session } } = await AuthService.getSession();
-        
+
         if (session && session.user) {
             const userRole = await AuthService.getUserRole();
             const isAdmin = await AuthService.isAdmin();
-            
+
             currentUser = {
                 userId: session.user.id,
                 email: session.user.email,
@@ -58,11 +58,11 @@ async function checkAuthentication() {
                 isAdmin: isAdmin,
                 loginTime: new Date().toISOString()
             };
-            
+
             updateUserInfo();
             return true;
         }
-        
+
         console.warn('Session is null/expired, clearing login data and redirecting to login.html');
         sessionStorage.removeItem('adminLogin');
         localStorage.removeItem('adminLogin');
@@ -71,7 +71,7 @@ async function checkAuthentication() {
         }
         window.location.href = 'login.html';
         return false;
-        
+
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
         sessionStorage.removeItem('adminLogin');
@@ -88,13 +88,13 @@ async function checkAuthentication() {
 function updateUserInfo() {
     if (currentUser) {
         $('#userName').text(currentUser.name);
-        
+
         const initials = currentUser.name
             .split(' ')
             .map(name => name.charAt(0))
             .join('')
             .toUpperCase();
-        
+
         $('#userInitials').text(initials);
     }
 }
@@ -102,43 +102,43 @@ function updateUserInfo() {
 // Event listener'ları ayarla
 function setupEventListeners() {
     // Arama ve yenileme butonları için event listener'lar
-    $('#searchButton').on('click', function() {
+    $('#searchButton').on('click', function () {
         performSearch();
     });
-    
-    $('#refreshButton').on('click', function() {
+
+    $('#refreshButton').on('click', function () {
         refreshReports();
     });
-    
+
     // Sidebar toggle fonksiyonları
-    window.toggleSidebar = function() {
+    window.toggleSidebar = function () {
         $('#sidebar').toggleClass('show');
     };
-    
-    window.collapseSidebar = function() {
+
+    window.collapseSidebar = function () {
         $('#sidebar').toggleClass('collapsed');
         $('#mainContent').toggleClass('expanded');
     };
-    
+
     // Logout fonksiyonu
-    window.logout = async function() {
+    window.logout = async function () {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             try {
                 // PG_API'den çıkış yap
                 if (typeof AuthService !== 'undefined' && AuthService.signOut) {
                     await AuthService.signOut();
                 }
-                
+
                 // Local storage'ı temizle
                 sessionStorage.removeItem('adminLogin');
                 localStorage.removeItem('adminLogin');
-                
+
                 // Login sayfasına yönlendir
                 window.location.href = 'login.html';
-                
+
             } catch (error) {
                 console.error('Çıkış hatası:', error);
-                
+
                 // Hata olsa bile local storage'ı temizle ve yönlendir
                 sessionStorage.removeItem('adminLogin');
                 localStorage.removeItem('adminLogin');
@@ -146,28 +146,28 @@ function setupEventListeners() {
             }
         }
     };
-    
+
     // Tarih aralığı değişikliği
-    $('#dateRange').on('change', function() {
+    $('#dateRange').on('change', function () {
         if ($(this).val() === 'custom') {
             $('#customDateRange').show();
         } else {
             $('#customDateRange').hide();
         }
     });
-    
+
     // Arama input'u için event listener
-    $('#searchReports').on('input', function() {
+    $('#searchReports').on('input', function () {
         filterReports();
     });
-    
+
     // Enter tuşu ile arama
-    $('#searchReports').on('keypress', function(e) {
+    $('#searchReports').on('keypress', function (e) {
         if (e.which === 13) {
             filterReports();
         }
     });
-    
+
     // Global fonksiyonları tanımla
     window.applyReportFilters = applyReportFilters;
     window.exportReport = exportReport;
@@ -177,13 +177,13 @@ function setupEventListeners() {
     window.deleteReport = deleteReport;
     window.generateCustomReport = generateCustomReport;
     window.createCustomReport = createCustomReport;
-    
+
     // Enter tuşu ile filtreleme (tarih alanları için)
     const filterInputs = ['startDate', 'endDate', 'customStartDate', 'customEndDate'];
     filterInputs.forEach(inputId => {
         const input = document.getElementById(inputId);
         if (input) {
-            input.addEventListener('keypress', function(e) {
+            input.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     applyReportFilters();
                 }
@@ -195,7 +195,7 @@ function setupEventListeners() {
 // Varsayılan tarihleri ayarla
 function setDefaultDates() {
     const today = new Date();
-    
+
     // Başlangıç tarihleri boş bırakılıyor
     $('#startDate').val('');
     $('#endDate').val(formatDateForInput(today));
@@ -208,13 +208,13 @@ async function loadReportData() {
     try {
         // Demo veriler (gerçek projede API'den gelecek)
         reportData = await getReportData();
-        
+
         // Metrikleri güncelle
         updateMetrics();
-        
+
         // Grafikleri güncelle
         updateCharts();
-        
+
     } catch (error) {
         console.error('Rapor verileri yüklenirken hata:', error);
         showNotification('Rapor verileri yüklenirken hata oluştu.', 'error');
@@ -262,7 +262,7 @@ async function getReportData() {
         // İstatistikleri hesapla
         const totalTests = testResults.length;
         const totalReports = reports.length;
-        
+
         // Test sürelerini hesapla
         const durations = testResults
             .filter(test => test.start_time && test.end_time)
@@ -272,7 +272,7 @@ async function getReportData() {
                 return Math.round((end - start) / (1000 * 60)); // dakika cinsinden
             });
 
-        const avgDuration = durations.length > 0 
+        const avgDuration = durations.length > 0
             ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
             : 0;
 
@@ -280,7 +280,7 @@ async function getReportData() {
         const slowestCompletion = durations.length > 0 ? Math.max(...durations) : 0;
 
         // Tamamlanma oranı
-        const completionRate = testResults.length > 0 
+        const completionRate = testResults.length > 0
             ? Math.round((testResults.filter(test => test.status === 'completed').length / testResults.length) * 100)
             : 0;
 
@@ -298,11 +298,11 @@ async function getReportData() {
                 return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
             }),
             mmpiA: last7Days.map(date => {
-                return testResults.filter(test => 
+                return testResults.filter(test =>
                     test.created && test.created.split('T')[0] === date
                 ).length;
             }),
-            mmpi2: [] // MMPI-2 için ayrı veriler eklenebilir
+            mmpi2: [] // MMPI için ayrı veriler eklenebilir
         };
 
         // Yaş grupları analizi
@@ -324,7 +324,7 @@ async function getReportData() {
                 else if (age >= 18 && age <= 25) ageGroups.data[1]++;
                 else if (age >= 26 && age <= 35) ageGroups.data[2]++;
                 else if (age > 35) ageGroups.data[3]++;
-            } catch (_) {}
+            } catch (_) { }
         }
 
         return {
@@ -399,7 +399,7 @@ function updateMetrics() {
     $('#avgScore').text(reportData.avgScore || 0);
     $('#completionRate').text((reportData.completionRate || 0) + '%');
     $('#avgDuration').text((reportData.avgDuration || 0) + 'dk');
-    
+
     // Detaylı metrikler
     $('#maxScore').text(reportData.maxScore || 0);
     $('#minScore').text(reportData.minScore || 0);
@@ -460,7 +460,7 @@ function initializeCharts() {
             }
         });
     }
-    
+
     // Age Groups Chart
     const ageGroupsElement = document.getElementById('ageGroupsChart');
     if (ageGroupsElement) {
@@ -498,14 +498,14 @@ function initializeCharts() {
 // Grafikleri güncelle
 function updateCharts() {
     if (!reportData || !charts) return;
-    
+
     // Test Trends Chart
     if (charts.testTrends) {
         charts.testTrends.data.labels = reportData.testTrends.labels;
         charts.testTrends.data.datasets[0].data = reportData.testTrends.mmpiA;
         charts.testTrends.update();
     }
-    
+
     // Age Groups Chart
     if (charts.ageGroups) {
         charts.ageGroups.data.labels = reportData.ageGroups.labels;
@@ -519,23 +519,23 @@ function applyReportFilters() {
     const dateRange = $('#dateRange').val();
     const testType = $('#testTypeFilter').val();
     const ageGroup = $('#ageGroupFilter').val();
-    
+
     currentFilters = {
         dateRange: dateRange,
         testType: testType,
         ageGroup: ageGroup
     };
-    
+
     // Filtreleri uygula ve verileri yeniden yükle
     loadReportData();
-    
+
     showNotification('Filtreler uygulandı.', 'success');
 }
 
 // Rapor dışa aktar
 function exportReport(format) {
     showNotification(`${format.toUpperCase()} raporu hazırlanıyor...`, 'info');
-    
+
     // Simüle edilmiş dışa aktarma
     setTimeout(() => {
         if (format === 'pdf') {
@@ -550,15 +550,15 @@ function exportReport(format) {
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
-            
+
             link.setAttribute('href', url);
             link.setAttribute('download', `mmpi_rapor_${formatDateForFilename(new Date())}.csv`);
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             showNotification('Excel raporu oluşturuldu.', 'success');
         }
     }, 2000);
@@ -568,7 +568,7 @@ function exportReport(format) {
 function generateCSVReport() {
     const headers = ['Metrik', 'Değer'];
     const csvContent = [headers.join(',')];
-    
+
     csvContent.push(`"Toplam Test",${reportData.totalTests}`);
     csvContent.push(`"Ortalama Puan",${reportData.avgScore}`);
     csvContent.push(`"Tamamlanma Oranı",${reportData.completionRate}%`);
@@ -577,7 +577,7 @@ function generateCSVReport() {
     csvContent.push(`"En Düşük Puan",${reportData.minScore}`);
     csvContent.push(`"Standart Sapma",${reportData.stdDev}`);
     csvContent.push(`"Medyan",${reportData.median}`);
-    
+
     return csvContent.join('\n');
 }
 
@@ -590,24 +590,24 @@ function generateCustomReport() {
 // Özel rapor oluştur
 function createCustomReport() {
     const $form = $('#customReportForm');
-    
+
     if (!$form[0].checkValidity()) {
         $form[0].reportValidity();
         return;
     }
-    
+
     const reportName = $('#reportName').val();
     const reportType = $('#reportType').val();
     const startDate = $('#customStartDate').val();
     const endDate = $('#customEndDate').val();
-    
+
     const includeScores = $('#includeScores').is(':checked');
     const includeDemographics = $('#includeDemographics').is(':checked');
     const includeTimings = $('#includeTimings').is(':checked');
     const includeCharts = $('#includeCharts').is(':checked');
     const includeStatistics = $('#includeStatistics').is(':checked');
     const includeRecommendations = $('#includeRecommendations').is(':checked');
-    
+
     const customReport = {
         name: reportName,
         type: reportType,
@@ -622,20 +622,20 @@ function createCustomReport() {
         },
         createdAt: new Date().toISOString()
     };
-    
+
     // Modal'ı kapat
     const modal = bootstrap.Modal.getInstance($('#customReportModal')[0]);
     modal.hide();
-    
+
     // Rapor oluşturma simülasyonu
     showNotification('Özel rapor oluşturuluyor...', 'info');
-    
+
     setTimeout(() => {
         showNotification(`"${reportName}" raporu başarıyla oluşturuldu.`, 'success');
-        
+
         // Form'u temizle
         $form[0].reset();
-        
+
         // Gerçek projede rapor görüntüleme sayfasına yönlendirilecek
         console.log('Oluşturulan özel rapor:', customReport);
     }, 3000);
@@ -663,7 +663,7 @@ function showNotification(message, type = 'info') {
             </div>
         </div>
     `);
-    
+
     // Toast container oluştur (yoksa)
     let toastContainer = $('.toast-container');
     if (toastContainer.length === 0) {
@@ -671,15 +671,15 @@ function showNotification(message, type = 'info') {
         toastContainer.css('z-index', '9999');
         $('body').append(toastContainer);
     }
-    
+
     toastContainer.append(toast);
-    
+
     // Toast'ı göster
     const bsToast = new bootstrap.Toast(toast[0]);
     bsToast.show();
-    
+
     // Toast kapandığında DOM'dan kaldır
-    toast.on('hidden.bs.toast', function() {
+    toast.on('hidden.bs.toast', function () {
         $(this).remove();
     });
 }
@@ -715,12 +715,12 @@ async function loadIndividualReports() {
                     if (pid) r._participantName = pMap[pid] || 'Bilinmiyor';
                 });
             }
-        } catch (_) {}
+        } catch (_) { }
 
         individualReports = reports || [];
         filteredReports = [...individualReports];
         displayReports();
-        
+
     } catch (error) {
         console.error('Raporlar yüklenirken hata:', error);
         showNotification('Raporlar yüklenirken hata oluştu.', 'error');
@@ -730,7 +730,7 @@ async function loadIndividualReports() {
 // Raporları filtrele
 function filterReports() {
     const searchTerm = $('#searchReports').val().trim().toLowerCase();
-    
+
     // Arama terimi boşsa tüm raporları göster
     if (!searchTerm) {
         filteredReports = [...individualReports];
@@ -739,21 +739,21 @@ function filterReports() {
             const participantName = (report._participantName || '').toLowerCase();
             const reportType = (report.report_type || '').toLowerCase();
             const testType = (report.test_results?.test_type || '').toLowerCase();
-            
+
             // Arama terimini boşluklara göre böl ve her kelimeyi kontrol et
             const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
-            
-            return searchWords.every(word => 
+
+            return searchWords.every(word =>
                 participantName.includes(word) ||
                 reportType.includes(word) ||
                 testType.includes(word)
             );
         });
     }
-    
+
     currentPage = 1;
     displayReports();
-    
+
     // Sonuç sayısını göster
     if (searchTerm) {
         showNotification(`${filteredReports.length} rapor bulundu.`, 'info');
@@ -764,7 +764,7 @@ function filterReports() {
 function displayReports() {
     const $tbody = $('#reportsTableBody');
     if ($tbody.length === 0) return;
-    
+
     if (filteredReports.length === 0) {
         $tbody.html(`
             <tr>
@@ -777,24 +777,24 @@ function displayReports() {
         updatePagination(0);
         return;
     }
-    
+
     const startIndex = (currentPage - 1) * reportsPerPage;
     const endIndex = startIndex + reportsPerPage;
     const reportsToShow = filteredReports.slice(startIndex, endIndex);
-    
+
     $tbody.html(reportsToShow.map(report => {
         const participantName = report._participantName || 'Bilinmiyor';
-        
-        const testDate = report.test_results?.start_time ? 
+
+        const testDate = report.test_results?.start_time ?
             new Date(report.test_results.start_time).toLocaleDateString('tr-TR') : '-';
-        
+
         const reportDate = new Date(report.created).toLocaleDateString('tr-TR');
-        
+
         const testType = report.test_results?.test_type || 'MMPI';
         const reportType = report.report_type || 'Standart';
         const status = report.test_results?.status === 'completed' ? 'Tamamlandı' : 'Beklemede';
         const statusClass = report.test_results?.status === 'completed' ? 'success' : 'warning';
-        
+
         return `
             <tr>
                 <td>
@@ -818,7 +818,7 @@ function displayReports() {
             </tr>
         `;
     }).join(''));
-    
+
     updatePagination(filteredReports.length);
 }
 
@@ -826,16 +826,16 @@ function displayReports() {
 function updatePagination(totalReports) {
     const $pagination = $('#reportsPagination');
     if ($pagination.length === 0) return;
-    
+
     const totalPages = Math.ceil(totalReports / reportsPerPage);
-    
+
     if (totalPages <= 1) {
         $pagination.html('');
         return;
     }
-    
+
     let paginationHTML = '';
-    
+
     // Önceki sayfa
     paginationHTML += `
         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
@@ -844,7 +844,7 @@ function updatePagination(totalReports) {
             </a>
         </li>
     `;
-    
+
     // Sayfa numaraları
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
@@ -857,7 +857,7 @@ function updatePagination(totalReports) {
             paginationHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
         }
     }
-    
+
     // Sonraki sayfa
     paginationHTML += `
         <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
@@ -866,7 +866,7 @@ function updatePagination(totalReports) {
             </a>
         </li>
     `;
-    
+
     $pagination.html(paginationHTML);
 }
 
@@ -874,7 +874,7 @@ function updatePagination(totalReports) {
 function changePage(page) {
     const totalPages = Math.ceil(filteredReports.length / reportsPerPage);
     if (page < 1 || page > totalPages) return;
-    
+
     currentPage = page;
     displayReports();
 }
@@ -892,7 +892,7 @@ function viewReport(reportId) {
         showNotification('Rapor bulunamadı.', 'error');
         return;
     }
-    
+
     // Rapor görüntüleme sayfasına yönlendir
     window.open(`../report.html?id=${reportId}`, '_blank');
 }
@@ -905,17 +905,17 @@ async function downloadReport(reportId) {
             showNotification('Rapor bulunamadı.', 'error');
             return;
         }
-        
+
         // PDF olarak indir
-        const participantName = report._participantName ? report._participantName.replace(/\s+/g,'_') : 'Rapor';
-        
+        const participantName = report._participantName ? report._participantName.replace(/\s+/g, '_') : 'Rapor';
+
         showNotification('Rapor indiriliyor...', 'info');
-        
+
         // PDF utils kullanarak raporu indir
         if (window.PDFUtils) {
             // Rapor sayfasını yeni sekmede aç ve PDF indirme işlemini başlat
             const reportWindow = window.open(`../report.html?id=${reportId}&download=true`, '_blank');
-            
+
             // Rapor sayfası yüklendikten sonra PDF indirme işlemini başlat
             reportWindow.addEventListener('load', () => {
                 if (reportWindow.PDFUtils) {
@@ -926,7 +926,7 @@ async function downloadReport(reportId) {
             // Fallback: Rapor içeriğini yeni sekmede aç
             window.open(`../report.html?id=${reportId}&download=true`, '_blank');
         }
-        
+
     } catch (error) {
         console.error('Rapor indirilirken hata:', error);
         showNotification('Rapor indirilirken hata oluştu.', 'error');
@@ -938,22 +938,22 @@ async function deleteReport(reportId) {
     if (!confirm('Bu raporu silmek istediğinizden emin misiniz?')) {
         return;
     }
-    
+
     try {
         const { error } = await PG_API
             .from('reports')
             .eq('id', reportId)
             .delete();
-        
+
         if (error) {
             console.error('Rapor silinirken hata:', error);
             showNotification('Rapor silinirken hata oluştu.', 'error');
             return;
         }
-        
+
         showNotification('Rapor başarıyla silindi.', 'success');
         loadIndividualReports();
-        
+
     } catch (error) {
         console.error('Rapor silinirken hata:', error);
         showNotification('Rapor silinirken hata oluştu.', 'error');

@@ -29,15 +29,15 @@ function checkAdditionalNoteVisibility() {
     }
 }
 
-// Norm konfigürasyonu (TR - MMPI-2 - Adult)
+// Norm konfigürasyonu (TR - MMPI - Adult)
 const NORM_DEFAULTS = {
-    testVersion: 'MMPI-2',
+    testVersion: 'MMPI',
     locale: 'TR',
     ageGroup: 'adult'
 };
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     // URL'den test ID'sini al
     const urlParams = new URLSearchParams(window.location.search);
@@ -294,7 +294,7 @@ function drawProfileChart(tScores) {
             if (!scales?.x || !scales?.y) return;
             const x1 = scales.x.getPixelForTick(2);
             const x2 = scales.x.getPixelForTick(3);
-            var x = x1 + (x2-x1)/2;
+            var x = x1 + (x2 - x1) / 2;
             ctx.save();
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
@@ -347,10 +347,10 @@ function drawProfileChart(tScores) {
                         size: 12
                     },
                     callbacks: {
-                        title: function(items) {
+                        title: function (items) {
                             // Parantezli açıklamalarla başlık
                             const idx = items?.[0]?.dataIndex ?? 0;
-                            const scale = ['L','F','K','Hs','D','Hy','Pd','Mf','Pa','Pt','Sc','Ma','Si'][idx];
+                            const scale = ['L', 'F', 'K', 'Hs', 'D', 'Hy', 'Pd', 'Mf', 'Pa', 'Pt', 'Sc', 'Ma', 'Si'][idx];
                             const longNames = {
                                 L: 'L (Yalan)', F: 'F (Sıklık)', K: 'K (Düzeltme)',
                                 Hs: 'Hs (Hipokondriazis)', D: 'D (Depresyon)', Hy: 'Hy (Histeri)',
@@ -359,7 +359,7 @@ function drawProfileChart(tScores) {
                             };
                             return longNames[scale] || scale;
                         },
-                        label: function(context) {
+                        label: function (context) {
                             return `: ${context.parsed.y}`;
                         }
                     }
@@ -368,7 +368,7 @@ function drawProfileChart(tScores) {
                     color: '#e06666',
                     align: 'top',
                     anchor: 'end',
-                    formatter: function(value) { return value; },
+                    formatter: function (value) { return value; },
                     font: {
                         family: 'Arial, sans-serif',
                         size: 12,
@@ -398,12 +398,12 @@ function drawProfileChart(tScores) {
                         }
                     },
                     grid: {
-                        color: function(context) {
+                        color: function (context) {
                             if (context.tick.value === 65) return '#dc3545';
                             if (context.tick.value === 70) return '#ffc107';
                             return '#e0e0e0';
                         },
-                        lineWidth: function(context) {
+                        lineWidth: function (context) {
                             if (context.tick.value === 65 || context.tick.value === 70) return 2;
                             return 1;
                         }
@@ -419,7 +419,7 @@ function drawProfileChart(tScores) {
                             size: 11,
                             weight: 'bold'
                         },
-                        callback: function(value, index) {
+                        callback: function (value, index) {
                             // X ekseninde ölçek kısa adı + T değeri (iki satır)
                             const scale = scaleOrder[index];
                             const t = (tScores && tScores[scale] !== undefined) ? tScores[scale] : 50;
@@ -462,7 +462,7 @@ function drawProfileChartForPdf(tScores) {
             if (!scales?.x || !scales?.y) return;
             const x1 = scales.x.getPixelForTick(2);
             const x2 = scales.x.getPixelForTick(3);
-            var x = x1 + (x2-x1)/2;
+            var x = x1 + (x2 - x1) / 2;
             ctx.save();
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
@@ -516,10 +516,10 @@ function drawProfileChartForPdf(tScores) {
                         size: 12
                     },
                     callbacks: {
-                        title: function(items) {
+                        title: function (items) {
                             // Parantezli açıklamalarla başlık
                             const idx = items?.[0]?.dataIndex ?? 0;
-                            const scale = ['L','F','K','Hs','D','Hy','Pd','Mf','Pa','Pt','Sc','Ma','Si'][idx];
+                            const scale = ['L', 'F', 'K', 'Hs', 'D', 'Hy', 'Pd', 'Mf', 'Pa', 'Pt', 'Sc', 'Ma', 'Si'][idx];
                             const longNames = {
                                 L: 'L (Yalan)', F: 'F (Sıklık)', K: 'K (Düzeltme)',
                                 Hs: 'Hs (Hipokondriazis)', D: 'D (Depresyon)', Hy: 'Hy (Histeri)',
@@ -528,7 +528,7 @@ function drawProfileChartForPdf(tScores) {
                             };
                             return longNames[scale] || scale;
                         },
-                        label: function(context) {
+                        label: function (context) {
                             return `: ${context.parsed.y}`;
                         }
                     }
@@ -537,7 +537,7 @@ function drawProfileChartForPdf(tScores) {
                     color: '#e06666',
                     align: 'top',
                     anchor: 'end',
-                    formatter: function(value) { return value; },
+                    formatter: function (value) { return value; },
                     font: {
                         family: 'Arial, sans-serif',
                         size: 12,
@@ -567,12 +567,12 @@ function drawProfileChartForPdf(tScores) {
                         }
                     },
                     grid: {
-                        color: function(context) {
+                        color: function (context) {
                             if (context.tick.value === 65) return '#dc3545';
                             if (context.tick.value === 70) return '#ffc107';
                             return '#e0e0e0';
                         },
-                        lineWidth: function(context) {
+                        lineWidth: function (context) {
                             if (context.tick.value === 65 || context.tick.value === 70) return 2;
                             return 1;
                         }
@@ -588,7 +588,7 @@ function drawProfileChartForPdf(tScores) {
                             size: 11,
                             weight: 'bold'
                         },
-                        callback: function(value, index) {
+                        callback: function (value, index) {
                             // X ekseninde ölçek kısa adı + T değeri (iki satır)
                             const scale = scaleOrder[index];
                             const t = (tScores && tScores[scale] !== undefined) ? tScores[scale] : 50;
@@ -657,29 +657,25 @@ function displayScaleResults(rawScores, tScores, interpretations) {
                                 <div class="col-4">
                                     <small class="text-muted d-block">Ham</small>
                                     <div class="h5 mb-0">${rawScore}</div>
-                                    <small class="text-muted">${
-                kCorrections[scale]
+                                    <small class="text-muted">${kCorrections[scale]
                     ? `+${(Number.isInteger(kCorrections[scale]) ? kCorrections[scale].toFixed(0) : kCorrections[scale])}K`
                     : '-'
-            }</small>
+                }</small>
                                 </div>
                                 <div class="col-4">
                                     <small class="text-muted d-block">T-Skor</small>
                                     <div class="h5 mb-0 text-primary fw-bold">${tScore}</div>
                                 </div>
                                 <div class="col-4 text-end">
-                                    <span class="badge ${
-                tScore >= 65 ? 'bg-danger' :
+                                    <span class="badge ${tScore >= 65 ? 'bg-danger' :
                     tScore >= 60 ? 'bg-warning text-dark' : 'bg-success'
-            } small">${
-                tScore >= 65 ? 'Yüksek' :
+                } small">${tScore >= 65 ? 'Yüksek' :
                     tScore >= 60 ? 'Orta' : 'Normal'
-            }</span>
+                }</span>
                                 </div>
                             </div>
-                            <p class="card-text small mt-1 mb-0" title="${interpretation}">${
-                interpretation.length > 60 ? interpretation.substring(0, 60) + '...' : interpretation
-            }</p>
+                            <p class="card-text small mt-1 mb-0" title="${interpretation}">${interpretation.length > 60 ? interpretation.substring(0, 60) + '...' : interpretation
+                }</p>
                         </div>
                     </div>
                 </div>
@@ -701,7 +697,7 @@ function displaySummary(summary) {
         if (summary.keyFindings && summary.keyFindings.length) items.push(`<strong>Bulgu:</strong> ${summary.keyFindings.join(', ')}`);
         if (summary.riskFactors && summary.riskFactors.length) items.push(`<strong>Riskler:</strong> ${summary.riskFactors.join(', ')}`);
         if (summary.strengths && summary.strengths.length) items.push(`<strong>Güçlü Yönler:</strong> ${summary.strengths.join(', ')}`);
-        summaryContent.innerHTML = `<p>${summary.overallAssessment}</p>${items.map(i=>`<p>${i}</p>`).join('')}`;
+        summaryContent.innerHTML = `<p>${summary.overallAssessment}</p>${items.map(i => `<p>${i}</p>`).join('')}`;
     } else {
         summaryContent.innerHTML = `<p>Özet verisi bulunamadı.</p>`;
     }
@@ -885,10 +881,10 @@ async function computeScoresFromTestResult(testResult, participant = null) {
         if (tScores['K'] > 70) validityAssessment.warnings.push('K ölçeği yüksek - Savunuculuk');
 
         // Özet
-        const clinical = ['Hs','D','Hy','Pd','Mf','Pa','Pt','Sc','Ma','Si'];
-        const elevated = clinical.filter(sc => tScores[sc] >= 65).sort((a,b)=>tScores[b]-tScores[a]);
-        const scaleNames = { Hs:'Hipokondriazis', D:'Depresyon', Hy:'Histeri', Pd:'Psikopati', Mf:'Maskülinite-Femininite', Pa:'Paranoya', Pt:'Psikasteni', Sc:'Şizofreni', Ma:'Hipomani', Si:'Sosyal İçedönüklük' };
-        const summary = elevated.length === 0 ? 'MMPI profili normal sınırlar içerisindedir. Klinik olarak anlamlı yükselme gözlenmemektedir.' : `MMPI profilinde ${elevated.map(s=>scaleNames[s]||s).join(', ')} ölçek(ler)inde klinik olarak anlamlı yükselme gözlenmektedir.`;
+        const clinical = ['Hs', 'D', 'Hy', 'Pd', 'Mf', 'Pa', 'Pt', 'Sc', 'Ma', 'Si'];
+        const elevated = clinical.filter(sc => tScores[sc] >= 65).sort((a, b) => tScores[b] - tScores[a]);
+        const scaleNames = { Hs: 'Hipokondriazis', D: 'Depresyon', Hy: 'Histeri', Pd: 'Psikopati', Mf: 'Maskülinite-Femininite', Pa: 'Paranoya', Pt: 'Psikasteni', Sc: 'Şizofreni', Ma: 'Hipomani', Si: 'Sosyal İçedönüklük' };
+        const summary = elevated.length === 0 ? 'MMPI profili normal sınırlar içerisindedir. Klinik olarak anlamlı yükselme gözlenmemektedir.' : `MMPI profilinde ${elevated.map(s => scaleNames[s] || s).join(', ')} ölçek(ler)inde klinik olarak anlamlı yükselme gözlenmektedir.`;
 
         // Öneriler
         const recommendations = [];
@@ -958,20 +954,20 @@ function initializePsychologistEvaluation() {
     document.getElementById('togglePdpSection').addEventListener('click', togglePdpSection);
 
     // PDP checkbox'larına event listener ekle
-    document.addEventListener('change', function(e) {
+    document.addEventListener('change', function (e) {
         if (e.target.type === 'checkbox' && e.target.closest('#pdpParametersSection')) {
             // Sayfa pozisyonunu kaydet
             const scrollPosition = window.scrollY || window.pageYOffset;
-            
+
             updatePdpResultMessage();
-            
+
             // Sayfa pozisyonunu koru
             window.scrollTo(0, scrollPosition);
         }
     });
 
     // Görev tanımları buton event listener'larını ekle
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.closest('.task-btn-check') || e.target.closest('.task-btn-cross')) {
             handleTaskButtonClick(e);
         }
@@ -980,7 +976,7 @@ function initializePsychologistEvaluation() {
     // Ek değerlendirme notu input'una event listener ekle
     const additionalNoteElement = document.getElementById('additionalNote');
     if (additionalNoteElement) {
-        additionalNoteElement.addEventListener('input', function() {
+        additionalNoteElement.addEventListener('input', function () {
             checkAdditionalNoteVisibility();
         });
     }
@@ -1330,7 +1326,7 @@ function loadPsychologistEvaluation() {
 function togglePdpSection() {
     // Sayfa pozisyonunu kaydet
     const scrollPosition = window.scrollY || window.pageYOffset;
-    
+
     const section = document.getElementById('pdpParametersSection');
     const icon = document.getElementById('pdpToggleIcon');
 
@@ -1342,7 +1338,7 @@ function togglePdpSection() {
         section.style.display = 'none';
         icon.className = 'fas fa-eye';
     }
-    
+
     // Sayfa pozisyonunu koru
     window.scrollTo(0, scrollPosition);
 }
@@ -1351,7 +1347,7 @@ function togglePdpSection() {
 function updatePdpResultMessage() {
     // Sayfa pozisyonunu kaydet
     const scrollPosition = window.scrollY || window.pageYOffset;
-    
+
     const checkboxes = document.querySelectorAll('#pdpParametersSection input[type="checkbox"]');
     const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
     const resultMessage = document.getElementById('pdpResultMessage');
@@ -1368,7 +1364,7 @@ function updatePdpResultMessage() {
         }
         resultMessage.style.display = 'block';
     }
-    
+
     // Sayfa pozisyonunu koru
     window.scrollTo(0, scrollPosition);
 }
@@ -1459,7 +1455,7 @@ function loadPdpParametersData(data) {
 
     // PDP sonuç mesajını güncelle
     updatePdpResultMessage();
-    
+
     // Sayfa pozisyonunu koru
     window.scrollTo(0, scrollPosition);
 }
@@ -1920,7 +1916,7 @@ async function downloadMmpiProfilChartAsPDF() {
         downloadCtx.textRenderingOptimization = 'optimizeQuality';
 
         // Orijinal canvas'ı yüksek çözünürlükle çiz
-        downloadCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, downloadCanvas.width,downloadCanvas.height);
+        downloadCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, downloadCanvas.width, downloadCanvas.height);
 
         // Yeni canvas'ı image'e çevir
         const imgData = downloadCanvas.toDataURL('image/png', 1.0);
@@ -2065,22 +2061,22 @@ async function downloadMmpiProfilChartAsPDF() {
                 pdf.setFont(robotoBase64 ? 'Roboto' : 'helvetica', 'normal');
                 pdf.text(rowData[1], infoStartX + 37, rowY + 6);
             });
-            
+
             // "Bilmiyorum" sayısı - tablonun altında
             const dontKnowY = currentY + tableHeight + 12; // Tablonun 12 punto altında
             // "Bilmiyorum" sayısı
             const dontKnowCount = typeof testResult.dont_know_count === 'number' ? testResult.dont_know_count :
                 countDontKnowFromAnswers(testResult.test_answers);
-            
+
             pdf.setFont(robotoBase64 ? 'Roboto' : 'helvetica', 'bold');
             pdf.setTextColor(0, 0, 0);
             pdf.setFontSize(12);
 
-            pdf.text('"Bilmiyorum" Sayısı:', infoStartX, dontKnowY+15);
+            pdf.text('"Bilmiyorum" Sayısı:', infoStartX, dontKnowY + 15);
 
 
             pdf.setFont(robotoBase64 ? 'Roboto' : 'helvetica', 'normal');
-            pdf.text(String(dontKnowCount), infoStartX + 40, dontKnowY+15);
+            pdf.text(String(dontKnowCount), infoStartX + 40, dontKnowY + 15);
         }
 
         // Grafiği ekle - katılımcı bilgileri ile aynı hizada
@@ -2179,9 +2175,9 @@ function setupRadioButtonListeners() {
         const radios = document.querySelectorAll(`input[name="${competencyName}"]`);
 
         radios.forEach((radio, index) => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 // İş Skalası alanları için work_scale_ prefix'ini kullan
-                const isWorkScale = ['performance', 'safety', 'quality', 'teamwork', 'discipline', 'representation', 'initiative', 'learning','workplace_rules','job_satisfaction'].includes(competencyName) ||
+                const isWorkScale = ['performance', 'safety', 'quality', 'teamwork', 'discipline', 'representation', 'initiative', 'learning', 'workplace_rules', 'job_satisfaction'].includes(competencyName) ||
                     inputPrefix.startsWith('work_scale_');
                 const prefix = isWorkScale ? 'work_scale_' : 'psych_scale_';
                 const actualInputPrefix = isWorkScale ? competencyName : inputPrefix;
@@ -2251,7 +2247,7 @@ function clearCompetencySelection(competencyName) {
     const inputPrefix = competencyIdMapping[competencyName];
     if (inputPrefix) {
         // İş Skalası alanları için work_scale_ prefix'ini kullan
-        const isWorkScale = ['performance', 'safety', 'quality', 'teamwork', 'discipline', 'representation', 'initiative', 'learning','job_satisfaction','workplace_rules'].includes(competencyName) ||
+        const isWorkScale = ['performance', 'safety', 'quality', 'teamwork', 'discipline', 'representation', 'initiative', 'learning', 'job_satisfaction', 'workplace_rules'].includes(competencyName) ||
             inputPrefix.startsWith('work_scale_');
         const prefix = isWorkScale ? 'work_scale_' : 'psych_scale_';
         const actualInputPrefix = isWorkScale ? competencyName : inputPrefix;
@@ -2286,7 +2282,7 @@ function setupInputListeners() {
 
     const workPrefixes = [
         'performance', 'safety', 'quality', 'teamwork', 'discipline',
-        'representation', 'initiative', 'learning','job_satisfaction','workplace_rules'
+        'representation', 'initiative', 'learning', 'job_satisfaction', 'workplace_rules'
     ];
 
 
@@ -2295,11 +2291,11 @@ function setupInputListeners() {
         for (let i = 1; i <= 5; i++) {
             const input = document.getElementById(`psych_scale_${prefix}_${i}`);
             if (input) {
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     updateCompetencyTotal(prefix);
                 });
                 // Change event'i de ekle
-                input.addEventListener('change', function() {
+                input.addEventListener('change', function () {
                     updateCompetencyTotal(prefix);
                 });
             }
@@ -2311,11 +2307,11 @@ function setupInputListeners() {
         for (let i = 1; i <= 5; i++) {
             const input = document.getElementById(`work_scale_${prefix}_${i}`);
             if (input) {
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     updateCompetencyTotal(prefix);
                 });
                 // Change event'i de ekle
-                input.addEventListener('change', function() {
+                input.addEventListener('change', function () {
                     updateCompetencyTotal(prefix);
                 });
             }
@@ -2340,7 +2336,7 @@ function setupTableClickListeners() {
 
             if (firstTd && radioButton) {
                 // 1. td'ye tıklandığında radio button'ı seç
-                firstTd.addEventListener('click', function(e) {
+                firstTd.addEventListener('click', function (e) {
                     // Eğer tıklanan element zaten radio button ise, normal davranışı bırak
                     if (e.target.type === 'radio') {
                         return;
@@ -2357,7 +2353,7 @@ function setupTableClickListeners() {
 
             if (secondTd && numberInput && radioButton) {
                 // 2. td'ye tıklandığında max değeri yaz ve readonly'yi kaldır
-                secondTd.addEventListener('click', function(e) {
+                secondTd.addEventListener('click', function (e) {
                     // Eğer tıklanan element zaten input ise, normal davranışı bırak
                     if (e.target.type === 'number') {
                         return;
@@ -2387,13 +2383,13 @@ function setupTableClickListeners() {
 }
 
 // Sayfa yüklendiğinde radio button listener'larını kur
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Mevcut DOMContentLoaded event'ine ek olarak
     setTimeout(() => {
         setupRadioButtonListeners(); // Radio button listener'larını kur
         setupInputListeners(); // Input listener'larını kur
         setupTableClickListeners(); // Tablo tıklama listener'larını kur
-        
+
         // Sayfa yüklendiğinde toplam hesaplamaları yap
         calculatePsychologicalTotal();
         calculateWorkTotal();

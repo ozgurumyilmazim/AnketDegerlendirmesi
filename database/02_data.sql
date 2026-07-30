@@ -21,7 +21,7 @@ INSERT INTO question_category (name, sort_order) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================================
--- 1. QUESTIONS (567 MMPI-2 questions)
+-- 1. QUESTIONS (567 MMPI questions)
 -- Source: dokumanlar/questions_insert.sql
 -- ============================================================
 INSERT INTO questions (question_number, question_text, category_id) VALUES

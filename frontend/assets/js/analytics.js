@@ -9,18 +9,18 @@ let filteredData = [];
 let originalData = [];
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     // Kullanıcı kimlik doğrulaması
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) return;
-    
+
     // Sayfa yetki kontrolü
     const hasPermission = await checkPagePermission('analytics');
     if (!hasPermission) return;
-    
+
     // Analitik verilerini yükle
     loadAnalyticsData();
-    
+
     // Event listener'ları ayarla
     setupEventListeners();
 });
@@ -29,11 +29,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function checkAuthentication() {
     try {
         const { data: { session } } = await AuthService.getSession();
-        
+
         if (session && session.user) {
             const userRole = await AuthService.getUserRole();
             const isAdmin = await AuthService.isAdmin();
-            
+
             currentUser = {
                 userId: session.user.id,
                 email: session.user.email,
@@ -42,11 +42,11 @@ async function checkAuthentication() {
                 isAdmin: isAdmin,
                 loginTime: new Date().toISOString()
             };
-            
+
             updateUserInfo();
             return true;
         }
-        
+
         console.warn('Session is null/expired, clearing login data and redirecting to login.html');
         sessionStorage.removeItem('adminLogin');
         localStorage.removeItem('adminLogin');
@@ -55,7 +55,7 @@ async function checkAuthentication() {
         }
         window.location.href = 'login.html';
         return false;
-        
+
     } catch (error) {
         console.error('Authentication kontrolü hatası:', error);
         sessionStorage.removeItem('adminLogin');
@@ -72,13 +72,13 @@ async function checkAuthentication() {
 function updateUserInfo() {
     if (currentUser) {
         document.getElementById('userName').textContent = currentUser.name;
-        
+
         const initials = currentUser.name
             .split(' ')
             .map(name => name.charAt(0))
             .join('')
             .toUpperCase();
-        
+
         document.getElementById('userInitials').textContent = initials;
     }
 }
@@ -89,16 +89,16 @@ async function loadAnalyticsData() {
         // Demo veriler (gerçek projede API'den gelecek)
         originalData = await getAnalyticsData();
         filteredData = [...originalData];
-        
+
         // Metrikleri güncelle
         updateMetrics();
-        
+
         // Grafikleri oluştur
         initializeCharts();
-        
+
         // Aktivite haritasını oluştur
         generateActivityHeatmap();
-        
+
     } catch (error) {
         console.error('Analitik veriler yüklenirken hata:', error);
         showNotification('Analitik veriler yüklenirken hata oluştu.', 'error');
@@ -136,14 +136,14 @@ async function getAnalyticsData() {
         const analyticsData = tests.map(test => {
             const age = test.participants?.age || 18;
             let ageGroup;
-            
+
             if (age <= 17) ageGroup = '13-17';
             else if (age <= 25) ageGroup = '18-25';
             else if (age <= 35) ageGroup = '26-35';
             else ageGroup = '36+';
 
             const testDate = new Date(test.created);
-            
+
             return {
                 id: test.id,
                 date: testDate.toISOString().split('T')[0],
@@ -172,31 +172,31 @@ function getDemoAnalyticsData() {
     const data = [];
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 90); // Son 90 gün
-    
+
     // Demo test verileri oluştur
     for (let i = 0; i < 90; i++) {
         const date = new Date(startDate);
         date.setDate(date.getDate() + i);
-        
+
         const dayOfWeek = date.getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        
+
         // Hafta sonu daha az test
         const baseTestCount = isWeekend ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 8) + 3;
-        
+
         for (let j = 0; j < baseTestCount; j++) {
-            const testTypes = ['MMPI', 'MMPI-2'];
+            const testTypes = ['MMPI', 'MMPI'];
             const testType = testTypes[Math.floor(Math.random() * testTypes.length)];
-            
+
             const ageGroups = [
                 { range: '13-17', weight: testType === 'MMPI' ? 0.7 : 0.1 },
                 { range: '18-25', weight: 0.4 },
                 { range: '26-35', weight: 0.3 },
-                { range: '36+', weight: testType === 'MMPI-2' ? 0.4 : 0.2 }
+                { range: '36+', weight: testType === 'MMPI' ? 0.4 : 0.2 }
             ];
-            
+
             const ageGroup = weightedRandom(ageGroups);
-            
+
             // Yaş grubuna göre puan dağılımı
             let baseScore;
             switch (ageGroup) {
@@ -215,11 +215,11 @@ function getDemoAnalyticsData() {
                 default:
                     baseScore = Math.random() * 40 + 60;
             }
-            
+
             const score = Math.min(100, Math.max(30, Math.round(baseScore)));
             const duration = Math.floor(Math.random() * 30) + 30; // 30-60 dakika
             const dontKnowCount = Math.floor(Math.random() * 20);
-            
+
             data.push({
                 id: data.length + 1,
                 date: date.toISOString().split('T')[0],
@@ -234,7 +234,7 @@ function getDemoAnalyticsData() {
             });
         }
     }
-    
+
     return data;
 }
 
@@ -242,14 +242,14 @@ function getDemoAnalyticsData() {
 function weightedRandom(items) {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
     let random = Math.random() * totalWeight;
-    
+
     for (const item of items) {
         random -= item.weight;
         if (random <= 0) {
             return item.range;
         }
     }
-    
+
     return items[0].range;
 }
 
@@ -257,14 +257,14 @@ function weightedRandom(items) {
 function updateMetrics() {
     const completedTests = filteredData.filter(test => test.completed);
     const totalTests = filteredData.length;
-    const avgScore = completedTests.length > 0 
+    const avgScore = completedTests.length > 0
         ? Math.round(completedTests.reduce((sum, test) => sum + test.score, 0) / completedTests.length)
         : 0;
     const completionRate = totalTests > 0 ? Math.round((completedTests.length / totalTests) * 100) : 0;
     const avgDuration = completedTests.length > 0
         ? Math.round(completedTests.reduce((sum, test) => sum + test.duration, 0) / completedTests.length)
         : 0;
-    
+
     // Önceki dönemle karşılaştırma (demo)
     const changes = {
         tests: Math.floor(Math.random() * 40) - 20, // -20 ile +20 arası
@@ -272,13 +272,13 @@ function updateMetrics() {
         completion: Math.floor(Math.random() * 10) - 5, // -5 ile +5 arası
         duration: Math.floor(Math.random() * 20) - 10 // -10 ile +10 arası
     };
-    
+
     // Metrikleri güncelle
     document.getElementById('totalTestsMetric').textContent = totalTests;
     document.getElementById('avgScoreMetric').textContent = avgScore;
     document.getElementById('completionRateMetric').textContent = `${completionRate}%`;
     document.getElementById('avgDurationMetric').textContent = `${avgDuration}dk`;
-    
+
     // Değişim göstergelerini güncelle
     updateChangeIndicator('testsChange', changes.tests, '%');
     updateChangeIndicator('scoreChange', changes.score, '%');
@@ -291,7 +291,7 @@ function updateChangeIndicator(elementId, change, suffix) {
     const element = document.getElementById(elementId);
     const sign = change >= 0 ? '+' : '';
     const className = change >= 0 ? 'positive' : 'negative';
-    
+
     element.textContent = `${sign}${change}${suffix} bu ay`;
     element.className = `metric-change ${className}`;
 }
@@ -306,13 +306,13 @@ function initializeCharts() {
 // Trend grafiğini başlat
 function initializeTrendsChart() {
     const ctx = document.getElementById('trendsChart').getContext('2d');
-    
+
     // Son 30 günün verilerini hazırla
     const last30Days = getLast30DaysData();
     const labels = last30Days.map(day => formatDateShort(day.date));
     const testCounts = last30Days.map(day => day.testCount);
     const avgScores = last30Days.map(day => day.avgScore);
-    
+
     charts.trendsChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -390,9 +390,9 @@ function initializeTrendsChart() {
 // Test türü grafiğini başlat
 function initializeTestTypeChart() {
     const ctx = document.getElementById('testTypeChart').getContext('2d');
-    
+
     const testTypeCounts = getTestTypeCounts();
-    
+
     charts.testTypeChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -419,7 +419,7 @@ function initializeTestTypeChart() {
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = Math.round((context.parsed / total) * 100);
                             return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -434,9 +434,9 @@ function initializeTestTypeChart() {
 // Yaş grubu grafiğini başlat
 function initializeAgeGroupChart() {
     const ctx = document.getElementById('ageGroupChart').getContext('2d');
-    
+
     const ageGroupData = getAgeGroupData();
-    
+
     charts.ageGroupChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -474,7 +474,7 @@ function initializeAgeGroupChart() {
                 },
                 tooltip: {
                     callbacks: {
-                        afterLabel: function(context) {
+                        afterLabel: function (context) {
                             const ageGroup = context.label;
                             const data = ageGroupData[ageGroup];
                             return [
@@ -493,42 +493,42 @@ function initializeAgeGroupChart() {
 function getLast30DaysData() {
     const result = [];
     const endDate = new Date();
-    
+
     for (let i = 29; i >= 0; i--) {
         const date = new Date(endDate);
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        
+
         const dayTests = filteredData.filter(test => test.date === dateStr);
         const completedDayTests = dayTests.filter(test => test.completed);
-        
+
         result.push({
             date: dateStr,
             testCount: dayTests.length,
-            avgScore: completedDayTests.length > 0 
+            avgScore: completedDayTests.length > 0
                 ? Math.round(completedDayTests.reduce((sum, test) => sum + test.score, 0) / completedDayTests.length)
                 : 0
         });
     }
-    
+
     return result;
 }
 
 // Test türü sayılarını hesapla
 function getTestTypeCounts() {
     const counts = {};
-    
+
     filteredData.forEach(test => {
         counts[test.testType] = (counts[test.testType] || 0) + 1;
     });
-    
+
     return counts;
 }
 
 // Yaş grubu verilerini hesapla
 function getAgeGroupData() {
     const groups = {};
-    
+
     filteredData.forEach(test => {
         if (!groups[test.ageGroup]) {
             groups[test.ageGroup] = {
@@ -537,24 +537,24 @@ function getAgeGroupData() {
                 completedCount: 0
             };
         }
-        
+
         groups[test.ageGroup].count++;
-        
+
         if (test.completed) {
             groups[test.ageGroup].totalScore += test.score;
             groups[test.ageGroup].completedCount++;
         }
     });
-    
+
     // Ortalama puanları ve tamamlanma oranlarını hesapla
     Object.keys(groups).forEach(ageGroup => {
         const group = groups[ageGroup];
-        group.avgScore = group.completedCount > 0 
+        group.avgScore = group.completedCount > 0
             ? Math.round(group.totalScore / group.completedCount)
             : 0;
         group.completionRate = Math.round((group.completedCount / group.count) * 100);
     });
-    
+
     return groups;
 }
 
@@ -562,43 +562,43 @@ function getAgeGroupData() {
 function generateActivityHeatmap() {
     const container = document.getElementById('activityHeatmap');
     container.innerHTML = '';
-    
+
     // Son 12 haftanın verilerini hazırla
     const weeks = 12;
     const days = 7;
     const endDate = new Date();
-    
+
     // Günlük test sayılarını hesapla
     const dailyCounts = {};
     filteredData.forEach(test => {
         dailyCounts[test.date] = (dailyCounts[test.date] || 0) + 1;
     });
-    
+
     // Maksimum test sayısını bul (renk skalası için)
     const maxCount = Math.max(...Object.values(dailyCounts), 1);
-    
+
     // Haftalık grid oluştur
     for (let week = weeks - 1; week >= 0; week--) {
         const weekDiv = document.createElement('div');
         weekDiv.style.display = 'flex';
         weekDiv.style.marginBottom = '2px';
-        
+
         for (let day = 0; day < days; day++) {
             const date = new Date(endDate);
             date.setDate(date.getDate() - (week * 7 + (6 - day)));
             const dateStr = date.toISOString().split('T')[0];
-            
+
             const count = dailyCounts[dateStr] || 0;
             const intensity = count / maxCount;
-            
+
             const cell = document.createElement('div');
             cell.className = 'heatmap-cell';
             cell.style.backgroundColor = getHeatmapColor(intensity);
             cell.setAttribute('data-tooltip', `${formatDate(dateStr)}: ${count} test`);
-            
+
             weekDiv.appendChild(cell);
         }
-        
+
         container.appendChild(weekDiv);
     }
 }
@@ -615,28 +615,28 @@ function getHeatmapColor(intensity) {
 // Event listener'ları ayarla
 function setupEventListeners() {
     // Sidebar toggle fonksiyonları
-    window.toggleSidebar = function() {
+    window.toggleSidebar = function () {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('show');
     };
-    
-    window.collapseSidebar = function() {
+
+    window.collapseSidebar = function () {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
-        
+
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
     };
-    
+
     // Logout fonksiyonu
-    window.logout = function() {
+    window.logout = function () {
         if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
             sessionStorage.removeItem('adminLogin');
             localStorage.removeItem('adminLogin');
             window.location.href = 'login.html';
         }
     };
-    
+
     // Global fonksiyonları tanımla
     window.applyFilters = applyFilters;
     window.clearFilters = clearFilters;
@@ -647,33 +647,33 @@ function applyFilters() {
     const dateRange = document.getElementById('dateRange').value;
     const testType = document.getElementById('testTypeFilter').value;
     const ageGroup = document.getElementById('ageGroupFilter').value;
-    
+
     // Tarih filtresi
     let startDate = new Date();
     if (dateRange !== 'custom') {
         startDate.setDate(startDate.getDate() - parseInt(dateRange));
     }
-    
+
     filteredData = originalData.filter(test => {
         const testDate = new Date(test.date);
-        
+
         // Tarih filtresi
         if (dateRange !== 'custom' && testDate < startDate) return false;
-        
+
         // Test türü filtresi
         if (testType && test.testType !== testType) return false;
-        
+
         // Yaş grubu filtresi
         if (ageGroup && test.ageGroup !== ageGroup) return false;
-        
+
         return true;
     });
-    
+
     // Verileri güncelle
     updateMetrics();
     updateCharts();
     generateActivityHeatmap();
-    
+
     showNotification(`${filteredData.length} test verisi filtrelendi.`, 'success');
 }
 
@@ -682,13 +682,13 @@ function clearFilters() {
     document.getElementById('dateRange').value = '30';
     document.getElementById('testTypeFilter').value = '';
     document.getElementById('ageGroupFilter').value = '';
-    
+
     filteredData = [...originalData];
-    
+
     updateMetrics();
     updateCharts();
     generateActivityHeatmap();
-    
+
     showNotification('Filtreler temizlendi.', 'info');
 }
 
@@ -700,13 +700,13 @@ function updateCharts() {
     charts.trendsChart.data.datasets[0].data = last30Days.map(day => day.testCount);
     charts.trendsChart.data.datasets[1].data = last30Days.map(day => day.avgScore);
     charts.trendsChart.update();
-    
+
     // Test türü grafiğini güncelle
     const testTypeCounts = getTestTypeCounts();
     charts.testTypeChart.data.labels = Object.keys(testTypeCounts);
     charts.testTypeChart.data.datasets[0].data = Object.values(testTypeCounts);
     charts.testTypeChart.update();
-    
+
     // Yaş grubu grafiğini güncelle
     const ageGroupData = getAgeGroupData();
     charts.ageGroupChart.data.labels = Object.keys(ageGroupData);
@@ -739,7 +739,7 @@ function showNotification(message, type = 'info') {
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     `;
-    
+
     // Toast container oluştur (yoksa)
     let toastContainer = document.querySelector('.toast-container');
     if (!toastContainer) {
@@ -748,15 +748,15 @@ function showNotification(message, type = 'info') {
         toastContainer.style.zIndex = '9999';
         document.body.appendChild(toastContainer);
     }
-    
+
     toastContainer.appendChild(toast);
-    
+
     // Toast'ı göster
     const bsToast = new bootstrap.Toast(toast);
     bsToast.show();
-    
+
     // Toast kapandığında DOM'dan kaldır
-    toast.addEventListener('hidden.bs.toast', function() {
+    toast.addEventListener('hidden.bs.toast', function () {
         toast.remove();
     });
 }
