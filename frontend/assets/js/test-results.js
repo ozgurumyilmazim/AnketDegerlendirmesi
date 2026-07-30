@@ -766,9 +766,21 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
     Object.keys(scaleKeys).forEach(scaleName => {
         let score = 0;
         const correctAnswers = []; // Debug için
+        const detailedCheck = []; // Debug için detaylı analiz
+        
         scaleKeys[scaleName].forEach(item => {
             const userAnswer = answersMap[item.question];
-            if (userAnswer === item.scoringAnswer) {
+            // Hem orijinal halini hem de olası hataları görmek için kontrol
+            const isMatch = userAnswer === item.scoringAnswer;
+            
+            detailedCheck.push({
+                soru: item.question,
+                beklenenCevap: item.scoringAnswer,
+                kullaniciCevabi: userAnswer,
+                eslesti: isMatch
+            });
+
+            if (isMatch) {
                 score++;
                 correctAnswers.push(item.question);
             }
@@ -777,7 +789,9 @@ async function calculateMMPIScores(testAnswers, scoringKeys, gender) {
         if (typeof debugLog === 'function') {
             debugLog(`Ölçek [${scaleName}] ham puanı: ${score}`, { 
                 beklenenCevapSayisi: scaleKeys[scaleName].length, 
-                eslesenSorular: correctAnswers 
+                eslesenSorular: correctAnswers,
+                // Sadece L, F, K gibi temel ölçeklerde çok yer kaplamaması için detayı da ekleyelim
+                detayliAnaliz: detailedCheck 
             });
         }
     });
