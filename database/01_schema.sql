@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS test_results (
     dont_know_count INTEGER DEFAULT 0,
     completed_questions INTEGER DEFAULT 0,
     total_questions INTEGER DEFAULT 567,
-    test_type VARCHAR(50) DEFAULT 'MMPI-2',
+    test_type VARCHAR(50) DEFAULT 'MMPI',
     test_version VARCHAR(20) DEFAULT '1.0',
     status VARCHAR(20) DEFAULT 'completed' CHECK (status IN ('started', 'in_progress', 'completed', 'abandoned')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -135,7 +135,7 @@ CREATE INDEX idx_scoring_keys_question ON scoring_keys(question_number);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS t_score_norms (
     id BIGSERIAL PRIMARY KEY,
-    test_version TEXT NOT NULL DEFAULT 'MMPI-2',
+    test_version TEXT NOT NULL DEFAULT 'MMPI',
     locale TEXT NOT NULL DEFAULT 'TR',
     scale_name TEXT NOT NULL,
     gender TEXT NOT NULL CHECK (gender IN ('male', 'female')),
@@ -155,7 +155,7 @@ CREATE INDEX idx_tnorm_lookup ON t_score_norms(scale_name, gender, raw_score);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS t_score_params (
     id BIGSERIAL PRIMARY KEY,
-    test_version TEXT NOT NULL DEFAULT 'MMPI-2',
+    test_version TEXT NOT NULL DEFAULT 'MMPI',
     locale TEXT NOT NULL DEFAULT 'TR',
     age_group TEXT NOT NULL DEFAULT 'adult',
     scale_name TEXT NOT NULL,

@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.t_score_params
 (
     id bigint NOT NULL DEFAULT nextval('t_score_params_id_seq'::regclass),
-    test_version text COLLATE pg_catalog."default" NOT NULL DEFAULT 'MMPI-2'::text,
+    test_version text COLLATE pg_catalog."default" NOT NULL DEFAULT 'MMPI'::text,
     locale text COLLATE pg_catalog."default" NOT NULL DEFAULT 'TR'::text,
     age_group text COLLATE pg_catalog."default" NOT NULL DEFAULT 'adult'::text,
     scale_name text COLLATE pg_catalog."default" NOT NULL,

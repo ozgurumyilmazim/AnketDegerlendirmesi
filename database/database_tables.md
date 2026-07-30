@@ -126,7 +126,7 @@ Normative mappings from raw scores to T-scores.
 ### 11. `t_score_params`
 Parameters (mean, standard deviation, K correction) for calculating T-scores.
 - `id` (bigint) - Primary Key
-- `test_version` (text) - Required (Default: 'MMPI-2')
+- `test_version` (text) - Required (Default: 'MMPI')
 - `locale` (text) - Required (Default: 'TR')
 - `age_group` (text) - Required (Default: 'adult')
 - `scale_name` (text) - Required
@@ -158,7 +158,7 @@ Stores the results of tests taken by participants.
 - `dont_know_count` (integer) - Default: 0
 - `completed_questions` (integer) - Default: 0
 - `total_questions` (integer) - Default: 567
-- `test_type` (varchar) - Default: 'MMPI-2'
+- `test_type` (varchar) - Default: 'MMPI'
 - `test_version` (varchar) - Default: '1.0'
 - `status` (varchar) - Default: 'completed' (Values: 'started', 'in_progress', 'completed', 'abandoned')
 - `created` (timestamp)

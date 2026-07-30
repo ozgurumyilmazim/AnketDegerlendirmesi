@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.test_results
     dont_know_count integer DEFAULT 0,
     completed_questions integer DEFAULT 0,
     total_questions integer DEFAULT 567,
-    test_type character varying(50) COLLATE pg_catalog."default" DEFAULT 'MMPI-2'::character varying,
+    test_type character varying(50) COLLATE pg_catalog."default" DEFAULT 'MMPI'::character varying,
     test_version character varying(20) COLLATE pg_catalog."default" DEFAULT '1.0'::character varying,
     status character varying(20) COLLATE pg_catalog."default" DEFAULT 'completed'::character varying,
     session_code character varying(11) COLLATE pg_catalog."default",

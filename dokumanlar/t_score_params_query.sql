@@ -1,7 +1,7 @@
 -- Tablo: cinsiyet + ölçek için M, SD ve K düzeltme katsayısı
 CREATE TABLE IF NOT EXISTS t_score_params (
   id           BIGSERIAL PRIMARY KEY,
-  test_version TEXT        NOT NULL DEFAULT 'MMPI-2',
+  test_version TEXT        NOT NULL DEFAULT 'MMPI',
   locale       TEXT        NOT NULL DEFAULT 'TR',
   age_group    TEXT        NOT NULL DEFAULT 'adult',
   scale_name   TEXT        NOT NULL,                      -- L, F, K, Hs, D, Hy, Pd, Mf, Pa, Pt, Sc, Ma, Si

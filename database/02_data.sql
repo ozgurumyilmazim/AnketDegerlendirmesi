@@ -584,14 +584,14 @@ INSERT INTO page_content (page_key, page_title, page_subtitle, page_body) VALUES
 ('kullanim', 'Kullanim Kosullari', 'MMPI psikolojik test sistemini kullanirken uymaniz gereken kurallar',
 '<h4>1. Hizmetin Kapsami</h4><p>OGULTURK A.S. tarafindan sunulan MMPI psikolojik test sistemi, bireylerin kisisel ve toplumsal uyumlarini objektif olarak degerlendirmeyi amaclayan bir dijital uygulamadir.</p>'),
 ('hakkimizda', 'Hakkimizda', 'OGULTURK A.S. ve MMPI Psikolojik Degerlendirme Sistemi',
-'<p>OGULTURK A.S. olarak, bireylerin kisisel ve toplumsal uyumlarini objektif bir sekilde degerlendirmek amaciyla MMPI-2 test hizmeti sunuyoruz.</p>')
+'<p>OGULTURK A.S. olarak, bireylerin kisisel ve toplumsal uyumlarini objektif bir sekilde degerlendirmek amaciyla MMPI test hizmeti sunuyoruz.</p>')
 ON CONFLICT (page_key) DO NOTHING;
 
 -- ============================================================
 -- 7. SETTINGS
 -- ============================================================
 INSERT INTO settings (setting_key, setting_value) VALUES
-('test_version', 'MMPI-2'),
+('test_version', 'MMPI'),
 ('max_dont_know', '10'),
 ('auto_save_interval', '30000'),
 ('app_name', 'MMPI Psikolojik Degerlendirme Sistemi')
