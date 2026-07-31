@@ -90,6 +90,7 @@ services:
   e2e:
     # Playwright test runner using official image matching package.json version
     image: mcr.microsoft.com/playwright:v1.61.1-noble
+    container_name: selma_e2e
     depends_on:
       - db
       - api
