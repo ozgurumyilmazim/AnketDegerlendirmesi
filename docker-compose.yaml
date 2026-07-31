@@ -91,7 +91,9 @@ services:
     # Playwright test runner using official image matching package.json version
     image: mcr.microsoft.com/playwright:1.50.0-noble
     depends_on:
-      - web
+      - db
+      - api
+      - nginx
     working_dir: /app/tests/e2e
     command: ["npx", "playwright", "test"]
     environment: {}
