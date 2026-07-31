@@ -95,9 +95,10 @@ services:
       - api
       - nginx
     working_dir: /app/tests/e2e
-    command: ["npx", "playwright", "test"]
+    command: ["sh", "-c", "npm run test && npm run show-report"]
     environment: {}
-    volumes:
+    ports:
+      - "9323:9323"
       - ./:/app:cached
     networks:
       - backend-network
