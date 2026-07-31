@@ -11,8 +11,8 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
       - pg_backups:/backups
-    ports:
-      - "127.0.0.1:5432:5432" # Sadece yerel yönetim bağlantıları için güvenli port
+    #ports:
+    #  - "127.0.0.1:5432:5432" # Sadece yerel yönetim bağlantıları için güvenli port
     networks:
       - backend-network
     deploy:
@@ -63,8 +63,8 @@ services:
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    ports:
-      - "127.0.0.1:5050:80" 
+    #ports:
+    #  - "127.0.0.1:5050:80" 
     networks:
       - backend-network
     depends_on:
@@ -97,8 +97,8 @@ services:
     working_dir: /app/tests/e2e
     command: ["sh", "-c", "npm run test && npm run show-report"]
     environment: {}
-    ports:
-      - "9323:9323"
+    #ports:
+    #  - "9323:9323"
     volumes:
       - ./:/app:cached
     networks:
