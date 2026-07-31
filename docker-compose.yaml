@@ -86,6 +86,20 @@ services:
       - pgadmin
       - api
 
+  # e2e tests
+  e2e:
+    # Playwright test runner using official image matching package.json version
+    image: mcr.microsoft.com/playwright:1.50.0-noble
+    depends_on:
+      - web
+    working_dir: /app/tests/e2e
+    command: ["npx", "playwright", "test"]
+    environment: {}
+    volumes:
+      - ./:/app:cached
+    networks:
+      - backend-network
+
 # --- NETWORKS (AĞLAR) ---
 networks:
   backend-network:
