@@ -99,6 +99,7 @@ services:
     environment: {}
     ports:
       - "9323:9323"
+    volumes:
       - ./:/app:cached
     networks:
       - backend-network
