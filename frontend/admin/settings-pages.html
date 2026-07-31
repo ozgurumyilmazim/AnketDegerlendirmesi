@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sayfa Yönetimi - MMPI Test Sistemi</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Admin CSS -->
     <link href="style.css" rel="stylesheet">
-    
+
     <style>
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -35,7 +36,9 @@
             font-weight: 500;
         }
 
-        .breadcrumb-nav a:hover { text-decoration: underline; }
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
 
         .breadcrumb-nav span {
             color: #6b7280;
@@ -102,13 +105,15 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
         }
 
-        .template-tab i { font-size: 1rem; }
+        .template-tab i {
+            font-size: 1rem;
+        }
 
         /* Editor paneli */
         .editor-panel {
             background: white;
             border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             overflow: hidden;
         }
 
@@ -128,7 +133,7 @@
         }
 
         .editor-header .badge {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             color: white;
             font-size: 0.75rem;
             padding: 0.35rem 0.75rem;
@@ -227,12 +232,37 @@
             outline: none;
         }
 
-        .editor-content h4 { font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0.5rem; }
-        .editor-content h5 { font-size: 1.05rem; font-weight: 700; margin: 0.9rem 0 0.4rem; }
-        .editor-content h6 { font-size: 0.95rem; font-weight: 700; margin: 0.8rem 0 0.35rem; }
-        .editor-content p { margin-bottom: 0.6rem; }
-        .editor-content ul, .editor-content ol { margin-bottom: 0.6rem; padding-left: 1.5rem; }
-        .editor-content li { margin-bottom: 0.25rem; }
+        .editor-content h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .editor-content h5 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0.9rem 0 0.4rem;
+        }
+
+        .editor-content h6 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0.8rem 0 0.35rem;
+        }
+
+        .editor-content p {
+            margin-bottom: 0.6rem;
+        }
+
+        .editor-content ul,
+        .editor-content ol {
+            margin-bottom: 0.6rem;
+            padding-left: 1.5rem;
+        }
+
+        .editor-content li {
+            margin-bottom: 0.25rem;
+        }
 
         .source-textarea {
             width: 100%;
@@ -247,7 +277,9 @@
             color: #1f2937;
         }
 
-        .source-textarea:focus { outline: none; }
+        .source-textarea:focus {
+            outline: none;
+        }
 
         .editor-footer-bar {
             padding: 0.75rem 1rem;
@@ -260,7 +292,10 @@
             background: #fafafa;
         }
 
-        .editor-footer-bar small { color: #9ca3af; font-size: 0.75rem; }
+        .editor-footer-bar small {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
 
         /* Önizleme */
         .preview-box {
@@ -277,11 +312,33 @@
             overflow-y: auto;
         }
 
-        .preview-box h4 { font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0.5rem; }
-        .preview-box h5 { font-size: 1.05rem; font-weight: 700; margin: 0.9rem 0 0.4rem; }
-        .preview-box h6 { font-size: 0.95rem; font-weight: 700; margin: 0.8rem 0 0.35rem; }
-        .preview-box p { margin-bottom: 0.6rem; }
-        .preview-box ul, .preview-box ol { margin-bottom: 0.6rem; padding-left: 1.5rem; }
+        .preview-box h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .preview-box h5 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0.9rem 0 0.4rem;
+        }
+
+        .preview-box h6 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0.8rem 0 0.35rem;
+        }
+
+        .preview-box p {
+            margin-bottom: 0.6rem;
+        }
+
+        .preview-box ul,
+        .preview-box ol {
+            margin-bottom: 0.6rem;
+            padding-left: 1.5rem;
+        }
 
         .editor-footer {
             padding: 1.25rem 1.5rem;
@@ -327,11 +384,17 @@
         }
 
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; }
-            .template-tabs { flex-direction: column; }
+            .main-content {
+                margin-left: 0;
+            }
+
+            .template-tabs {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div id="sidebar-container"></div>
@@ -384,25 +447,35 @@
 
             <div class="editor-toolbar">
                 <button class="toolbar-btn" title="Kalın" onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
-                <button class="toolbar-btn" title="İtalik" onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
-                <button class="toolbar-btn" title="Altı Çizili" onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
+                <button class="toolbar-btn" title="İtalik" onclick="execCmd('italic')"><i
+                        class="fas fa-italic"></i></button>
+                <button class="toolbar-btn" title="Altı Çizili" onclick="execCmd('underline')"><i
+                        class="fas fa-underline"></i></button>
                 <div class="toolbar-divider"></div>
                 <button class="toolbar-btn" title="Başlık 4" onclick="execCmd('formatBlock', 'h4')"><b>H4</b></button>
                 <button class="toolbar-btn" title="Başlık 5" onclick="execCmd('formatBlock', 'h5')"><b>H5</b></button>
                 <button class="toolbar-btn" title="Başlık 6" onclick="execCmd('formatBlock', 'h6')"><b>H6</b></button>
                 <button class="toolbar-btn" title="Paragraf" onclick="execCmd('formatBlock', 'p')"><b>P</b></button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" title="Sırasız Liste" onclick="execCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-                <button class="toolbar-btn" title="Sıralı Liste" onclick="execCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                <button class="toolbar-btn" title="Sırasız Liste" onclick="execCmd('insertUnorderedList')"><i
+                        class="fas fa-list-ul"></i></button>
+                <button class="toolbar-btn" title="Sıralı Liste" onclick="execCmd('insertOrderedList')"><i
+                        class="fas fa-list-ol"></i></button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" title="Sola Hizala" onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
-                <button class="toolbar-btn" title="Ortala" onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
-                <button class="toolbar-btn" title="Sağa Hizala" onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i></button>
+                <button class="toolbar-btn" title="Sola Hizala" onclick="execCmd('justifyLeft')"><i
+                        class="fas fa-align-left"></i></button>
+                <button class="toolbar-btn" title="Ortala" onclick="execCmd('justifyCenter')"><i
+                        class="fas fa-align-center"></i></button>
+                <button class="toolbar-btn" title="Sağa Hizala" onclick="execCmd('justifyRight')"><i
+                        class="fas fa-align-right"></i></button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" title="Geri Al" onclick="execCmd('undo')"><i class="fas fa-undo"></i></button>
-                <button class="toolbar-btn" title="Yinele" onclick="execCmd('redo')"><i class="fas fa-redo"></i></button>
+                <button class="toolbar-btn" title="Geri Al" onclick="execCmd('undo')"><i
+                        class="fas fa-undo"></i></button>
+                <button class="toolbar-btn" title="Yinele" onclick="execCmd('redo')"><i
+                        class="fas fa-redo"></i></button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" title="HTML Kaynağı" onclick="toggleSource()"><i class="fas fa-code"></i></button>
+                <button class="toolbar-btn" title="HTML Kaynağı" onclick="toggleSource()"><i
+                        class="fas fa-code"></i></button>
             </div>
 
             <div class="editor-body">
@@ -451,7 +524,8 @@
     <div class="modal fade" id="previewModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                     <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Sayfa Önizlemesi</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -511,10 +585,10 @@
     <script>
         // ---------- Page Config ----------
         const pageConfig = {
-            'ana-sayfa':  { title: '<i class="fas fa-home me-2"></i>Ana Sayfa İçeriği', badge: 'Site ana sayfası', file: 'index.html' },
+            'ana-sayfa': { title: '<i class="fas fa-home me-2"></i>Ana Sayfa İçeriği', badge: 'Site ana sayfası', file: 'index.html' },
             'hakkimizda': { title: '<i class="fas fa-info-circle me-2"></i>Hakkımızda İçeriği', badge: 'Hakkımızda sayfası', file: 'hakkimizda.html' },
-            'gizlilik':   { title: '<i class="fas fa-shield-alt me-2"></i>Gizlilik Politikası İçeriği', badge: 'Gizlilik sayfası', file: 'gizlilik.html' },
-            'kullanim':   { title: '<i class="fas fa-file-contract me-2"></i>Kullanım Koşulları İçeriği', badge: 'Kullanım koşulları sayfası', file: 'kullanim.html' }
+            'gizlilik': { title: '<i class="fas fa-shield-alt me-2"></i>Gizlilik Politikası İçeriği', badge: 'Gizlilik sayfası', file: 'gizlilik.html' },
+            'kullanim': { title: '<i class="fas fa-file-contract me-2"></i>Kullanım Koşulları İçeriği', badge: 'Kullanım koşulları sayfası', file: 'kullanim.html' }
         };
 
         const pageKeys = ['ana-sayfa', 'hakkimizda', 'gizlilik', 'kullanim'];
@@ -553,7 +627,7 @@
                         try {
                             if (document.queryCommandState(m[1])) btn.classList.add('active');
                             else btn.classList.remove('active');
-                        } catch(e) {}
+                        } catch (e) { }
                     }
                 }
             });
@@ -731,7 +805,7 @@
         }
 
         // ---------- Editor Events ----------
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             const hasPermission = await checkPagePermission('settings-pages');
             if (!hasPermission) return;
             const editor = document.getElementById('pageEditor');
@@ -739,11 +813,11 @@
             editor.addEventListener('mouseup', updateToolbarState);
 
             // Preview button override
-            document.getElementById('previewBtn').onclick = function(e) {
+            document.getElementById('previewBtn').onclick = function (e) {
                 e.preventDefault();
                 previewPage();
             };
-            document.getElementById('previewFooterBtn').onclick = function(e) {
+            document.getElementById('previewFooterBtn').onclick = function (e) {
                 e.preventDefault();
                 previewPage();
             };
@@ -836,7 +910,7 @@
         <div class="about-card">
             <div class="about-icon"><i class="fas fa-flask"></i></div>
             <h4 class="fw-bold mb-3">MMPI-2 Hakk\u0131nda</h4>
-            <p class="text-muted mb-0">567 maddeden olu\u015fan MMPI-2, d\u00fcnya genelinde en yayg\u0131n kullan\u0131lan objektif ki\u015filik testidir. 10 temel klinik \u00f6l\u00e7ek ve \u00e7e\u015fitli ge\u00e7erlilik \u00f6l\u00e7ekleri ile kapsaml\u0131 bir profil sunar.</p>
+            <p class="text-muted mb-0">566 maddeden olu\u015fan MMPI-2, d\u00fcnya genelinde en yayg\u0131n kullan\u0131lan objektif ki\u015filik testidir. 10 temel klinik \u00f6l\u00e7ek ve \u00e7e\u015fitli ge\u00e7erlilik \u00f6l\u00e7ekleri ile kapsaml\u0131 bir profil sunar.</p>
         </div>
     </div>
 </div>`
@@ -873,7 +947,7 @@
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-flask"></i></div>
                     <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
-                    <p class="text-muted mb-0">567 sorudan olu\u015fan MMPI-2 envanteri, onlarca y\u0131ll\u0131k ara\u015ft\u0131rma ve klinik deneyime dayanmaktad\u0131r.</p>
+                    <p class="text-muted mb-0">566 sorudan olu\u015fan MMPI-2 envanteri, onlarca y\u0131ll\u0131k ara\u015ft\u0131rma ve klinik deneyime dayanmaktad\u0131r.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -918,7 +992,7 @@
                 <div class="step-card text-center">
                     <div class="step-number mx-auto">3</div>
                     <h5 class="fw-bold mb-2">Testi Yan\u0131tlay\u0131n</h5>
-                    <p class="text-muted mb-0 small">567 soruyu "Do\u011fru", "Yanl\u0131\u015f" ya da "Bilmiyorum" olarak i\u015faretleyin.</p>
+                    <p class="text-muted mb-0 small">566 soruyu "Do\u011fru", "Yanl\u0131\u015f" ya da "Bilmiyorum" olarak i\u015faretleyin.</p>
                 </div>
             </div>
             <div class="col-md-3">
@@ -965,4 +1039,5 @@
         };
     </script>
 </body>
+
 </html>

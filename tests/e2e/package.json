@@ -7,6 +7,7 @@
     "test": "node node_modules/@playwright/test/cli.js test --project=chromium",
     "test:headed": "node node_modules/@playwright/test/cli.js test --headed",
     "test:debug": "node node_modules/@playwright/test/cli.js test --debug",
+    "show-report": "playwright show-report --host 0.0.0.0 --port 9323",
     "report": "node node_modules/@playwright/test/cli.js show-report reports",
     "server": "node server.js"
   },

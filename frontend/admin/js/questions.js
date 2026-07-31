@@ -5,7 +5,7 @@ class QuestionsManager {
         this.currentEditId = null;
         this.currentDeleteId = null;
         this.categories = [];
-        
+
         this.init();
     }
 
@@ -93,16 +93,16 @@ class QuestionsManager {
     async loadQuestions() {
         try {
             this.showLoading(true);
-            
+
             if (window.PG_API) {
                 try {
                     const { data, error } = await window.PG_API
                         .from('questions')
                         .select('*')
                         .order('question_number', { ascending: true });
-                    
+
                     if (error) throw error;
-                    
+
                     this.questions = data || [];
                 } catch (dbError) {
                     console.error('Error loading from database:', dbError);
@@ -114,7 +114,7 @@ class QuestionsManager {
                 this.showError('Veritabanı bağlantısı mevcut değil.');
                 this.questions = [];
             }
-            
+
             this.filteredQuestions = [...this.questions];
             this.renderQuestions();
             this.updateStatistics();
@@ -185,7 +185,7 @@ class QuestionsManager {
 
         this.filteredQuestions = this.questions.filter(q => {
             const matchesSearch = q.question_text.toLowerCase().includes(searchTerm) ||
-                                q.question_number.toString().includes(searchTerm);
+                q.question_number.toString().includes(searchTerm);
             const matchesCategory = !categoryFilter || parseInt(q.category_id) === parseInt(categoryFilter);
             return matchesSearch && matchesCategory;
         });
@@ -195,7 +195,7 @@ class QuestionsManager {
 
     renderQuestions() {
         const tbody = document.getElementById('questionsTableBody');
-        
+
         if (this.filteredQuestions.length === 0) {
             document.getElementById('noResults').style.display = 'block';
             tbody.innerHTML = '';
@@ -245,7 +245,7 @@ class QuestionsManager {
     async saveQuestion() {
         try {
             const formData = this.getFormData('addQuestionForm');
-            
+
             if (!this.validateQuestionData(formData)) return;
 
             if (this.questions.find(q => q.question_number === formData.question_number)) {
@@ -258,7 +258,7 @@ class QuestionsManager {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
-            
+
             let savedToDb = false;
 
             if (window.PG_API) {
@@ -266,9 +266,9 @@ class QuestionsManager {
                     const { data, error } = await window.PG_API
                         .from('questions')
                         .insert([newQuestion]);
-                    
+
                     if (error) throw new Error(error);
-                    
+
                     if (data && data.length > 0) {
                         newQuestion = data[0];
                         savedToDb = true;
@@ -284,14 +284,14 @@ class QuestionsManager {
 
             this.questions.push(newQuestion);
             this.questions.sort((a, b) => a.question_number - b.question_number);
-            
+
             this.filterQuestions();
             this.updateStatistics();
-            
+
             const modal = bootstrap.Modal.getInstance(document.getElementById('addQuestionModal'));
             if (modal) modal.hide();
             document.getElementById('addQuestionForm').reset();
-            
+
             this.showSuccess(savedToDb ? 'Soru başarıyla kaydedildi.' : 'Soru yerel olarak kaydedildi.');
         } catch (error) {
             this.showError('Soru kaydedilirken hata oluştu: ' + error.message);
@@ -301,7 +301,7 @@ class QuestionsManager {
     async updateQuestion() {
         try {
             const formData = this.getFormData('editQuestionForm');
-            
+
             if (!this.validateQuestionData(formData)) return;
 
             const questionIndex = this.questions.findIndex(q => q.id === this.currentEditId);
@@ -321,7 +321,7 @@ class QuestionsManager {
                 ...formData,
                 updated_at: new Date().toISOString()
             };
-            
+
             let savedToDb = false;
 
             if (window.PG_API && !this.currentEditId.startsWith('local-')) {
@@ -330,7 +330,7 @@ class QuestionsManager {
                         .from('questions')
                         .eq('id', this.currentEditId)
                         .update(formData);
-                    
+
                     if (error) throw new Error(error);
                     savedToDb = true;
                 } catch (dbError) {
@@ -341,13 +341,13 @@ class QuestionsManager {
 
             this.questions[questionIndex] = updatedQuestion;
             this.questions.sort((a, b) => a.question_number - b.question_number);
-            
+
             this.filterQuestions();
             this.updateStatistics();
-            
+
             const modal = bootstrap.Modal.getInstance(document.getElementById('editQuestionModal'));
             if (modal) modal.hide();
-            
+
             this.showSuccess(savedToDb ? 'Soru başarıyla güncellendi.' : 'Soru yerel olarak güncellendi.');
         } catch (error) {
             this.showError('Soru güncellenirken hata oluştu: ' + error.message);
@@ -368,7 +368,7 @@ class QuestionsManager {
                         .from('questions')
                         .eq('id', this.currentDeleteId)
                         .delete();
-                    
+
                     if (error) throw new Error(error);
                 } catch (dbError) {
                     this.showError('Veritabanından silinirken hata: ' + (dbError.message || dbError || 'Bilinmeyen hata'));
@@ -379,9 +379,9 @@ class QuestionsManager {
             this.questions.splice(questionIndex, 1);
             this.filterQuestions();
             this.updateStatistics();
-            
+
             bootstrap.Modal.getInstance(document.getElementById('deleteQuestionModal')).hide();
-            
+
             this.showSuccess('Soru başarıyla silindi.');
         } catch (error) {
             this.showError('Soru silinirken hata oluştu: ' + error.message);
@@ -436,7 +436,7 @@ class QuestionsManager {
         const modal = new bootstrap.Modal(document.getElementById('viewQuestionModal'));
         modal.show();
 
-        document.getElementById('viewQuestionModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('viewQuestionModal').addEventListener('hidden.bs.modal', function () {
             this.remove();
         });
     }
@@ -477,7 +477,7 @@ class QuestionsManager {
     }
 
     validateQuestionData(data) {
-        if (!data.question_number || data.question_number < 1 || data.question_number > 567) {
+        if (!data.question_number || data.question_number < 1 || data.question_number > 566) {
             this.showError('Geçerli bir soru numarası giriniz (1-567).');
             return false;
         }
@@ -533,12 +533,12 @@ class QuestionsManager {
         `;
 
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-        
+
         const toastElement = document.getElementById(toastId);
         const toast = new bootstrap.Toast(toastElement);
         toast.show();
 
-        toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.addEventListener('hidden.bs.toast', function () {
             this.remove();
         });
     }

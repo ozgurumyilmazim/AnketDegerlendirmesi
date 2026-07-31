@@ -157,7 +157,7 @@ Stores the results of tests taken by participants.
 - `end_time` (timestamp)
 - `dont_know_count` (integer) - Default: 0
 - `completed_questions` (integer) - Default: 0
-- `total_questions` (integer) - Default: 567
+- `total_questions` (integer) - Default: 566
 - `test_type` (varchar) - Default: 'MMPI'
 - `test_version` (varchar) - Default: '1.0'
 - `status` (varchar) - Default: 'completed' (Values: 'started', 'in_progress', 'completed', 'abandoned')

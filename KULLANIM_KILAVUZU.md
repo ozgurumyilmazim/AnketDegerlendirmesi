@@ -20,7 +20,7 @@ Bu proje, **Minnesota Çok Yönlü Kişilik Envanteri (MMPI-2)** testinin web ta
 
 ### Temel Özellikler
 
-- 567 soruluk MMPI-2 testini çevrimiçi uygulama
+- 566 soruluk MMPI-2 testini çevrimiçi uygulama
 - Klinik ve geçerlilik ölçeklerine göre otomatik puanlama
 - T-skoru dönüşümü ve grafiksel profil çıktısı
 - Psikolog değerlendirmesi ve PDF rapor oluşturma
@@ -151,7 +151,7 @@ Girilen bilgiler `localStorage`'a (`mmpiPersonalInfo`) kaydedilir ve PostgREST �
 
 ### 3.4. Test Sayfası (`mmpi-test.html`)
 
-- 567 soru tek tek gösterilir
+- 566 soru tek tek gösterilir
 - Her soruya üç cevap seçeneği: **Doğru**, **Yanlış**, **Bilmiyorum**
 - İlerleme çubuğu ile soru sayısı gösterilir
 - En fazla **10 "Bilmiyorum"** cevabına izin verilir (test-config.js'de `maxDontKnowAnswers`)
@@ -242,7 +242,7 @@ Rapor sayfasına `?id=` parametresi ile test sonucu ID'si verilerek erişilir.
 
 ### 5.1. Sorular
 
-- **Toplam:** 567 soru (MMPI-2 standardı)
+- **Toplam:** 566 soru (MMPI-2 standardı)
 - **Cevap Tipleri:** `Doğru`, `Yanlış`, `Bilmiyorum`
 - **Kategoriler:** Genel, Aile, Sağlık, Cinsellik, Duygusal, Sosyal
 - Sorular PostgREST üzerinden `questions` tablosundan yüklenir
@@ -351,7 +351,7 @@ Proje PostgreSQL kullanır. Ana tablolar:
 | `users` | Admin/psikolog hesapları (bcrypt hash ile) |
 | `participants` | Test katılımcıları |
 | `test_results` | Test cevapları ve sonuçları (JSONB) |
-| `questions` | 567 MMPI-2 sorusu |
+| `questions` | 566 MMPI-2 sorusu |
 | `scoring_keys` | Ölçek-soru eşleştirmeleri |
 | `t_score_norms` | T-skoru norm değerleri |
 | `t_score_params` | Ortalama (M), standart sapma (SD), K katsayısı |

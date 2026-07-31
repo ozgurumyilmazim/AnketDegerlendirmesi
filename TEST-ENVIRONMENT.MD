@@ -28,7 +28,7 @@
 1. `https://selma.ozguryilmaz.com.tr/` → "Teste Başla"
 2. Kişisel bilgiler girilir → "Devam Et"
 3. KVKK onayı → "Devam Et"
-4. MMPI-2 testi (567 soru) → "Testi Bitir"
+4. MMPI-2 testi (566 soru) → "Testi Bitir"
 5. `test-complete.html` → yönlendirme
 6. `report.html` → otomatik profil grafiği ve PDF çıktısı
 

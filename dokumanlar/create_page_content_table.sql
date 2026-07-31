@@ -161,7 +161,7 @@ INSERT INTO page_content (page_key, page_title, page_subtitle, page_body) VALUES
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-flask"></i></div>
                     <h4 class="fw-bold mb-3">Bilimsel Temelli</h4>
-                    <p class="text-muted mb-0">567 sorudan oluşan MMPI-2 envanteri, onlarca yıllık araştırma ve klinik deneyime dayanmaktadır.</p>
+                    <p class="text-muted mb-0">566 sorudan oluşan MMPI-2 envanteri, onlarca yıllık araştırma ve klinik deneyime dayanmaktadır.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -206,7 +206,7 @@ INSERT INTO page_content (page_key, page_title, page_subtitle, page_body) VALUES
                 <div class="step-card text-center">
                     <div class="step-number mx-auto">3</div>
                     <h5 class="fw-bold mb-2">Testi Yanıtlayın</h5>
-                    <p class="text-muted mb-0 small">567 soruyu "Doğru", "Yanlış" ya da "Bilmiyorum" olarak işaretleyin.</p>
+                    <p class="text-muted mb-0 small">566 soruyu "Doğru", "Yanlış" ya da "Bilmiyorum" olarak işaretleyin.</p>
                 </div>
             </div>
             <div class="col-md-3">

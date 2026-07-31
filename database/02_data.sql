@@ -21,7 +21,7 @@ INSERT INTO question_category (name, sort_order) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================================
--- 1. QUESTIONS (567 MMPI questions)
+-- 1. QUESTIONS (566 MMPI questions)
 -- Source: dokumanlar/questions_insert.sql
 -- ============================================================
 INSERT INTO questions (question_number, question_text, category_id) VALUES
@@ -127,8 +127,8 @@ INSERT INTO questions (question_number, question_text, category_id) VALUES
 (100, 'Bildigim bir konuda bir kimse sacma sapan ya da cahilce konusursa onu hemen duzeltirim.', 1)
 ON CONFLICT (question_number) DO UPDATE SET question_text = EXCLUDED.question_text, category_id = EXCLUDED.category_id;
 
--- Note: question 101-567 are in dokumanlar/questions_insert.sql
--- This file contains all 567 questions. Run the full file if needed:
+-- Note: question 101-566 are in dokumanlar/questions_insert.sql
+-- This file contains all 566 questions. Run the full file if needed:
 -- \i ../dokumanlar/questions_insert.sql
 
 -- ============================================================

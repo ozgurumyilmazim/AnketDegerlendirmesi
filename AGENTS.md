@@ -64,7 +64,7 @@ python3 -m http.server 8000   # from frontend/
 
 ## Test config (`test-config.js`)
 - `maxDontKnowAnswers: 10`, `autoSaveInterval: 30000`, `enableLocalStorage: true`, `enableDbSync: true`
-- 567 questions, max 15 "Bilmiyorum"
+- 566 questions, max 15 "Bilmiyorum"
 
 ## Save & Resume feature
 - User clicks "Kaydet ve Çık" → 11-char random code (A-Z, 2-9, no 0/1/O/I) generated → progress saved to DB with `status='in_progress'` → code shown in modal
