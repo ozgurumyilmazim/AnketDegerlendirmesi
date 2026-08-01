@@ -123,7 +123,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.waitForTimeout(3000);
 
     // Katilimci bilgilerini dogrula
-    await adminPage.waitForSelector(`#testResultsTable tbody tr:has-text("${participant.lastName}")`, { timeout: 15000 });
+    await expect(adminPage.locator('#testResultsTable tbody tr', { hasText: participant.lastName })).toBeVisible({ timeout: 15000 });
 
     await adminPage.goto('/admin/reports.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(2000);
