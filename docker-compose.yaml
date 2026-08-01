@@ -96,7 +96,7 @@ services:
       - api
       - nginx
     working_dir: /app/tests/e2e
-    command: [ "sh", "-c", "npm run test && npm run show-report && npm run server" ]
+    command: [ "sh", "-c", "npm run server & sleep 5 && npm run test && npm run show-report && wait" ]
     environment: {}
     #ports:
     #  - "9323:9323"
