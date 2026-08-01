@@ -41,7 +41,7 @@ const html = (msg, running) => `<!DOCTYPE html>
 <style>body{padding-top:2rem}pre{max-height:70vh}</style></head><body>
 <div class="container"><h1 class="mb-3">E2E Test Runner</h1>
 <div class="d-flex gap-3 mb-3">
-   <button class="btn btn-primary btn-lg" id="runBtn" onclick="fetch('/test-runner/run',{method:'POST'}).then(r=>r.json()).then(r=>{if(r.error)alert(r.error);else{testRunning=true;poll();}})">▶ Testi Başlat</button>
+   <button class="btn btn-primary btn-lg" id="runBtn" onclick="fetch('test-runner/run',{method:'POST'}).then(r=>r.json()).then(r=>{if(r.error)alert(r.error);else{testRunning=true;poll();}})">▶ Testi Başlat</button>
   <a class="btn btn-outline-success btn-lg" href="/test-reports/" target="_blank">📊 Rapor</a>
 </div>
 <div id="status" class="alert alert-info">${msg}</div>
@@ -49,7 +49,7 @@ const html = (msg, running) => `<!DOCTYPE html>
 </div>
 <script>
 let testRunning=${testRunning};
-function poll(){setInterval(async()=>{const r=await fetch('/test-runner/status').then(r=>r.json());document.getElementById('output').textContent=r.output;if(!r.running && testRunning){testRunning=false;document.getElementById('status').className='alert alert-success';document.getElementById('status').textContent='Test tamamlandı!';document.getElementById('runBtn').disabled=false;}else if(r.running){document.getElementById('status').className='alert alert-warning';document.getElementById('status').textContent='Test çalışıyor...';document.getElementById('runBtn').disabled=true;testRunning=true;}},1000);}
+function poll(){setInterval(async()=>{    const r=await fetch('test-runner/status').then(r=>r.json());document.getElementById('output').textContent=r.output;if(!r.running && testRunning){testRunning=false;document.getElementById('status').className='alert alert-success';document.getElementById('status').textContent='Test tamamlandı!';document.getElementById('runBtn').disabled=false;}else if(r.running){document.getElementById('status').className='alert alert-warning';document.getElementById('status').textContent='Test çalışıyor...';document.getElementById('runBtn').disabled=true;testRunning=true;}},1000);}
 ${testRunning ? 'testRunning=true;setTimeout(poll,500);' : ''}
 document.getElementById('runBtn').disabled=${testRunning};
 </script></body></html>`;
