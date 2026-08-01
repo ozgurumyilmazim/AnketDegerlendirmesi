@@ -16,6 +16,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // 1. ANASAYFA
     // =========================================================
     await page.goto('/', { waitUntil: 'networkidle' });
+    await page.waitForSelector('a, button', { hasText: 'Teste Başla', timeout: 30000 });
     await page.locator('a, button').filter({ hasText: 'Teste Başla' }).first().click();
 
     // =========================================================
