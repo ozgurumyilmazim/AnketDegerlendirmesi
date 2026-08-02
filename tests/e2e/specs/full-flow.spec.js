@@ -78,15 +78,14 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
       const mmpi = window.mmpiTest;
       if (!mmpi) throw new Error('mmpiTest bulunamadi');
 
-      // Tüm sorular için %50 ihtimalle 'Doğru' veya 'Yanlış' seçimi yapılır
+      // Fill all answers randomly: 'Doğru' or 'Yanlış'
+      mmpi.answers = {};
       for (const q of mmpi.questions) {
-        mevcutSoruSayisi = mevcutSoruSayisi + 1;
-        answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-        // answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
+        const isTrue = Math.random() < 0.5;
+        mmpi.answers[q.question_number] = isTrue ? 'Doğru' : 'Yanlış';
       }
 
-      Object.assign(answers, mmpi.answers);
-      mmpi.answers = answer;
+      // Reset counters and display last question
       mmpi.dontKnowCount = 0;
       mmpi.currentQuestionIndex = mmpi.questions.length - 1;
       mmpi.displayQuestion();
