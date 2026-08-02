@@ -149,7 +149,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.waitForSelector(`#testResultsTable tbody tr:has-text("${participant.lastName}")`, { timeout: 15000 });
 
     // İşlemler sutunundakı detay butonuna tıkla
-    await adminPage.locator('button:has-label("Detayları Görüntüle")').click();
+    await adminPage.locator('button:has-attribute("aria-label", "Detayları Görüntüle")').click();
     await adminPage.waitForURL('**/admin/test-detail.html', { timeout: 30000 });
 
     // Doğru sayısı ve yanlış sayısını doğrula
