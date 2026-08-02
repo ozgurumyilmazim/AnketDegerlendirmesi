@@ -147,14 +147,45 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.waitForSelector(`#testResultsTable tbody tr:has-text("${participant.lastName}")`, { timeout: 15000 });
 
     // İşlemler sutunundakı detay butonuna tıkla
-    await adminPage.locator('#testResultsTable tbody tr td:nth-child(10) a').click();
+    await adminPage.locator('button:has-label("Detayları Görüntüle")').click();
     await adminPage.waitForURL('**/admin/test-detail.html', { timeout: 30000 });
 
     // Doğru sayısı ve yanlış sayısını doğrula
     const correctCount = await adminPage.locator('#correctCount').textContent();
     const incorrectCount = await adminPage.locator('#incorrectCount').textContent();
-    expect(correctCount).not.toBe('-');
-    expect(incorrectCount).not.toBe('-');
+
+
+    // Beklenen Değerler
+    const expectedCorrect = Object.values(answers).filter(answer => answer === 'Doğru').length;
+    const expectedIncorrect = Object.values(answers).filter(answer => answer === 'Yanlış').length;
+
+    console.log(`Dogru Sayisi (Beklenen/Kayitli)=${expectedCorrect}/${correctCount}`);
+    console.log(`Yanlis Sayisi (Beklenen/Kayitli)=${expectedIncorrect}/${incorrectCount}`);
+
+    //expect(correctCount).not.toBe('-');
+    //expect(incorrectCount).not.toBe('-');
+
+    expect(correctCount).toBe(String(expectedCorrect));
+    expect(incorrectCount).toBe(String(expectedIncorrect));
+
+    const adSoyad = await adminPage.locator('#adSoyad').textContent();
+    expect(adSoyad).toContain(participant.firstName);
+    expect(adSoyad).toContain(participant.lastName);
+
+    const yas = await adminPage.locator('#yas').textContent();
+    expect(yas).toContain(participant.age);
+
+    const cinsiyet = await adminPage.locator('#cinsiyet').textContent();
+    expect(cinsiyet).toContain(participant.gender);
+
+    const egitim = await adminPage.locator('#egitim').textContent();
+    expect(egitim).toContain(participant.education);
+
+    const meslek = await adminPage.locator('#meslek').textContent();
+    expect(meslek).toContain(participant.profession);
+
+    const medeniDurum = await adminPage.locator('#medeniDurum').textContent();
+    expect(medeniDurum).toContain(participant.maritalStatus);
 
     await adminPage.goto('/admin/reports.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(2000);
