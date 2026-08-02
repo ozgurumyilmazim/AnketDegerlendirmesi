@@ -61,12 +61,14 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await expect(page.locator('#questionContainer')).toBeVisible({ timeout: 15000 });
 
     // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır
+    // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır ve cevap metni kaydedilir
     for (let i = 0; i < 3; i++) {
       mevcutSoruSayisi = mevcutSoruSayisi + 1;
-      answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-      // let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
-      console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
-      await page.locator(answers[mevcutSoruSayisi]).click();
+      const isTrue = Math.random() < 0.5;
+      const selector = isTrue ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+      answers[mevcutSoruSayisi] = isTrue ? 'Doğru' : 'Yanlış';
+      console.log(`Soru ${mevcutSoruSayisi} için Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
+      await page.locator(selector).click();
       await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
