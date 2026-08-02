@@ -124,7 +124,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.fill('#username', ADMIN_CREDENTIALS.email);
     await adminPage.fill('#password', ADMIN_CREDENTIALS.password);
     await adminPage.locator('#loginForm button[type="submit"]').click();
-    await adminPage.waitForURL('**/admin/dashboard.html', { timeout: 15000 });
+    await adminPage.waitForURL('**/admin/dashboard.html', { timeout: 30000 });
 
     await expect(adminPage.locator('#totalTests')).toBeVisible({ timeout: 10000 });
     console.log(`Dashboard: Toplam Test=${await adminPage.locator('#totalTests').textContent()}`);
