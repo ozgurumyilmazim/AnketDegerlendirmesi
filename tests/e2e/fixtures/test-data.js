@@ -37,6 +37,6 @@ export const ADMIN_CREDENTIALS = {
 export const TEST_CONFIG = {
   totalQuestions: 566,
   maxDontKnow: 10,
-  ' answerLabel: 'Doğru',
+  // answerLabel: 'Doğru',
   dontKnowLabel: 'Bilmiyorum',
 };
