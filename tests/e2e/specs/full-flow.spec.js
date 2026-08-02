@@ -135,6 +135,8 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
 
     // Katilimci bilgilerini dogrula: DataTables arama kutusunu kullan
     await adminPage.fill('input[type="search"]', participant.lastName);
+    // Enter'a basarak arama yap
+    await adminPage.press('input[type="search"]', 'Enter');
     // Arama sonuçları gelene kadar bekle
     await expect(adminPage.locator('#testResultsTable tbody tr', { hasText: participant.lastName })).toBeVisible({ timeout: 15000 });
 
