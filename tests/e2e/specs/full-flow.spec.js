@@ -3,6 +3,8 @@ import { createTestParticipant, ADMIN_CREDENTIALS, TEST_CONFIG } from '../fixtur
 
 test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
   let participant;
+  let mevcutSoruSayisi = 0
+  let answers = {};
 
   test.beforeAll(() => {
     participant = createTestParticipant();
@@ -60,8 +62,11 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
 
     // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır
     for (let i = 0; i < 3; i++) {
-      const randomAnswerSelector = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-      await page.locator(randomAnswerSelector).click();
+      mevcutSoruSayisi = mevcutSoruSayisi + 1;
+      let answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+      'let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
+      console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[i]}`);
+      await page.locator(answers[i]).click();
       await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
@@ -72,15 +77,16 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await page.evaluate(() => {
       const mmpi = window.mmpiTest;
       if (!mmpi) throw new Error('mmpiTest bulunamadi');
-      const answers = {};
 
       // Tüm sorular için %50 ihtimalle 'Doğru' veya 'Yanlış' seçimi yapılır
       for (const q of mmpi.questions) {
-        answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
+        mevcutSoruSayisi = mevcutSoruSayisi + 1;
+        answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+        ' answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
       }
 
       Object.assign(answers, mmpi.answers);
-      mmpi.answers = answers;
+      mmpi.answers = answer;
       mmpi.dontKnowCount = 0;
       mmpi.currentQuestionIndex = mmpi.questions.length - 1;
       mmpi.displayQuestion();
@@ -92,8 +98,10 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await expect(page.locator('#progressText')).toContainText(`${TEST_CONFIG.totalQuestions} /`);
 
     // Son soru için de rastgele seçim yapılır
-    const lastAnswerSelector = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-    await page.locator(lastAnswerSelector).click();
+    mevcutSoruSayisi = mevcutSoruSayisi + 1;
+    answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+    ' const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
+    await page.locator(answer[mevcutSoruSayisi]).click();
     await page.locator('#finishBtn').click();
 
     await page.waitForSelector('#loadingModal.show', { state: 'detached', timeout: 120000 }).catch(() => { });
@@ -139,6 +147,16 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.press('input[type="search"]', 'Enter');
     // Arama sonuçları gelene kadar bekle
     await expect(adminPage.locator('#testResultsTable tbody tr', { hasText: participant.lastName })).toBeVisible({ timeout: 15000 });
+
+    // İşlemler sutunundakı detay butonuna tıkla
+    await adminPage.locator('#testResultsTable tbody tr td:nth-child(10) a').click();
+    await adminPage.waitForURL('**/admin/test-detail.html', { timeout: 30000 });
+
+    // Doğru sayısı ve yanlış sayısını doğrula
+    const correctCount = await adminPage.locator('#correctCount').textContent();
+    const incorrectCount = await adminPage.locator('#incorrectCount').textContent();
+    expect(correctCount).not.toBe('-');
+    expect(incorrectCount).not.toBe('-');
 
     await adminPage.goto('/admin/reports.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(2000);
