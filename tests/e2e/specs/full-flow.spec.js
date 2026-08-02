@@ -58,19 +58,27 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('#questionContainer')).toBeVisible({ timeout: 15000 });
 
+    // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır
     for (let i = 0; i < 3; i++) {
-      await page.locator('label[for="answerTrue"]').click();
+      const randomAnswerSelector = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+      await page.locator(randomAnswerSelector).click();
       await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
     const progressText = await page.locator('#progressText').textContent();
     expect(progressText).toContain('4 /');
 
+    // Sayfa İçi State Müdahalesi: Tüm sorular rastgele 'Doğru' veya 'Yanlış' olarak doldurulur
     await page.evaluate(() => {
       const mmpi = window.mmpiTest;
       if (!mmpi) throw new Error('mmpiTest bulunamadi');
       const answers = {};
-      for (const q of mmpi.questions) answers[q.question_number] = 'Doğru';
+
+      // Tüm sorular için %50 ihtimalle 'Doğru' veya 'Yanlış' seçimi yapılır
+      for (const q of mmpi.questions) {
+        answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
+      }
+
       Object.assign(answers, mmpi.answers);
       mmpi.answers = answers;
       mmpi.dontKnowCount = 0;
@@ -82,10 +90,13 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     });
 
     await expect(page.locator('#progressText')).toContainText(`${TEST_CONFIG.totalQuestions} /`);
-    await page.locator('label[for="answerTrue"]').click();
+
+    // Son soru için de rastgele seçim yapılır
+    const lastAnswerSelector = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+    await page.locator(lastAnswerSelector).click();
     await page.locator('#finishBtn').click();
 
-    await page.waitForSelector('#loadingModal.show', { state: 'detached', timeout: 120000 }).catch(() => {});
+    await page.waitForSelector('#loadingModal.show', { state: 'detached', timeout: 120000 }).catch(() => { });
     await page.waitForURL('**/test-complete.html', { timeout: 60000 });
 
     // =========================================================
