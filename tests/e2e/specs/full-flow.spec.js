@@ -151,7 +151,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // İşlemler sutunundakı detay butonuna tıkla
     // Click the “Detayları Görüntüle” button
     const row = adminPage.locator(`#testResultsTable tbody tr:has-text("${participant.lastName}")`);
-    await row.locator('button[title="Detayları Görüntüle"]').click();
+    await row.locator('td:nth-child(10)').click();
 
     // await adminPage.locator('button[title="Detayları Görüntüle"]').click();
     await adminPage.waitForURL('**/admin/test-detail.html', { timeout: 30000 });
