@@ -63,11 +63,11 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır
     for (let i = 0; i < 3; i++) {
       mevcutSoruSayisi = mevcutSoruSayisi + 1;
-      let answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+      answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
       // let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
-      console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[i]}`);
-      await page.locator(answers[i]).click();
-      await page.locator('#nextBtn').click();
+       console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
+       await page.locator(answers[mevcutSoruSayisi]).click();
+       await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
     const progressText = await page.locator('#progressText').textContent();
