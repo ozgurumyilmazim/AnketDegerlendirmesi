@@ -65,9 +65,9 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
       mevcutSoruSayisi = mevcutSoruSayisi + 1;
       answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
       // let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
-       console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
-       await page.locator(answers[mevcutSoruSayisi]).click();
-       await page.locator('#nextBtn').click();
+      console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
+      await page.locator(answers[mevcutSoruSayisi]).click();
+      await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
     const progressText = await page.locator('#progressText').textContent();
@@ -97,10 +97,10 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await expect(page.locator('#progressText')).toContainText(`${TEST_CONFIG.totalQuestions} /`);
 
     // Son soru için de rastgele seçim yapılır
-    mevcutSoruSayisi = mevcutSoruSayisi + 1;
-    answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-    // const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
-    await page.locator(answer[mevcutSoruSayisi]).click();
+    //mevcutSoruSayisi = mevcutSoruSayisi + 1;
+    //answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+    const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
+    await page.locator(lastAnswerSelector).click();
     await page.locator('#finishBtn').click();
 
     await page.waitForSelector('#loadingModal.show', { state: 'detached', timeout: 120000 }).catch(() => { });
