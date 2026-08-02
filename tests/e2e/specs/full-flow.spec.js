@@ -64,7 +64,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     for (let i = 0; i < 3; i++) {
       mevcutSoruSayisi = mevcutSoruSayisi + 1;
       let answers[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-      'let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
+      // let randomAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
       console.log(`Soru ${mevcutSoruSayisi} icin Rastgele Cevap: ${answers[i]}`);
       await page.locator(answers[i]).click();
       await page.locator('#nextBtn').click();
@@ -82,7 +82,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
       for (const q of mmpi.questions) {
         mevcutSoruSayisi = mevcutSoruSayisi + 1;
         answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-        ' answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
+        // answers[q.question_number] = Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
       }
 
       Object.assign(answers, mmpi.answers);
@@ -100,7 +100,7 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // Son soru için de rastgele seçim yapılır
     mevcutSoruSayisi = mevcutSoruSayisi + 1;
     answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-    ' const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
+    // const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
     await page.locator(answer[mevcutSoruSayisi]).click();
     await page.locator('#finishBtn').click();
 
@@ -141,12 +141,11 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await adminPage.goto('/admin/test-results.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(3000);
 
-    // Katilimci bilgilerini dogrula: DataTables arama kutusunu kullan
-    await adminPage.fill('input[type="search"]', participant.lastName);
-    // Enter'a basarak arama yap
-    await adminPage.press('input[type="search"]', 'Enter');
-    // Arama sonuçları gelene kadar bekle
-    await expect(adminPage.locator('#testResultsTable tbody tr', { hasText: participant.lastName })).toBeVisible({ timeout: 15000 });
+    // Use DataTables global search
+    await adminPage.fill('#testResultsTable_filter input', participant.lastName);
+    await adminPage.press('#testResultsTable_filter input', 'Enter');
+    // Wait for the filtered row to appear
+    await adminPage.waitForSelector(`#testResultsTable tbody tr:has-text("${participant.lastName}")`, { timeout: 15000 });
 
     // İşlemler sutunundakı detay butonuna tıkla
     await adminPage.locator('#testResultsTable tbody tr td:nth-child(10) a').click();
