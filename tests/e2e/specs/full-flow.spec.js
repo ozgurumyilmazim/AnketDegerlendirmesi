@@ -6,6 +6,18 @@ const BASE_URL = process.env.BASE_URL || 'https://selma.ozguryilmaz.com.tr';
 // ── Reusable helpers ──────────────────────────────────────────────
 
 async function fillPersonalInfo(page, participant) {
+  console.log('--- Kişisel Bilgi Formu Dolduruluyor ---');
+  console.log(`  Ad: ${participant.firstName}`);
+  console.log(`  Soyad: ${participant.lastName}`);
+  console.log(`  TC No: ${participant.tcNo}`);
+  console.log(`  Cinsiyet: ${participant.gender} (${GENDER_DISPLAY[participant.gender]})`);
+  console.log(`  Yaş: ${participant.age}`);
+  console.log(`  Kurum Kodu: ${participant.institutionCode}`);
+  console.log(`  Kurum Adı: ${participant.institutionName}`);
+  console.log(`  Meslek: ${participant.profession}`);
+  console.log(`  Eğitim: ${participant.education}`);
+  console.log(`  Medeni Durum: ${participant.maritalStatus}`);
+
   await page.fill('#firstName', participant.firstName);
   await page.fill('#lastName', participant.lastName);
   await page.fill('#tcNo', participant.tcNo);
@@ -19,12 +31,16 @@ async function fillPersonalInfo(page, participant) {
 }
 
 async function loginAsAdmin(page) {
+  console.log('--- Admin Girişi ---');
+  console.log(`  E-posta: ${ADMIN_CREDENTIALS.email}`);
+  console.log(`  Şifre: ${'*'.repeat(ADMIN_CREDENTIALS.password.length)}`);
   await page.goto('/admin/login.html');
   await page.waitForLoadState('networkidle');
   await page.fill('#username', ADMIN_CREDENTIALS.email);
   await page.fill('#password', ADMIN_CREDENTIALS.password);
   await page.locator('#loginForm button[type="submit"]').click();
   await page.waitForURL('**/admin/dashboard.html', { timeout: 30000 });
+  console.log('  Giriş başarılı, dashboard yüklendi');
 }
 
 function randomAnswer() {
@@ -169,34 +185,41 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await expect(page.locator('.alert-success')).toBeVisible({ timeout: 10000 });
 
     const totalQ = await page.locator('#totalQuestions').textContent();
+    const duration = await page.locator('#testDuration').textContent();
+    const dontKnowCount = await page.locator('#dontKnowCount').textContent();
+    const testId = await page.locator('#testId').textContent();
+    const participantName = await page.locator('#participantName').textContent();
+    const participantAge = await page.locator('#participantAge').textContent();
+    const participantGender = await page.locator('#participantGender').textContent();
+
+    console.log('--- Test Complete Sayfası Değerleri ---');
+    console.log(`  Toplam Soru: ${totalQ}`);
+    console.log(`  Süre: ${duration}`);
+    console.log(`  Bilmiyorum: ${dontKnowCount}`);
+    console.log(`  Test ID: ${testId}`);
+    console.log(`  Katılımcı: ${participantName}`);
+    console.log(`  Yaş: ${participantAge}`);
+    console.log(`  Cinsiyet: ${participantGender}`);
+
     expect(totalQ).not.toBe('-');
     expect(Number(totalQ)).toBe(TEST_CONFIG.totalQuestions);
-
-    const duration = await page.locator('#testDuration').textContent();
     expect(duration).not.toBe('-');
-
-    const dontKnowCount = await page.locator('#dontKnowCount').textContent();
     expect(dontKnowCount).toContain('0');
-
-    const testId = await page.locator('#testId').textContent();
     expect(testId).toContain('MMPI-');
-
-    const participantName = await page.locator('#participantName').textContent();
     expect(participantName).toContain(participant.firstName);
     expect(participantName).toContain(participant.lastName);
-
-    const participantAge = await page.locator('#participantAge').textContent();
     expect(participantAge).toContain(String(participant.age));
-
-    const participantGender = await page.locator('#participantGender').textContent();
     expect(participantGender).toContain(GENDER_DISPLAY[participant.gender]);
 
     // localStorage doğrulaması
     const mmpiResults = await page.evaluate(() => localStorage.getItem('mmpiTestResults'));
     expect(mmpiResults).not.toBeNull();
     const parsed = JSON.parse(mmpiResults);
+    const answerCount = Object.keys(parsed.answers).length;
+    console.log(`--- localStorage Doğrulaması ---`);
+    console.log(`  Toplam cevap sayısı: ${answerCount}`);
     expect(parsed.answers).toBeDefined();
-    expect(Object.keys(parsed.answers).length).toBe(TEST_CONFIG.totalQuestions);
+    expect(answerCount).toBe(TEST_CONFIG.totalQuestions);
 
     // =========================================================
     // 7. ADMIN PANELI
@@ -221,6 +244,8 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
 
     // DataTables global search ile katılımcıyı bul
     const searchInput = adminPage.locator('#testResultsTable_filter input');
+    console.log(`--- Admin Arama ---`);
+    console.log(`  Arama terimi: ${participant.lastName}`);
     await searchInput.fill(participant.lastName);
     await searchInput.press('Enter');
     await adminPage.waitForSelector(
