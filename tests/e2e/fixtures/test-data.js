@@ -10,8 +10,13 @@ function generateTckn() {
 }
 
 function generateGender() {
-  return Math.random() < 0.5 ? 'Erkek' : 'Kadın';
+  return Math.random() < 0.5 ? 'male' : 'female';
 }
+
+export const GENDER_DISPLAY = {
+  male: 'Erkek',
+  female: 'Kadın',
+};
 
 export function createTestParticipant() {
   const suffix = Date.now().toString(36).slice(-6);

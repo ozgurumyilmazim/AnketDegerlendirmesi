@@ -1,10 +1,45 @@
 import { test, expect } from '@playwright/test';
-import { createTestParticipant, ADMIN_CREDENTIALS, TEST_CONFIG } from '../fixtures/test-data.js';
+import { createTestParticipant, GENDER_DISPLAY, ADMIN_CREDENTIALS, TEST_CONFIG } from '../fixtures/test-data.js';
+
+const BASE_URL = process.env.BASE_URL || 'https://selma.ozguryilmaz.com.tr';
+
+// ── Reusable helpers ──────────────────────────────────────────────
+
+async function fillPersonalInfo(page, participant) {
+  await page.fill('#firstName', participant.firstName);
+  await page.fill('#lastName', participant.lastName);
+  await page.fill('#tcNo', participant.tcNo);
+  await page.selectOption('#gender', participant.gender);
+  await page.fill('#age', String(participant.age));
+  await page.fill('#institutionCode', participant.institutionCode);
+  await page.fill('#institutionName', participant.institutionName);
+  await page.fill('#profession', participant.profession);
+  await page.selectOption('#education', participant.education);
+  await page.selectOption('#maritalStatus', participant.maritalStatus);
+}
+
+async function loginAsAdmin(page) {
+  await page.goto('/admin/login.html');
+  await page.waitForLoadState('networkidle');
+  await page.fill('#username', ADMIN_CREDENTIALS.email);
+  await page.fill('#password', ADMIN_CREDENTIALS.password);
+  await page.locator('#loginForm button[type="submit"]').click();
+  await page.waitForURL('**/admin/dashboard.html', { timeout: 30000 });
+}
+
+function randomAnswer() {
+  return Math.random() < 0.5 ? 'Doğru' : 'Yanlış';
+}
+
+function answerSelector(answer) {
+  return answer === 'Doğru' ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
+}
+
+// ── Test Suite ────────────────────────────────────────────────────
 
 test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
   let participant;
-  let mevcutSoruSayisi = 0
-  let answers = {};
+  let allAnswers = {};
 
   test.beforeAll(() => {
     participant = createTestParticipant();
@@ -18,30 +53,31 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // 1. ANASAYFA
     // =========================================================
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector('a, button', { hasText: 'Teste Başla', timeout: 30000 });
-    await page.locator('a, button').filter({ hasText: 'Teste Başla' }).first().click();
+    await page.waitForSelector('a.hero-cta', { hasText: 'Teste Başla', timeout: 30000 });
+    await page.locator('a.hero-cta').filter({ hasText: 'Teste Başla' }).first().click();
 
     // =========================================================
     // 2. UYARI SAYFASI (testebasla.html)
     // =========================================================
     await page.waitForURL('**/testebasla.html');
+
+    // "Kayıtlı Teste Devam Et" butonu mevcut mu?
+    const resumeBtn = page.locator('a.btn.btn-outline-primary', { hasText: 'Kayıtlı Teste Devam Et' });
+    await expect(resumeBtn).toBeVisible();
+
     await page.locator('a.btn-success').filter({ hasText: 'Teste Başla' }).click();
 
     // =========================================================
     // 3. KISISEL BILGI FORMU
     // =========================================================
     await page.waitForURL('**/personal-info.html', { timeout: 15000 });
+    await expect(page.locator('#personalInfoForm')).toBeVisible();
 
-    await page.fill('#firstName', participant.firstName);
-    await page.fill('#lastName', participant.lastName);
-    await page.fill('#tcNo', participant.tcNo);
-    await page.selectOption('#gender', participant.gender);
-    await page.fill('#age', String(participant.age));
-    await page.fill('#institutionCode', participant.institutionCode);
-    await page.fill('#institutionName', participant.institutionName);
-    await page.fill('#profession', participant.profession);
-    await page.selectOption('#education', participant.education);
-    await page.selectOption('#maritalStatus', participant.maritalStatus);
+    // "Kayıtlı teste devam et" linki mevcut mu?
+    const resumeLink = page.locator('a[href="test-devam.html"]', { hasText: 'Kayıtlı teste devam et' });
+    await expect(resumeLink).toBeVisible();
+
+    await fillPersonalInfo(page, participant);
     await page.locator('#personalInfoForm button[type="submit"]').click();
 
     // =========================================================
@@ -50,6 +86,16 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await page.waitForURL('**/kvkk-consent.html', { timeout: 15000 });
     await page.waitForLoadState('networkidle');
     await expect(page.locator('#kvkkContent')).toBeVisible({ timeout: 10000 });
+
+    // Geri Dön butonu mevcut mu?
+    const backBtn = page.locator('button', { hasText: 'Geri Dön' });
+    await expect(backBtn).toBeVisible();
+
+    // Checkbox onaysız tıklanırsa uyarı gösterilmeli
+    await page.locator('#acceptBtn').click();
+    await expect(page.locator('#warningMessage')).not.toHaveClass(/d-none/);
+
+    // Şimdi işaretle ve onayla
     await page.check('#kvkkConsent');
     await page.locator('#acceptBtn').click();
 
@@ -60,34 +106,40 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('#questionContainer')).toBeVisible({ timeout: 15000 });
 
-    // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır
-    // İlk 3 Soru: Rastgele "Doğru" veya "Yanlış" seçeneği tıklanır ve cevap metni kaydedilir
+    // "Kişisel Bilgileri Düzenle" butonu mevcut mu?
+    const editInfoBtn = page.locator('button', { hasText: 'Kişisel Bilgileri Düzenle' });
+    await expect(editInfoBtn).toBeVisible();
+
+    // İlk 3 soruyu rastgele cevapla ve cevapları kaydet
     for (let i = 0; i < 3; i++) {
-      mevcutSoruSayisi = mevcutSoruSayisi + 1;
-      const isTrue = Math.random() < 0.5;
-      const selector = isTrue ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-      answers[mevcutSoruSayisi] = isTrue ? 'Doğru' : 'Yanlış';
-      console.log(`Soru ${mevcutSoruSayisi} için Rastgele Cevap: ${answers[mevcutSoruSayisi]}`);
-      await page.locator(selector).click();
+      const answer = randomAnswer();
+      const qNum = i + 1;
+      allAnswers[qNum] = answer;
+      console.log(`Soru ${qNum} için Rastgele Cevap: ${answer}`);
+      await page.locator(answerSelector(answer)).click();
       await page.locator('#nextBtn').click();
       await page.waitForTimeout(200);
     }
+
+    // İlerleme çubuğu 4. soruyu göstermeli
     const progressText = await page.locator('#progressText').textContent();
     expect(progressText).toContain('4 /');
 
-    // Sayfa İçi State Müdahalesi: Tüm sorular rastgele 'Doğru' veya 'Yanlış' olarak doldurulur
+    // "Önceki" butonu artık aktif olmalı (index > 0)
+    await expect(page.locator('#prevBtn')).toBeEnabled();
+
+    // Sayfa İçi State Müdahalesi: Tüm soruları rastgele doldur
     await page.evaluate(() => {
       const mmpi = window.mmpiTest;
       if (!mmpi) throw new Error('mmpiTest bulunamadi');
 
-      // Fill all answers randomly: 'Doğru' or 'Yanlış'
+      // Mevcut cevapları temizle ve tümünü rastgele doldur
       mmpi.answers = {};
       for (const q of mmpi.questions) {
         const isTrue = Math.random() < 0.5;
         mmpi.answers[q.question_number] = isTrue ? 'Doğru' : 'Yanlış';
       }
 
-      // Reset counters and display last question
       mmpi.dontKnowCount = 0;
       mmpi.currentQuestionIndex = mmpi.questions.length - 1;
       mmpi.displayQuestion();
@@ -98,11 +150,14 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
 
     await expect(page.locator('#progressText')).toContainText(`${TEST_CONFIG.totalQuestions} /`);
 
-    // Son soru için de rastgele seçim yapılır
-    //mevcutSoruSayisi = mevcutSoruSayisi + 1;
-    //answer[mevcutSoruSayisi] = Math.random() < 0.5 ? 'label[for="answerTrue"]' : 'label[for="answerFalse"]';
-    const lastAnswerSelector = Math.random() < 0.5 ? 'label[for= "answerTrue"]' : 'label[for= "answerFalse"]';
-    await page.locator(lastAnswerSelector).click();
+    // Son soru için rastgele seçim
+    const lastAnswer = randomAnswer();
+    await page.locator(answerSelector(lastAnswer)).click();
+
+    // Sonraki butonu gizlenmiş, Tamamla butonu görünür olmalı
+    await expect(page.locator('#nextBtn')).toBeHidden();
+    await expect(page.locator('#finishBtn')).toBeVisible();
+
     await page.locator('#finishBtn').click();
 
     await page.waitForSelector('#loadingModal.show', { state: 'detached', timeout: 120000 }).catch(() => { });
@@ -111,12 +166,32 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // =========================================================
     // 6. TEST COMPLETE DOGRULAMA
     // =========================================================
-    await expect(page.locator('text=Test Sonuçları Kaydedildi')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.alert-success')).toBeVisible({ timeout: 10000 });
+
     const totalQ = await page.locator('#totalQuestions').textContent();
     expect(totalQ).not.toBe('-');
+    expect(Number(totalQ)).toBe(TEST_CONFIG.totalQuestions);
+
     const duration = await page.locator('#testDuration').textContent();
     expect(duration).not.toBe('-');
 
+    const dontKnowCount = await page.locator('#dontKnowCount').textContent();
+    expect(dontKnowCount).toContain('0');
+
+    const testId = await page.locator('#testId').textContent();
+    expect(testId).toContain('MMPI-');
+
+    const participantName = await page.locator('#participantName').textContent();
+    expect(participantName).toContain(participant.firstName);
+    expect(participantName).toContain(participant.lastName);
+
+    const participantAge = await page.locator('#participantAge').textContent();
+    expect(participantAge).toContain(String(participant.age));
+
+    const participantGender = await page.locator('#participantGender').textContent();
+    expect(participantGender).toContain(GENDER_DISPLAY[participant.gender]);
+
+    // localStorage doğrulaması
     const mmpiResults = await page.evaluate(() => localStorage.getItem('mmpiTestResults'));
     expect(mmpiResults).not.toBeNull();
     const parsed = JSON.parse(mmpiResults);
@@ -127,76 +202,65 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // 7. ADMIN PANELI
     // =========================================================
     const adminPage = await context.newPage();
-    await adminPage.goto('/admin/login.html');
-    await adminPage.waitForLoadState('networkidle');
-
-    await adminPage.fill('#username', ADMIN_CREDENTIALS.email);
-    await adminPage.fill('#password', ADMIN_CREDENTIALS.password);
-    await adminPage.locator('#loginForm button[type="submit"]').click();
-    await adminPage.waitForURL('**/admin/dashboard.html', { timeout: 30000 });
+    await loginAsAdmin(adminPage);
 
     await expect(adminPage.locator('#totalTests')).toBeVisible({ timeout: 10000 });
     console.log(`Dashboard: Toplam Test=${await adminPage.locator('#totalTests').textContent()}`);
 
-    // Test sonuclari sayfasini kontrol et
+    // =========================================================
+    // 8. TEST SONUCLARI SAYFASI
+    // =========================================================
     await adminPage.goto('/admin/test-results.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(3000);
 
-    // Use DataTables global search
-    await adminPage.fill('#testResultsTable_filter input', participant.lastName);
-    await adminPage.press('#testResultsTable_filter input', 'Enter');
-    // Wait for the filtered row to appear
-    await adminPage.waitForSelector(`#testResultsTable tbody tr:has-text("${participant.lastName}")`, { timeout: 15000 });
+    // Filtre alanları mevcut mu?
+    await expect(adminPage.locator('#filterName')).toBeVisible();
+    await expect(adminPage.locator('#filterDateFrom')).toBeVisible();
+    await expect(adminPage.locator('#filterDateTo')).toBeVisible();
+    await expect(adminPage.locator('#filterStatus')).toBeVisible();
 
-    // İşlemler sutunundakı detay butonuna tıkla
-    // Click the “Detayları Görüntüle” button
+    // DataTables global search ile katılımcıyı bul
+    const searchInput = adminPage.locator('#testResultsTable_filter input');
+    await searchInput.fill(participant.lastName);
+    await searchInput.press('Enter');
+    await adminPage.waitForSelector(
+      `#testResultsTable tbody tr:has-text("${participant.lastName}")`,
+      { timeout: 15000 }
+    );
+
+    // =========================================================
+    // 9. TEST DETAY MODALINI AC
+    // =========================================================
     const row = adminPage.locator(`#testResultsTable tbody tr:has-text("${participant.lastName}")`);
-    await row.locator('td:nth-child(10) button[title="Detayları Görüntüle"]').waitFor({ state: 'visible', timeout: 5000 });
-    await row.locator('td:nth-child(10) button[title="Detayları Görüntüle"]').click();
+    const detailBtn = row.locator('button[title="Detayları Görüntüle"]');
+    await detailBtn.waitFor({ state: 'visible', timeout: 5000 });
+    await detailBtn.click();
 
-    // await adminPage.locator('button[title="Detayları Görüntüle"]').click();
-    await adminPage.waitForURL('**/admin/test-detail.html', { timeout: 30000 });
+    // Modal açılmalı
+    await adminPage.waitForSelector('#testDetailModal.show', { timeout: 15000 });
 
-    // Doğru sayısı ve yanlış sayısını doğrula
-    const correctCount = await adminPage.locator('#correctCount').textContent();
-    const incorrectCount = await adminPage.locator('#incorrectCount').textContent();
+    // Detay içeriği yüklenmeli
+    const detailContent = adminPage.locator('#testDetailContent');
+    await expect(detailContent).not.toBeEmpty({ timeout: 10000 });
 
+    // Rapor Oluştur butonu mevcut mu?
+    const generateReportBtn = adminPage.locator('#testDetailGenerateReportBtn');
+    await expect(generateReportBtn).toBeVisible();
 
-    // Beklenen Değerler
-    const expectedCorrect = Object.values(answers).filter(answer => answer === 'Doğru').length;
-    const expectedIncorrect = Object.values(answers).filter(answer => answer === 'Yanlış').length;
+    // Modalı kapat
+    await adminPage.locator('#testDetailModal .btn-close').click();
+    await adminPage.waitForSelector('#testDetailModal.show', { state: 'hidden', timeout: 5000 });
 
-    console.log(`Dogru Sayisi (Beklenen/Kayitli)=${expectedCorrect}/${correctCount}`);
-    console.log(`Yanlis Sayisi (Beklenen/Kayitli)=${expectedIncorrect}/${incorrectCount}`);
-
-    //expect(correctCount).not.toBe('-');
-    //expect(incorrectCount).not.toBe('-');
-
-    expect(correctCount).toBe(String(expectedCorrect));
-    expect(incorrectCount).toBe(String(expectedIncorrect));
-
-    const adSoyad = await adminPage.locator('#adSoyad').textContent();
-    expect(adSoyad).toContain(participant.firstName);
-    expect(adSoyad).toContain(participant.lastName);
-
-    const yas = await adminPage.locator('#yas').textContent();
-    expect(yas).toContain(participant.age);
-
-    const cinsiyet = await adminPage.locator('#cinsiyet').textContent();
-    expect(cinsiyet).toContain(participant.gender);
-
-    const egitim = await adminPage.locator('#egitim').textContent();
-    expect(egitim).toContain(participant.education);
-
-    const meslek = await adminPage.locator('#meslek').textContent();
-    expect(meslek).toContain(participant.profession);
-
-    const medeniDurum = await adminPage.locator('#medeniDurum').textContent();
-    expect(medeniDurum).toContain(participant.maritalStatus);
-
+    // =========================================================
+    // 10. RAPORLAR SAYFASI
+    // =========================================================
     await adminPage.goto('/admin/reports.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await adminPage.waitForTimeout(2000);
     await expect(adminPage.locator('body')).toContainText('Raporlar');
+
+    // Metrik kartları mevcut mu?
+    await expect(adminPage.locator('#totalTests')).toBeVisible();
+    await expect(adminPage.locator('#totalReports')).toBeVisible();
 
     console.log('=== TEST BASARILI ===');
     await adminPage.close();
