@@ -96,12 +96,14 @@ services:
       - api
       - nginx
     working_dir: /app/tests/e2e
-    command: [ "sh", "-c", "npm run server" ]
+    # Run Playwright tests and then serve the HTML report
+    command: [ "sh", "-c", "npm run test && npm run show-report" ]
     environment: {}
     ports:
       - "9323:9323"
     volumes:
       - ./:/app:cached
+      - ./frontend/test-reports:/app/tests/e2e/reports
     networks:
       - backend-network
 
