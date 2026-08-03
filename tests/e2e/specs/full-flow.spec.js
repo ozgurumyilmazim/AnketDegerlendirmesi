@@ -227,13 +227,16 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
       `#testResultsTable tbody tr:has-text("${participant.lastName}")`,
       { timeout: 15000 }
     );
+    // DataTables draw render'ı geciktirebilir, satır içinde butonun belirmesini bekle
+    await adminPage.waitForTimeout(1000);
 
     // =========================================================
     // 9. TEST DETAY MODALINI AC
     // =========================================================
-    const row = adminPage.locator(`#testResultsTable tbody tr:has-text("${participant.lastName}")`);
-    const detailBtn = row.locator('button[title="Detayları Görüntüle"]');
-    await detailBtn.waitFor({ state: 'visible', timeout: 5000 });
+    const detailBtn = adminPage.locator(
+      `#testResultsTable tbody tr:has-text("${participant.lastName}") button[title="Detayları Görüntüle"]`
+    );
+    await detailBtn.waitFor({ state: 'visible', timeout: 10000 });
     await detailBtn.click();
 
     // Modal açılmalı
