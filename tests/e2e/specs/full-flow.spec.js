@@ -228,15 +228,15 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
       { timeout: 15000 }
     );
     // DataTables draw render'ı geciktirebilir, satır içinde butonun belirmesini bekle
-    await adminPage.waitForTimeout(1000);
+    await adminPage.waitForTimeout(2000);
 
     // =========================================================
     // 9. TEST DETAY MODALINI AC
     // =========================================================
-    const detailBtn = adminPage.locator(
-      `#testResultsTable tbody tr:has-text("${participant.lastName}") button[title="Detayları Görüntüle"]`
-    );
-    await detailBtn.waitFor({ state: 'visible', timeout: 10000 });
+    // DataTables render fonksiyonu dinamik HTML oluşturur, icon class'ı ile bul
+    const row = adminPage.locator(`#testResultsTable tbody tr:has-text("${participant.lastName}")`).first();
+    const detailBtn = row.locator('.btn-outline-primary.action-btn').first();
+    await detailBtn.waitFor({ state: 'visible', timeout: 15000 });
     await detailBtn.click();
 
     // Modal açılmalı
