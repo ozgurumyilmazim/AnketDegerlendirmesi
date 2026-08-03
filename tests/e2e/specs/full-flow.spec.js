@@ -53,8 +53,8 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     // 1. ANASAYFA
     // =========================================================
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector('a.hero-cta', { hasText: 'Teste Başla', timeout: 30000 });
-    await page.locator('a.hero-cta').filter({ hasText: 'Teste Başla' }).first().click();
+    await page.waitForSelector('.navbar .btn-primary', { hasText: 'Teste Başla', timeout: 30000 });
+    await page.locator('.navbar .btn-primary').filter({ hasText: 'Teste Başla' }).click();
 
     // =========================================================
     // 2. UYARI SAYFASI (testebasla.html)
