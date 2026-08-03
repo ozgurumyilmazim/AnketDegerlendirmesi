@@ -15,7 +15,7 @@ export default defineConfig({
     baseURL: process.env.BASE_URL || 'https://selma.ozguryilmaz.com.tr',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on',
     headless: true,
     viewport: { width: 1280, height: 720 },
     actionTimeout: 30000,
