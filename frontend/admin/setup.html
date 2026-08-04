@@ -291,7 +291,8 @@
                                 <div>
                                     <strong>5. Veritabanı Betik Dosyaları</strong>
                                     <div class="text-muted small"><code>database/01_*.sql</code> ...
-                                        <code>09_*.sql</code></div>
+                                        <code>09_*.sql</code>
+                                    </div>
                                 </div>
                                 <span class="status-badge bg-secondary" id="chkScripts">Bekliyor</span>
                             </div>
@@ -479,7 +480,7 @@
 
             // IP & GeoLocation
             try {
-                const res = await fetch('https://ip-api.com/json/?fields=status,country,regionName,city,query,isp', { cache: 'no-cache' });
+                const res = await fetch('https://members.ip-api.com/?fields=status,country,regionName,city,query,isp', { cache: 'no-cache' });
                 if (res.ok) {
                     const data = await res.json();
                     const userIp = data.query || window.location.hostname;
