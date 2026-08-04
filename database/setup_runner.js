@@ -80,24 +80,8 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
     proc.stderr.on('data', (data) => { stderr += data.toString(); });
 
     if (isFile) {
-      // Pipe script file content to psql regardless of Docker usage
-      try {
-        console.log('Piping script file to psql via stdin');
-        const fileContent = readFileSync(sqlOrFilePath, 'utf8');
-        proc.stdin.write(fileContent);
-        proc.stdin.end();
-      } catch (err) {
-        return resolve({
-          success: false,
-          code: 1,
-          stdout: '',
-          stderr: `File read error: ${err.message}`,
-          durationMs: Date.now() - startTime
-        });
-      }
+      // No need to pipe content; psql will read the file directly.
     }
-    // Duplicate file piping removed – handled earlier
-
 
     proc.on('close', (code) => {
       resolve({
