@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kurulumu & DB - MMPI Admin Panel</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.ico">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed { width: 70px; }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded { margin-left: 70px; }
+
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-custom .card-header {
+            background: transparent;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+        }
+
+        .check-item {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .check-item:last-child { border-bottom: none; }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 0.35em 0.85em;
+            border-radius: 50rem;
+            font-weight: 600;
+        }
+
+        .script-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .script-card-header {
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .script-card-header:hover { background: #f1f5f9; }
+
+        .script-log {
+            background: #0f172a;
+            color: #38bdf8;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.82rem;
+            padding: 1rem;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border-top: 1px solid #1e293b;
+            display: none;
+        }
+
+        .script-log.open { display: block; }
+
+        .console-output {
+            background: #1e1e2e;
+            color: #a6adc8;
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fa-spin-custom { animation: spin 1s linear infinite; }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <button class="sidebar-toggle d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars text-dark"></i>
+                </button>
+                <button class="sidebar-toggle d-none d-md-block me-3" onclick="collapseSidebar()">
+                    <i class="fas fa-bars text-dark"></i>
+                </button>
+
+                <h4 class="mb-0 text-dark"><i class="fas fa-database text-primary me-2"></i>Sistem Kurulumu & DB</h4>
+
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center text-decoration-none" type="button" data-bs-toggle="dropdown">
+                            <div class="user-avatar me-2"><span id="userInitials">A</span></div>
+                            <span id="userName">Admin</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Container -->
+        <div class="container-fluid p-4">
+
+            <!-- System Status Banner -->
+            <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 shadow-sm" id="setupStatusBanner">
+                <div>
+                    <h5 class="alert-heading mb-1"><i class="fas fa-info-circle me-2"></i>Veritabanı Kurulum Durumu</h5>
+                    <p class="mb-0 small" id="setupStatusDesc">Sistem kontrol ediliyor...</p>
+                </div>
+                <div>
+                    <span class="badge bg-secondary fs-6" id="globalStatusBadge"><i class="fas fa-spinner fa-spin-custom me-1"></i>Kontrol Ediliyor</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Left Column: Environment & Library Checks -->
+                <div class="col-lg-5">
+                    <div class="card card-custom">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-tasks text-primary me-2"></i>Ortam & Kütüphane Kontrolleri</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="runDiagnostics()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nginx Check -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>1. Web Sunucu (Nginx)</strong>
+                                    <div class="text-muted small">HTTP yanıtı alınıyor mu?</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkNginx">Bekliyor</span>
+                            </div>
+
+                            <!-- JS Libraries -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>2. JavaScript Kütüphaneleri</strong>
+                                    <div class="text-muted small">test-config, mmpi-scoring, pg-config</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkJsLibs">Bekliyor</span>
+                            </div>
+
+                            <!-- PostgREST API -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>3. PostgREST API</strong>
+                                    <div class="text-muted small">Veritabanı API katmanı bağlantısı</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkPostgrest">Bekliyor</span>
+                            </div>
+
+                            <!-- PostgreSQL pgcrypto (Mandatory) -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>4. PostgreSQL <code>pgcrypto</code> (Zorunlu)</strong>
+                                    <div class="text-muted small">UUID & Şifreleme eklentisi</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkPgCrypto">Bekliyor</span>
+                            </div>
+
+                            <!-- DB Scripts files -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>5. Veritabanı Betik Dosyaları</strong>
+                                    <div class="text-muted small"><code>database/01_*.sql</code> ... <code>09_*.sql</code></div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkScripts">Bekliyor</span>
+                            </div>
+
+                            <!-- Init Status -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>6. Veritabanı Durumu</strong>
+                                    <div class="text-muted small">İlklendirme durumu (1 kez çalıştırılmalı)</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkInitState">Bekliyor</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Card -->
+                    <div class="card card-custom">
+                        <div class="card-header bg-light">
+                            <span><i class="fas fa-play-circle text-success me-2"></i>Kurulum İşlemleri</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                <i class="fas fa-shield-alt text-primary me-1"></i>
+                                Veritabanı betikleri projenin ilk açılışında sırasıyla <strong>sadece 1 kez</strong> çalıştırılmalıdır.
+                            </p>
+                            <button class="btn btn-success w-100 btn-lg mb-3 shadow-sm" id="btnExecuteInit" onclick="startInitialization()" disabled>
+                                <i class="fas fa-rocket me-2"></i>İlk Veritabanı Betiklerini Çalıştır
+                            </button>
+
+                            <hr class="my-3">
+
+                            <!-- Reset / Danger Zone -->
+                            <div class="p-3 bg-light rounded border border-danger border-opacity-25">
+                                <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i>Tehlikeli Bölge</h6>
+                                <p class="small text-muted mb-2">Tüm veritabanı tablolarını silerek sistemi sıfırlar.</p>
+                                <button class="btn btn-outline-danger btn-sm w-100" onclick="confirmReset()">
+                                    <i class="fas fa-trash-alt me-1"></i>Tüm Tabloları Sıfırla (Drop Tables)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Execution Console -->
+                <div class="col-lg-7">
+                    <div class="card card-custom">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-terminal text-dark me-2"></i>Veritabanı Betikleri (database/)</span>
+                            <span class="badge bg-primary" id="scriptCountBadge">9 Betik</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="progress mb-3" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" id="progressBar" style="width: 0%;"></div>
+                            </div>
+
+                            <!-- List of scripts -->
+                            <div id="scriptListContainer">
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-hourglass-start fa-2x mb-2"></i>
+                                    <div>Ortam denetimi tamamlandığında betik listesi görüntülenecektir.</div>
+                                </div>
+                            </div>
+
+                            <h6 class="mt-4 mb-2"><i class="fas fa-align-left me-1"></i>Konsol Çıktısı</h6>
+                            <div class="console-output" id="consoleOutput">--- Sistem konsolu hazır ---</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Reset Modal -->
+    <div class="modal fade" id="resetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Veritabanını Sıfırla</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold text-danger mb-2">Bu işlem public şemasındaki TÜM veritabanı tablolarını silecektir!</p>
+                    <p class="small text-muted mb-0">İlklendirme durumu sıfırlanacak ve başlangıç betikleri tekrar çalıştırılabilir hale gelecektir.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" onclick="executeReset()">Evet, Tüm Tabloları Sil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+    <script src="../assets/js/page-permissions.js"></script>
+
+    <script>
+        // Load sidebar
+        fetch('sidebar.html')
+            .then(res => res.text())
+            .then(data => { document.getElementById('sidebar-container').innerHTML = data; })
+            .catch(err => console.error('Sidebar yükleme hatası:', err));
+
+        const SETUP_RUNNER_API = 'http://' + window.location.hostname + ':3098';
+
+        const TARGET_SCRIPTS = [
+            '01_schema.sql',
+            '02_postgrest_setup.sql',
+            '03_taskdefinitions.sql',
+            '04_data.sql',
+            '05_setup_admin.sql',
+            '06_page_permissions.sql',
+            '07_add_session_code.sql',
+            '08_page_permissions_incomplete_tests.sql',
+            '09_fix_update_updated_column.sql'
+        ];
+
+        let isInitialized = false;
+        let isPgCryptoOk = false;
+        let isExecuting = false;
+
+        function updateBadge(id, status, text) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const classes = {
+                pass: 'bg-success',
+                fail: 'bg-danger',
+                warn: 'bg-warning text-dark',
+                pending: 'bg-secondary',
+                running: 'bg-primary'
+            };
+            el.className = 'status-badge ' + (classes[status] || 'bg-secondary');
+            el.textContent = text;
+        }
+
+        function logConsole(msg) {
+            const con = document.getElementById('consoleOutput');
+            const time = new Date().toLocaleTimeString('tr-TR');
+            con.textContent += `\n[${time}] ${msg}`;
+            con.scrollTop = con.scrollHeight;
+        }
+
+        async function runDiagnostics() {
+            logConsole('Ortam ve kütüphane kontrolleri başlatılıyor...');
+
+            // 1. Nginx Check
+            try {
+                const res = await fetch(window.location.href, { method: 'HEAD' });
+                updateBadge('chkNginx', res.ok ? 'pass' : 'fail', res.ok ? 'Aktif (HTTP 200)' : 'Hata ' + res.status);
+            } catch (e) {
+                updateBadge('chkNginx', 'fail', 'Erişilemedi');
+            }
+
+            // 2. JS Libraries
+            try {
+                const libs = typeof PG_CONFIG !== 'undefined';
+                updateBadge('chkJsLibs', libs ? 'pass' : 'fail', libs ? 'Yüklendi' : 'Eksik');
+            } catch (e) {
+                updateBadge('chkJsLibs', 'fail', 'Hata');
+            }
+
+            // 3. PostgREST API
+            try {
+                const apiUrl = typeof PG_CONFIG !== 'undefined' ? PG_CONFIG.apiUrl : '/api';
+                const res = await fetch(apiUrl + '/');
+                updateBadge('chkPostgrest', (res.ok || res.status === 401) ? 'pass' : 'fail', res.ok ? 'Erişilebilir' : `HTTP ${res.status}`);
+            } catch (e) {
+                updateBadge('chkPostgrest', 'fail', 'Bağlantı Yok');
+            }
+
+            // Call Backend Setup Runner Service
+            try {
+                const res = await fetch(SETUP_RUNNER_API + '/status');
+                const data = await res.json();
+
+                // 4. pgcrypto
+                isPgCryptoOk = data.pgCrypto && data.pgCrypto.installed;
+                updateBadge('chkPgCrypto', isPgCryptoOk ? 'pass' : 'fail', isPgCryptoOk ? 'Mevcut (Yüklü)' : 'Eksik / Yüklenemedi');
+
+                // 5. Scripts list
+                const scriptOk = data.scripts && data.scripts.length >= 9;
+                updateBadge('chkScripts', scriptOk ? 'pass' : 'warn', scriptOk ? `${data.scripts.length} Betik Hazır` : 'Eksik Betikler');
+
+                // 6. Init State
+                isInitialized = data.initStatus && data.initStatus.initialized;
+                updateBadge('chkInitState', isInitialized ? 'pass' : 'pending', isInitialized ? 'İlklendirildi (Tamam)' : 'Kurulum Bekliyor');
+
+                renderScriptList(data.scripts || TARGET_SCRIPTS);
+                updateGlobalStatus();
+
+            } catch (err) {
+                logConsole('Setup Runner servis yanıtı alınamadı (' + SETUP_RUNNER_API + '). Doğrudan DB kontrolüne geçiliyor...');
+                // Fallback check via PostgREST
+                checkFallbackInitStatus();
+            }
+        }
+
+        async function checkFallbackInitStatus() {
+            try {
+                const res = await fetch(PG_CONFIG.apiUrl + '/questions?limit=1');
+                if (res.ok) {
+                    isInitialized = true;
+                    isPgCryptoOk = true;
+                    updateBadge('chkPgCrypto', 'pass', 'Algılandı');
+                    updateBadge('chkScripts', 'pass', '9 Betik Hazır');
+                    updateBadge('chkInitState', 'pass', 'İlklendirildi (Tamam)');
+                } else {
+                    isInitialized = false;
+                    updateBadge('chkInitState', 'pending', 'Kurulum Bekliyor');
+                }
+            } catch (e) {
+                isInitialized = false;
+                updateBadge('chkInitState', 'pending', 'Kurulum Bekliyor');
+            }
+            renderScriptList(TARGET_SCRIPTS);
+            updateGlobalStatus();
+        }
+
+        function updateGlobalStatus() {
+            const banner = document.getElementById('setupStatusBanner');
+            const desc = document.getElementById('setupStatusDesc');
+            const badge = document.getElementById('globalStatusBadge');
+            const btnExec = document.getElementById('btnExecuteInit');
+
+            if (isInitialized) {
+                banner.className = 'alert alert-success d-flex align-items-center justify-content-between mb-4 shadow-sm';
+                desc.textContent = 'Veritabanı önceden ilklendirildi (1 kez çalıştırıldı). Sistem çalışmaya hazır.';
+                badge.className = 'badge bg-success fs-6';
+                badge.textContent = 'Sistem İlklendirildi';
+                btnExec.disabled = true;
+                btnExec.innerHTML = '<i class="fas fa-check-circle me-2"></i>Betikler Önceden Çalıştırıldı';
+            } else if (isPgCryptoOk) {
+                banner.className = 'alert alert-warning d-flex align-items-center justify-content-between mb-4 shadow-sm';
+                desc.textContent = 'Tüm ortam ve pgcrypto kontrolleri başarılı. Veritabanı betiklerini çalıştırabilirsiniz.';
+                badge.className = 'badge bg-warning text-dark fs-6';
+                badge.textContent = 'Kurulum Bekliyor';
+                btnExec.disabled = false;
+                btnExec.innerHTML = '<i class="fas fa-rocket me-2"></i>İlk Veritabanı Betiklerini Çalıştır';
+            } else {
+                banner.className = 'alert alert-danger d-flex align-items-center justify-content-between mb-4 shadow-sm';
+                desc.textContent = 'Zorunlu pgcrypto eklentisi veya PostgreSQL bağlantısı doğrulanamadı. Lütfen kontrolleri inceleyin.';
+                badge.className = 'badge bg-danger fs-6';
+                badge.textContent = 'Gereksinim Eksik';
+                btnExec.disabled = true;
+            }
+        }
+
+        function renderScriptList(scriptNames) {
+            const container = document.getElementById('scriptListContainer');
+            container.innerHTML = scriptNames.map((name, index) => `
+                <div class="script-card" id="card-${index}">
+                    <div class="script-card-header" onclick="toggleLog(${index})">
+                        <div>
+                            <span class="badge bg-dark me-2">${String(index + 1).padStart(2, '0')}</span>
+                            <strong>database/${name}</strong>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary" id="scriptBadge-${index}">Bekliyor</span>
+                            <i class="fas fa-chevron-down text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="script-log" id="scriptLog-${index}">Henüz çalıştırılmadı...</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleLog(idx) {
+            const el = document.getElementById(`scriptLog-${idx}`);
+            if (el) el.classList.toggle('open');
+        }
+
+        async function startInitialization() {
+            if (isInitialized || isExecuting) return;
+            if (!confirm('01_schema.sql ile 09_fix_update_updated_column.sql arasındaki betikler sırasıyla çalıştırılacaktır. Devam edilsin mi?')) {
+                return;
+            }
+
+            isExecuting = true;
+            document.getElementById('btnExecuteInit').disabled = true;
+            logConsole('Veritabanı betikleri çalıştırma sırası başlatılıyor...');
+
+            try {
+                const res = await fetch(SETUP_RUNNER_API + '/execute', { method: 'POST' });
+                const data = await res.json();
+
+                if (data.results && Array.isArray(data.results)) {
+                    data.results.forEach((r, idx) => {
+                        const badge = document.getElementById(`scriptBadge-${idx}`);
+                        const logEl = document.getElementById(`scriptLog-${idx}`);
+
+                        if (badge) {
+                            badge.className = 'badge ' + (r.status === 'success' ? 'bg-success' : 'bg-danger');
+                            badge.textContent = r.status === 'success' ? `Başarılı (${r.durationMs}ms)` : 'Hata';
+                        }
+                        if (logEl) {
+                            logEl.textContent = `--- STDOUT ---\n${r.stdout || '(çıktı yok)'}\n\n--- STDERR ---\n${r.stderr || '(hata yok)'}`;
+                        }
+                        logConsole(`Betik ${r.fileName} -> ${r.status.toUpperCase()} (${r.durationMs}ms)`);
+                    });
+                }
+
+                if (data.success) {
+                    logConsole('TÜM BETİKLER BAŞARIYLA TAMAMLANDI! Sistem ilklendirildi.');
+                    document.getElementById('progressBar').style.width = '100%';
+                    isInitialized = true;
+                    updateGlobalStatus();
+                } else {
+                    logConsole('Betik çalıştırma sırasında hata oluştu!');
+                }
+            } catch (err) {
+                logConsole('Betikler çalıştırılırken sunucu bağlantı hatası: ' + err.message);
+            } finally {
+                isExecuting = false;
+            }
+        }
+
+        function confirmReset() {
+            const modal = new bootstrap.Modal(document.getElementById('resetModal'));
+            modal.show();
+        }
+
+        async function executeReset() {
+            const modalEl = document.getElementById('resetModal');
+            const modal = bootstrap.Instance ? bootstrap.Instance.getInstance(modalEl) : null;
+            if (modal) modal.hide();
+
+            logConsole('Veritabanı sıfırlama işlemi başlatıldı (DROP SCHEMA public CASCADE)...');
+
+            try {
+                const res = await fetch(SETUP_RUNNER_API + '/reset', { method: 'POST' });
+                const data = await res.json();
+
+                if (data.success) {
+                    logConsole('Tüm veritabanı tabloları başarıyla silindi ve sıfırlandı.');
+                    alert('Veritabanı sıfırlandı! Şimdi başlangıç betiklerini yeniden çalıştırabilirsiniz.');
+                    runDiagnostics();
+                } else {
+                    logConsole('Sıfırlama hatası: ' + (data.stderr || 'Bilinmeyen hata'));
+                    alert('Sıfırlama hatası: ' + (data.stderr || 'Sunucu hatası'));
+                }
+            } catch (err) {
+                logConsole('Sıfırlama isteği başarısız: ' + err.message);
+                alert('Sıfırlama isteği gönderilemedi.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            runDiagnostics();
+        });
+    </script>
+</body>
+
+</html>

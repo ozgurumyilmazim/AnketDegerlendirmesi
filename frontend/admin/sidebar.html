@@ -55,6 +55,12 @@
                     <span class="sidebar-text">Sayfa Yetkileri</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="setup.html" id="nav-setup">
+                    <i class="fas fa-database me-2"></i>
+                    <span class="sidebar-text">Kurulum & DB</span>
+                </a>
+            </li>
             <li class="nav-item mt-3">
                 <a class="nav-link" href="../index.html" target="_blank">
                     <i class="fas fa-external-link-alt me-2"></i>
@@ -92,6 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
             break;
         case 'task-definitions.html':
             document.getElementById('nav-task-definitions').classList.add('active');
+            break;
+        case 'setup.html':
+            document.getElementById('nav-setup')?.classList.add('active');
             break;
         case 'settings.html':
         case 'settings-kvkk.html':
