@@ -480,7 +480,7 @@
 
             // IP & GeoLocation
             try {
-                const res = await fetch('https://members.ip-api.com/?fields=status,country,regionName,city,query,isp', { cache: 'no-cache' });
+                const res = await fetch('https://ipapi.co/json/', { cache: 'no-cache' });
                 if (res.ok) {
                     const data = await res.json();
                     const userIp = data.query || window.location.hostname;
