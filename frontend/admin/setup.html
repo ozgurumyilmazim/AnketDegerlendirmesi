@@ -79,7 +79,9 @@
             justify-content: space-between;
         }
 
-        .check-item:last-child { border-bottom: none; }
+        .check-item:last-child {
+            border-bottom: none;
+        }
 
         .status-badge {
             font-size: 0.78rem;
@@ -107,7 +109,9 @@
             user-select: none;
         }
 
-        .script-card-header:hover { background: #f1f5f9; }
+        .script-card-header:hover {
+            background: #f1f5f9;
+        }
 
         .script-log {
             background: #0f172a;
@@ -122,7 +126,9 @@
             display: none;
         }
 
-        .script-log.open { display: block; }
+        .script-log.open {
+            display: block;
+        }
 
         .console-output {
             background: #1e1e2e;
@@ -135,8 +141,15 @@
             overflow-y: auto;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .fa-spin-custom { animation: spin 1s linear infinite; }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fa-spin-custom {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 
@@ -151,19 +164,22 @@
                     <span class="fw-bold text-dark fs-5">MMPI Admin</span>
                 </a>
 
-                <h4 class="mb-0 text-dark border-start ps-3"><i class="fas fa-database text-primary me-2"></i>Sistem Kurulumu & DB</h4>
+                <h4 class="mb-0 text-dark border-start ps-3"><i class="fas fa-database text-primary me-2"></i>Sistem
+                    Kurulumu & DB</h4>
 
                 <div class="ms-auto d-flex align-items-center">
                     <a href="dashboard.html" class="btn btn-outline-primary btn-sm me-3">
                         <i class="fas fa-tachometer-alt me-1"></i>Dashboard'a Dön
                     </a>
                     <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle d-flex align-items-center text-decoration-none" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center text-decoration-none"
+                            type="button" data-bs-toggle="dropdown">
                             <div class="user-avatar me-2"><span id="userInitials">A</span></div>
                             <span id="userName">Admin</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
                         </ul>
                     </div>
                 </div>
@@ -174,13 +190,15 @@
         <div class="container-fluid p-4">
 
             <!-- System Status Banner -->
-            <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 shadow-sm" id="setupStatusBanner">
+            <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 shadow-sm"
+                id="setupStatusBanner">
                 <div>
                     <h5 class="alert-heading mb-1"><i class="fas fa-info-circle me-2"></i>Veritabanı Kurulum Durumu</h5>
                     <p class="mb-0 small" id="setupStatusDesc">Sistem kontrol ediliyor...</p>
                 </div>
                 <div>
-                    <span class="badge bg-secondary fs-6" id="globalStatusBadge"><i class="fas fa-spinner fa-spin-custom me-1"></i>Kontrol Ediliyor</span>
+                    <span class="badge bg-secondary fs-6" id="globalStatusBadge"><i
+                            class="fas fa-spinner fa-spin-custom me-1"></i>Kontrol Ediliyor</span>
                 </div>
             </div>
 
@@ -190,7 +208,8 @@
                     <!-- Network, Protocol & IP Card -->
                     <div class="card card-custom">
                         <div class="card-header bg-light">
-                            <span><i class="fas fa-network-wired text-info me-2"></i>Ağ, Bağlantı & Güvenlik Bilgileri</span>
+                            <span><i class="fas fa-network-wired text-info me-2"></i>Ağ, Bağlantı & Güvenlik
+                                Bilgileri</span>
                         </div>
                         <div class="card-body p-0">
                             <!-- URL & Protocol -->
@@ -217,7 +236,8 @@
                                     <strong>Coğrafi Konum (GeoIP)</strong>
                                     <div class="text-muted small" id="geoDisplay">Konum alınıyor...</div>
                                 </div>
-                                <span class="status-badge bg-info text-white" id="chkGeoBadge"><i class="fas fa-map-marker-alt me-1"></i>Konum</span>
+                                <span class="status-badge bg-info text-white" id="chkGeoBadge"><i
+                                        class="fas fa-map-marker-alt me-1"></i>Konum</span>
                             </div>
                         </div>
                     </div>
@@ -226,7 +246,8 @@
                     <div class="card card-custom">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-tasks text-primary me-2"></i>Ortam & Kütüphane Kontrolleri</span>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="runDiagnostics()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="runDiagnostics()"><i
+                                    class="fas fa-sync-alt me-1"></i>Yenile</button>
                         </div>
                         <div class="card-body p-0">
                             <!-- Nginx Check -->
@@ -269,7 +290,8 @@
                             <div class="check-item">
                                 <div>
                                     <strong>5. Veritabanı Betik Dosyaları</strong>
-                                    <div class="text-muted small"><code>database/01_*.sql</code> ... <code>09_*.sql</code></div>
+                                    <div class="text-muted small"><code>database/01_*.sql</code> ...
+                                        <code>09_*.sql</code></div>
                                 </div>
                                 <span class="status-badge bg-secondary" id="chkScripts">Bekliyor</span>
                             </div>
@@ -293,9 +315,11 @@
                         <div class="card-body">
                             <p class="small text-muted mb-3">
                                 <i class="fas fa-shield-alt text-primary me-1"></i>
-                                Veritabanı betikleri projenin ilk açılışında sırasıyla <strong>sadece 1 kez</strong> çalıştırılmalıdır.
+                                Veritabanı betikleri projenin ilk açılışında sırasıyla <strong>sadece 1 kez</strong>
+                                çalıştırılmalıdır.
                             </p>
-                            <button class="btn btn-success w-100 btn-lg mb-3 shadow-sm" id="btnExecuteInit" onclick="startInitialization()" disabled>
+                            <button class="btn btn-success w-100 btn-lg mb-3 shadow-sm" id="btnExecuteInit"
+                                onclick="startInitialization()" disabled>
                                 <i class="fas fa-rocket me-2"></i>İlk Veritabanı Betiklerini Çalıştır
                             </button>
 
@@ -303,8 +327,10 @@
 
                             <!-- Reset / Danger Zone -->
                             <div class="p-3 bg-light rounded border border-danger border-opacity-25">
-                                <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i>Tehlikeli Bölge</h6>
-                                <p class="small text-muted mb-2">Tüm veritabanı tablolarını silerek sistemi sıfırlar.</p>
+                                <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i>Tehlikeli
+                                    Bölge</h6>
+                                <p class="small text-muted mb-2">Tüm veritabanı tablolarını silerek sistemi sıfırlar.
+                                </p>
                                 <button class="btn btn-outline-danger btn-sm w-100" onclick="confirmReset()">
                                     <i class="fas fa-trash-alt me-1"></i>Tüm Tabloları Sıfırla (Drop Tables)
                                 </button>
@@ -322,7 +348,8 @@
                         </div>
                         <div class="card-body">
                             <div class="progress mb-3" style="height: 10px;">
-                                <div class="progress-bar bg-success" role="progressbar" id="progressBar" style="width: 0%;"></div>
+                                <div class="progress-bar bg-success" role="progressbar" id="progressBar"
+                                    style="width: 0%;"></div>
                             </div>
 
                             <!-- List of scripts -->
@@ -352,12 +379,15 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="fw-bold text-danger mb-2">Bu işlem public şemasındaki TÜM veritabanı tablolarını silecektir!</p>
-                    <p class="small text-muted mb-0">İlklendirme durumu sıfırlanacak ve başlangıç betikleri tekrar çalıştırılabilir hale gelecektir.</p>
+                    <p class="fw-bold text-danger mb-2">Bu işlem public şemasındaki TÜM veritabanı tablolarını
+                        silecektir!</p>
+                    <p class="small text-muted mb-0">İlklendirme durumu sıfırlanacak ve başlangıç betikleri tekrar
+                        çalıştırılabilir hale gelecektir.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" onclick="executeReset()">Evet, Tüm Tabloları Sil</button>
+                    <button type="button" class="btn btn-danger" onclick="executeReset()">Evet, Tüm Tabloları
+                        Sil</button>
                 </div>
             </div>
         </div>
@@ -369,7 +399,9 @@
     <script src="../assets/js/page-permissions.js"></script>
 
     <script>
-        const SETUP_RUNNER_API = 'http://' + window.location.hostname + ':3098';
+        const SETUP_RUNNER_API = `${window.location.origin}`;   // e.g. https://selma.ozguryilmaz.com.tr
+        // const SETUP_RUNNER_API = 'http://' + window.location.hostname + ':3098';
+        // Existing constant (likely defined near the top)
 
         const TARGET_SCRIPTS = [
             '01_schema.sql',
