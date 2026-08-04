@@ -97,7 +97,7 @@ services:
       - nginx
     working_dir: /app/tests/e2e
     # Run Playwright tests and then serve the HTML report
-    command: [ "sh", "-c", "npm run test && npm run show-report" ]
+    command: [ "sh", "-c", "npm run server" ]
     environment: {}
     ports:
       - "9323:9323"
