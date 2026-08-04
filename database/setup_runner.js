@@ -316,11 +316,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({ success, result: dbRes }));
     return;
   }
-    const result = await executeScripts();
-    res.writeHead(result.error ? 400 : 200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(result));
-    return;
-  }
+
 
   // Reset database / drop tables endpoint
   if (url === '/reset' && req.method === 'POST') {
