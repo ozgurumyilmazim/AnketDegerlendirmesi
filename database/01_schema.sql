@@ -9,9 +9,6 @@
 
 
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
 -- ============================================================
 -- USERS TABLE (auth.users + custom users)
 -- ============================================================
@@ -103,10 +100,10 @@ CREATE INDEX IF NOT EXISTS idx_test_results_created
 -- TEST RESULTS MIN VIEW (for duplicate test detection)
 -- ============================================================
 CREATE OR REPLACE VIEW public.test_results_min AS
-SELECT id, participant_id, status, created_at
+SELECT id, participant_id, status, created
 FROM public.test_results;
 
--- GRANT SELECT ON public.test_results_min TO anon;
+GRANT SELECT ON public.test_results_min TO anon;
 
 -- ============================================================
 -- QUESTION CATEGORIES TABLE

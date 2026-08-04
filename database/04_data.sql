@@ -1072,12 +1072,12 @@ INSERT INTO kvkk (id, kvkk_title, kvkk_text, kvkk_required) VALUES (
 -- 6. PAGE CONTENT
 -- Source: dokumanlar/create_page_content_table.sql
 -- ============================================================
-INSERT INTO page_content (page_key, page_title, page_subtitle, page_body) VALUES
-('gizlilik', 'Gizlilik Politikasi', 'Kişisel verilerinizin nasil toplandigi, islendigi ve korundugu hakkinda bilgi',
+INSERT INTO page_content (id, page_key, page_title, page_subtitle, page_body) VALUES
+(1,'gizlilik', 'Gizlilik Politikasi', 'Kişisel verilerinizin nasil toplandigi, islendigi ve korundugu hakkinda bilgi',
 '<h4>1. Veri Sorumlusu</h4><p>6698 sayili Kişisel Verilerin Korunmasi Kanunu uyarinca, Kişisel verileriniz; veri sorumlusu olarak <strong>OGULTURK A.S.</strong> tarafindan toplanmakta, islenmekte ve ilgili birim sorumlusu ile paylasilmaktadir.</p>'),
-('kullanim', 'Kullanim Kosullari', 'MMPI psikolojik test sistemini kullanirken uymaniz gereken kurallar',
+(2,'kullanim', 'Kullanim Kosullari', 'MMPI psikolojik test sistemini kullanirken uymaniz gereken kurallar',
 '<h4>1. Hizmetin Kapsami</h4><p>OGULTURK A.S. tarafindan sunulan MMPI psikolojik test sistemi, bireylerin Kişisel ve toplumsal uyumlarini objektif olarak degerlendirmeyi amaclayan bir dijital uygulamadir.</p>'),
-('hakkimizda', 'Hakkimizda', 'OGULTURK A.S. ve MMPI Psikolojik Degerlendirme Sistemi',
+(3,'hakkimizda', 'Hakkimizda', 'OGULTURK A.S. ve MMPI Psikolojik Degerlendirme Sistemi',
 '<p>OGULTURK A.S. olarak, bireylerin Kişisel ve toplumsal uyumlarini objektif bir sekilde degerlendirmek amaciyla MMPI test hizmeti sunuyoruz.</p>')
 ON CONFLICT (page_key) DO NOTHING;
 
