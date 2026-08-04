@@ -24,7 +24,7 @@ let executionLogs = [];
 function runPsqlCommand(sqlOrFilePath, isFile = false) {
   return new Promise((resolve) => {
     const startTime = Date.now();
-    
+
     let useDocker = false;
     try {
       const inspect = execSync(`docker inspect -f "{{.State.Running}}" ${DB_CONTAINER}`, { stdio: 'pipe' }).toString().trim();
@@ -35,23 +35,27 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
       useDocker = false;
     }
 
+    // Determine how to run psql
     let proc;
-    // If a DB connection URI is provided, always use the local psql client (no Docker exec)
+    // If a full DB URI is available, use the local psql client directly.
     if (DB_URI) {
+      // DB_URI already contains host, port, user, password, db name, and JWT secret.
       if (isFile) {
+        // For script files we pipe the file content via stdin.
         proc = spawn('psql', ['-d', DB_URI], { shell: true });
       } else {
+        // Single command execution – note the -c argument is a single string.
         proc = spawn('psql', ['-d', DB_URI, '-c', sqlOrFilePath], { shell: true });
       }
     } else if (useDocker) {
-      // Existing Docker exec path using explicit credentials
+      // Fallback to Docker exec using explicit credentials.
       if (isFile) {
         proc = spawn('docker', ['exec', '-i', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME], { shell: true });
       } else {
         proc = spawn('docker', ['exec', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
       }
     } else {
-      // Local fallback with explicit credentials
+      // Local psql fallback when only separate credentials are available.
       if (isFile) {
         proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-f', sqlOrFilePath], { shell: true });
       } else {
@@ -215,7 +219,7 @@ async function executeScripts() {
  */
 async function resetDatabase() {
   if (isExecuting) return { error: 'Execution in progress' };
-  
+
   const sql = `
     DROP SCHEMA public CASCADE;
     CREATE SCHEMA public;
