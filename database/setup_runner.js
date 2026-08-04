@@ -174,6 +174,7 @@ async function checkInitStatus() {
  * Execute root database scripts in sequential order
  */
 async function executeScripts() {
+  console.log('Starting script execution...');
   if (isExecuting) return { error: 'Initialization is already in progress' };
   isExecuting = true;
   executionLogs = [];
@@ -183,6 +184,7 @@ async function executeScripts() {
   const results = [];
 
   for (const script of scripts) {
+        console.log(`Running script: ${script.fileName}`);
     const logItem = {
       fileName: script.fileName,
       status: 'running',
