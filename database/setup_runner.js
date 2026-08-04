@@ -36,37 +36,26 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
     }
 
     let proc;
-    if (useDocker) {
-      // Use DB_URI if provided, otherwise fall back to explicit credentials
-      if (DB_URI) {
-        // Docker exec with connection string
-        if (isFile) {
-          proc = spawn('docker', ['exec', '-i', DB_CONTAINER, 'psql', '-d', DB_URI], { shell: true });
-        } else {
-          proc = spawn('docker', ['exec', DB_CONTAINER, 'psql', '-d', DB_URI, '-c', sqlOrFilePath], { shell: true });
-        }
+    // If a DB connection URI is provided, always use the local psql client (no Docker exec)
+    if (DB_URI) {
+      if (isFile) {
+        proc = spawn('psql', ['-d', DB_URI], { shell: true });
       } else {
-        // Existing credential based approach
-        if (isFile) {
-          proc = spawn('docker', ['exec', '-i', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME], { shell: true });
-        } else {
-          proc = spawn('docker', ['exec', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
-        }
+        proc = spawn('psql', ['-d', DB_URI, '-c', sqlOrFilePath], { shell: true });
+      }
+    } else if (useDocker) {
+      // Existing Docker exec path using explicit credentials
+      if (isFile) {
+        proc = spawn('docker', ['exec', '-i', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME], { shell: true });
+      } else {
+        proc = spawn('docker', ['exec', DB_CONTAINER, 'psql', '-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
       }
     } else {
-      // Local psql fallback
-      if (DB_URI) {
-        if (isFile) {
-          proc = spawn('psql', ['-d', DB_URI], { shell: true });
-        } else {
-          proc = spawn('psql', ['-d', DB_URI, '-c', sqlOrFilePath], { shell: true });
-        }
+      // Local fallback with explicit credentials
+      if (isFile) {
+        proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-f', sqlOrFilePath], { shell: true });
       } else {
-        if (isFile) {
-          proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-f', sqlOrFilePath], { shell: true });
-        } else {
-          proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
-        }
+        proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
       }
     }
 
