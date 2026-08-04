@@ -310,7 +310,8 @@ const server = http.createServer(async (req, res) => {
   // Execute only the 00_create_anon.sql script
   if (url === '/execute/00' && req.method === 'POST') {
     const scriptPath = join(PROJECT_DIR, 'database', '00_create_anon.sql');
-    const dbRes = await runPsqlCommand(`\n\i ${scriptPath}\n`);
+    // Use file mode for psql to execute the script directly
+    const dbRes = await runPsqlCommand(scriptPath, true);
     const success = dbRes.success;
     res.writeHead(success ? 200 : 400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success, result: dbRes }));
