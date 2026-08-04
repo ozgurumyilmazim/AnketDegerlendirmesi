@@ -115,14 +115,11 @@ services:
     container_name: selma_setup_runner
     restart: unless-stopped
     environment:
-      # if you need DB credentials for the scripts, expose them here
+      DB_NAME: ${DB_NAME:-mydatabase}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-securepassword123}
-      PGRST_DB_URI: "postgres://postgres:securepassword123@selma_db:5432/mydatabase"
-      # -------------------------------------------------
-      # NEW – expose the same PostgREST DB URI we use for the API
-      PGRST_DB_URI: "postgres://${DB_USER:-postgres}:${DB_PASSWORD:-securepassword123}@selma_db:5432/${DB_NAME:-mydatabase}?options=-c%20app.jwt_secret%3D${JWT_SECRET}"
-      # -------------------------------------------------
+      PGRST_DB_URI: "postgres://${DB_USER:-postgres}:${DB_PASSWORD}@selma_db:5432/${DB_NAME:-mydatabase}"
+
     networks:
       - backend-network
     depends_on:
