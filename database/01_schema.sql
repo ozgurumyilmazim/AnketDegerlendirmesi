@@ -228,7 +228,7 @@ CREATE INDEX idx_mmpi_int_range ON mmpi_interpretations(scale_name, min_t_score,
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.page_content
 (
-    id integer NOT NULL DEFAULT nextval('page_content_id_seq'::regclass),
+    id integer NOT NULL ,
     page_key character varying(50) COLLATE pg_catalog."default" NOT NULL,
     page_title character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
     page_subtitle text COLLATE pg_catalog."default" DEFAULT ''::text,
