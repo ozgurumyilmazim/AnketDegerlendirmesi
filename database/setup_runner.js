@@ -15,6 +15,11 @@ const DB_USER = process.env.DB_USER || 'postgres';
 const DB_NAME = process.env.DB_NAME || 'mydatabase';
 const DB_URI = process.env.PGRST_DB_URI; // from docker-compose env
 
+console.log('Setup Runner environment:');
+console.log(`DB_CONTAINER=${DB_CONTAINER}`);
+console.log(`DB_USER=${DB_USER}`);
+console.log(`DB_NAME=${DB_NAME}`);
+console.log(`DB_URI=${DB_URI}`);
 let isExecuting = false;
 let executionLogs = [];
 
@@ -36,6 +41,8 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
     }
 
     // Determine how to run psql
+console.log('Running psql command...');
+console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}`);
     let proc;
     // If a full DB URI is available, use the local psql client directly.
     if (DB_URI) {
@@ -62,6 +69,9 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
         proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
       }
     }
+if (proc) {
+  console.log('Spawned psql process:', proc.spawnargs.join(' '));
+}
 
     let stdout = '';
     let stderr = '';
