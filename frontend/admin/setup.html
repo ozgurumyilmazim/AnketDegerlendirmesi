@@ -212,6 +212,14 @@
                                 Bilgileri</span>
                         </div>
                         <div class="card-body p-0">
+    <!-- DB Health Check Badge -->
+    <div class="check-item">
+        <div><strong>DB Bağlantı Sağlamlığı</strong></div>
+        <span class="status-badge bg-secondary" id="chkDbHealth">Bekliyor</span>
+    </div>
+    <!-- Button to run 00 script -->
+    <button class="btn btn-primary mt-2" id="btnRun00" onclick="runZeroScript()" disabled>00 Scriptini Çalıştır</button>
+    <button class="btn btn-primary mt-2" id="btnRunAnon" onclick="startInitialization()" disabled>Anon Role Oluştur ve Betikleri Çalıştır</button>
                             <!-- URL & Protocol -->
                             <div class="check-item">
                                 <div style="max-width: 65%;">
@@ -549,6 +557,19 @@
             // Call Backend Setup Runner Service
             try {
                 const res = await fetch(SETUP_RUNNER_API + '/status');
+
+              // Fetch DB health check
+              try {
+                  const dbRes = await fetch(SETUP_RUNNER_API + '/dbcheck');
+                  const dbData = await dbRes.json();
+                  const dbOk = dbData.ok;
+                  updateBadge('chkDbHealth', dbOk ? 'pass' : 'fail', dbOk ? 'OK' : 'HATA');
+                  // Enable button if DB is healthy
+                  const btn = document.getElementById('btnRun00');
+                  if (btn) btn.disabled = !dbOk;
+              } catch (e) {
+                  updateBadge('chkDbHealth', 'fail', 'HATA');
+              }
                 const data = await res.json();
 
                 // 4. pgcrypto
@@ -647,7 +668,24 @@
             if (el) el.classList.toggle('open');
         }
 
-        async function startInitialization() {
+        async function runZeroScript() {
+          // Call the endpoint to execute only 00_create_anon.sql
+          try {
+              const res = await fetch(SETUP_RUNNER_API + '/execute/00', { method: 'POST' });
+              const data = await res.json();
+              if (data.success) {
+                  logConsole('00_create_anon.sql başarıyla çalıştırıldı.');
+                  // Refresh diagnostics to update status
+                  runDiagnostics();
+              } else {
+                  logConsole('00_create_anon.sql çalıştırma hatası: ' + (data.result?.stderr || 'Bilinmeyen'));
+              }
+          } catch (e) {
+              logConsole('00_create_anon.sql isteği hatası: ' + e.message);
+          }
+      }
+
+      async function startInitialization() {
             if (isInitialized || isExecuting) return;
             if (!confirm('01_schema.sql ile 09_fix_update_updated_column.sql arasındaki betikler sırasıyla çalıştırılacaktır. Devam edilsin mi?')) {
                 return;

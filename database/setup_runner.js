@@ -260,6 +260,9 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(204);
     res.end();
     return;
+  }
+
+  const url = req.url.replace('/setup-api', '');
 
   // DB connection health check endpoint
   if (url === '/dbcheck' && req.method === 'GET') {
@@ -269,10 +272,6 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({ ok }));
     return;
   }
-
-  }
-
-  const url = req.url.replace('/setup-api', '');
 
   // Status check endpoint
   if (url === '/status' || url === '/') {
@@ -300,8 +299,23 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Execute scripts endpoint
+  // Execute scripts endpoint (all scripts)
   if (url === '/execute' && req.method === 'POST') {
+    const result = await executeScripts();
+    res.writeHead(result.error ? 400 : 200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(result));
+    return;
+  }
+
+  // Execute only the 00_create_anon.sql script
+  if (url === '/execute/00' && req.method === 'POST') {
+    const scriptPath = join(PROJECT_DIR, 'database', '00_create_anon.sql');
+    const dbRes = await runPsqlCommand(`\n\i ${scriptPath}\n`);
+    const success = dbRes.success;
+    res.writeHead(success ? 200 : 400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success, result: dbRes }));
+    return;
+  }
     const result = await executeScripts();
     res.writeHead(result.error ? 400 : 200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(result));
