@@ -126,14 +126,26 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
  */
 function getDatabaseScripts() {
   if (!existsSync(DB_DIR)) return [];
-  const files = readdirSync(DB_DIR);
-  return files
-    .filter(f => f.endsWith('.sql') && /^\d{2}_/.test(f))
-    .sort((a, b) => a.localeCompare(b))
-    .map(f => ({
-      fileName: f,
-      filePath: join(DB_DIR, f)
-    }));
+  // Look for .sql files either in the DB directory itself or in a "scripts" subfolder
+  const candidateDirs = [DB_DIR];
+  const scriptsSubdir = join(DB_DIR, 'scripts');
+  if (existsSync(scriptsSubdir) && readdirSync(scriptsSubdir).some(f => f.endsWith('.sql'))){
+    candidateDirs.push(scriptsSubdir);
+  }
+  const scripts = [];
+  for (const dir of candidateDirs) {
+    const files = readdirSync(dir);
+    files
+      .filter(f => f.endsWith('.sql') && /^\d{2}_/.test(f))
+      .forEach(f => {
+        scripts.push({
+          fileName: f,
+          filePath: join(dir, f)
+        });
+      });
+  }
+  return scripts
+    .sort((a, b) => a.fileName.localeCompare(b.fileName));
 }
 
 /**
