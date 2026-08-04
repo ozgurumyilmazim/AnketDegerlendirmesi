@@ -1,6 +1,9 @@
 # Use a lightweight Node image
 FROM node:20-alpine
 
+# Install PostgreSQL client for psql commands
+RUN apk add --no-cache postgresql-client
+
 # Set working directory
 WORKDIR /app
 
