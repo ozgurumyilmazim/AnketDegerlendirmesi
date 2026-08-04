@@ -52,7 +52,7 @@ console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}
         proc = spawn('psql', ['-d', DB_URI], { shell: true });
       } else {
         // Single command execution – note the -c argument is a single string.
-        proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', sqlOrFilePath], { shell: true });
+        proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', `"${sqlOrFilePath}"`], { shell: true });
       }
     } else if (useDocker) {
       // Fallback to Docker exec using explicit credentials.
