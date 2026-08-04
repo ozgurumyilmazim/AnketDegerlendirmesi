@@ -185,8 +185,44 @@
             </div>
 
             <div class="row">
-                <!-- Left Column: Environment & Library Checks -->
+                <!-- Left Column: Diagnostics & Network -->
                 <div class="col-lg-5">
+                    <!-- Network, Protocol & IP Card -->
+                    <div class="card card-custom">
+                        <div class="card-header bg-light">
+                            <span><i class="fas fa-network-wired text-info me-2"></i>Ağ, Bağlantı & Güvenlik Bilgileri</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- URL & Protocol -->
+                            <div class="check-item">
+                                <div style="max-width: 65%;">
+                                    <strong>Sayfa URL & Protokol</strong>
+                                    <div class="text-muted small text-break" id="urlDisplay">Yükleniyor...</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkProtocol">Kontrol Ediliyor</span>
+                            </div>
+
+                            <!-- IP Address -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>Kullanıcı IP Adresi</strong>
+                                    <div class="text-muted small fw-semibold" id="ipDisplay">Sorgulanıyor...</div>
+                                </div>
+                                <span class="status-badge bg-secondary" id="chkIpStatus">Kontrol Ediliyor</span>
+                            </div>
+
+                            <!-- Geolocation -->
+                            <div class="check-item">
+                                <div>
+                                    <strong>Coğrafi Konum (GeoIP)</strong>
+                                    <div class="text-muted small" id="geoDisplay">Konum alınıyor...</div>
+                                </div>
+                                <span class="status-badge bg-info text-white" id="chkGeoBadge"><i class="fas fa-map-marker-alt me-1"></i>Konum</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environment & Library Diagnostics Card -->
                     <div class="card card-custom">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-tasks text-primary me-2"></i>Ortam & Kütüphane Kontrolleri</span>
@@ -372,8 +408,77 @@
             con.scrollTop = con.scrollHeight;
         }
 
+        function isPrivateIP(ip) {
+            if (!ip) return false;
+            ip = ip.trim().toLowerCase();
+
+            if (ip === 'localhost' || ip === '::1' || ip === '127.0.0.1' || ip === '0.0.0.0') return true;
+
+            const parts = ip.split('.');
+            if (parts.length === 4) {
+                const p1 = parseInt(parts[0], 10);
+                const p2 = parseInt(parts[1], 10);
+
+                if (p1 === 10) return true; // 10.0.0.0/8
+                if (p1 === 172 && (p2 >= 16 && p2 <= 31)) return true; // 172.16.0.0/12
+                if (p1 === 192 && p2 === 168) return true; // 192.168.0.0/16
+                if (p1 === 127) return true; // 127.0.0.0/8
+                if (p1 === 169 && p2 === 254) return true; // 169.254.0.0/16
+            }
+
+            if (ip.startsWith('fe80:') || ip.startsWith('fc00:') || ip.startsWith('fd00:')) {
+                return true;
+            }
+
+            return false;
+        }
+
+        async function checkNetworkAndSecurity() {
+            // URL & Protocol check
+            const currentUrl = window.location.href;
+            const isHttps = window.location.protocol === 'https:';
+            document.getElementById('urlDisplay').textContent = currentUrl;
+
+            if (isHttps) {
+                updateBadge('chkProtocol', 'pass', 'HTTPS (Güvenli)');
+            } else {
+                updateBadge('chkProtocol', 'warn', 'Uyarı: HTTP (Güvensiz)');
+            }
+
+            // IP & GeoLocation
+            try {
+                const res = await fetch('https://ip-api.com/json/?fields=status,country,regionName,city,query,isp', { cache: 'no-cache' });
+                if (res.ok) {
+                    const data = await res.json();
+                    const userIp = data.query || window.location.hostname;
+                    const isPriv = isPrivateIP(userIp);
+
+                    document.getElementById('ipDisplay').textContent = userIp;
+
+                    if (isPriv) {
+                        updateBadge('chkIpStatus', 'warn', 'Uyarı: Private IP');
+                        document.getElementById('geoDisplay').textContent = 'Özel / Yerel Ağ IP Bloğu (Private IP)';
+                    } else {
+                        updateBadge('chkIpStatus', 'pass', 'Genel IP (Public IP)');
+                        const geoText = (data.status === 'success') ? `${data.city || ''}, ${data.country || ''} (${data.isp || ''})` : 'Konum Alınamadı';
+                        document.getElementById('geoDisplay').textContent = geoText;
+                    }
+                    return;
+                }
+            } catch (e) {
+                const host = window.location.hostname;
+                const isPriv = isPrivateIP(host);
+                document.getElementById('ipDisplay').textContent = host;
+                document.getElementById('geoDisplay').textContent = isPriv ? 'Yerel Sunucu / Private IP' : 'Konum Servisi Alınamadı';
+                updateBadge('chkIpStatus', isPriv ? 'warn' : 'pending', isPriv ? 'Uyarı: Private IP' : 'IP Algılandı');
+            }
+        }
+
         async function runDiagnostics() {
-            logConsole('Ortam ve kütüphane kontrolleri başlatılıyor...');
+            logConsole('Ortam, ağ ve kütüphane kontrolleri başlatılıyor...');
+
+            // Ağ ve Güvenlik Denetimi
+            checkNetworkAndSecurity();
 
             // 1. Nginx Check
             try {
