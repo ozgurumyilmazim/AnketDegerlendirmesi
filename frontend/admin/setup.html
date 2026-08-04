@@ -480,31 +480,39 @@
 
             // IP & GeoLocation
             try {
+                // ipapi.co returns JSON with fields: ip, city, country_name, org, etc.
                 const res = await fetch('https://ipapi.co/json/', { cache: 'no-cache' });
                 if (res.ok) {
                     const data = await res.json();
-                    const userIp = data.query || window.location.hostname;
+
+                    // Use the public IP reported by the service
+                    const userIp = data.ip || window.location.hostname;
                     const isPriv = isPrivateIP(userIp);
 
                     document.getElementById('ipDisplay').textContent = userIp;
 
                     if (isPriv) {
                         updateBadge('chkIpStatus', 'warn', 'Uyarı: Private IP');
-                        document.getElementById('geoDisplay').textContent = 'Özel / Yerel Ağ IP Bloğu (Private IP)';
+                        document.getElementById('geoDisplay').textContent =
+                            'Özel / Yerel Ağ IP Bloğu (Private IP)';
                     } else {
                         updateBadge('chkIpStatus', 'pass', 'Genel IP (Public IP)');
-                        const geoText = (data.status === 'success') ? `${data.city || ''}, ${data.country || ''} (${data.isp || ''})` : 'Konum Alınamadı';
-                        document.getElementById('geoDisplay').textContent = geoText;
+                        const geoText = `${data.city || ''}, ${data.country_name || ''} (${data.org || ''})`;
+                        document.getElementById('geoDisplay').textContent = geoText.trim();
                     }
                     return;
                 }
             } catch (e) {
+                // Fallback to hostname if the external service fails
                 const host = window.location.hostname;
                 const isPriv = isPrivateIP(host);
                 document.getElementById('ipDisplay').textContent = host;
-                document.getElementById('geoDisplay').textContent = isPriv ? 'Yerel Sunucu / Private IP' : 'Konum Servisi Alınamadı';
+                document.getElementById('geoDisplay').textContent = isPriv
+                    ? 'Yerel Sunucu / Private IP'
+                    : 'Konum Servisi Alınamadı';
                 updateBadge('chkIpStatus', isPriv ? 'warn' : 'pending', isPriv ? 'Uyarı: Private IP' : 'IP Algılandı');
             }
+
         }
 
         async function runDiagnostics() {
