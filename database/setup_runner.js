@@ -47,13 +47,13 @@ console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}
     // If a full DB URI is available, use the local psql client directly.
     if (DB_URI) {
       // DB_URI already contains host, port, user, password, db name, and JWT secret.
-      if (isFile) {
-        // For script files we pipe the file content via stdin.
-        proc = spawn('psql', ['-d', DB_URI], { shell: true });
-      } else {
-        // Single command execution – note the -c argument is a single string.
-        proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', `"${sqlOrFilePath}"`], { shell: true });
-      }
+        if (isFile) {
+          // Execute script file directly via -f flag
+          proc = spawn('psql', ['-d', DB_URI, '-f', sqlOrFilePath], { shell: true });
+        } else {
+          // Single command execution – note the -c argument is a single string.
+          proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', sqlOrFilePath], { shell: true });
+        }
     } else if (useDocker) {
       // Fallback to Docker exec using explicit credentials.
       if (isFile) {
@@ -79,8 +79,10 @@ if (proc) {
     proc.stdout.on('data', (data) => { stdout += data.toString(); });
     proc.stderr.on('data', (data) => { stderr += data.toString(); });
 
-    if (isFile && useDocker) {
+    if (isFile) {
+      // Pipe script file content to psql regardless of Docker usage
       try {
+        console.log('Piping script file to psql via stdin');
         const fileContent = readFileSync(sqlOrFilePath, 'utf8');
         proc.stdin.write(fileContent);
         proc.stdin.end();
@@ -94,6 +96,8 @@ if (proc) {
         });
       }
     }
+      // Duplicate file piping removed – handled earlier
+
 
     proc.on('close', (code) => {
       resolve({
