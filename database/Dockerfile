@@ -7,8 +7,12 @@ RUN apk add --no-cache postgresql-client
 # Set working directory
 WORKDIR /app
 
-# Copy the runner script and its package.json (if any)
+# Copy the runner script
 COPY setup_runner.js ./
+
+# Copy all SQL script files
+COPY *.sql ./
+
 # If you have a package.json with dependencies, also copy it and run npm ci
 # COPY package*.json ./
 # RUN npm ci --only=production
