@@ -107,6 +107,23 @@ services:
     networks:
       - backend-network
 
+  # --- SETUP RUNNER SERVICE (admin/setup.html backend) ---
+  setup_runner:
+    build:
+      context: ./database # folder containing setup_runner.js
+      dockerfile: Dockerfile # you can add a minimal Dockerfile (see below)
+    container_name: selma_setup_runner
+    restart: unless-stopped
+    environment:
+      # if you need DB credentials for the scripts, expose them here
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-securepassword123}
+      DB_NAME: ${DB_NAME:-mydatabase}
+    networks:
+      - backend-network
+    depends_on:
+      - db
+
 # --- NETWORKS (AĞLAR) ---
 networks:
   backend-network:
