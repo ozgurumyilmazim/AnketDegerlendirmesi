@@ -167,7 +167,21 @@ async function executeScripts() {
   isExecuting = true;
   executionLogs = [];
 
-  const scripts = getDatabaseScripts();
+  // 1. Verify DB connection
+  const connRes = await runPsqlCommand("SELECT 1;");
+  if (!connRes.success) {
+    isExecuting = false;
+    return { error: 'Database connection failed', stderr: connRes.stderr };
+  }
+
+  // 2. Run 00_create_anon.sql specifically if it exists
+  const anonScriptPath = join(DB_DIR, '00_create_anon.sql');
+  if (existsSync(anonScriptPath)) {
+    console.log('Running mandatory: 00_create_anon.sql');
+    await runPsqlCommand(anonScriptPath, true);
+  }
+
+  const scripts = getDatabaseScripts().filter(s => s.fileName !== '00_create_anon.sql');
   let overallSuccess = true;
   const results = [];
 
