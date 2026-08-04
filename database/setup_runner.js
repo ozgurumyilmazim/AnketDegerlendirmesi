@@ -41,19 +41,19 @@ function runPsqlCommand(sqlOrFilePath, isFile = false) {
     }
 
     // Determine how to run psql
-console.log('Running psql command...');
-console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}`);
+    console.log('Running psql command...');
+    console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}`);
     let proc;
     // If a full DB URI is available, use the local psql client directly.
     if (DB_URI) {
       // DB_URI already contains host, port, user, password, db name, and JWT secret.
-        if (isFile) {
-          // Execute script file directly via -f flag
-          proc = spawn('psql', ['-d', DB_URI, '-f', sqlOrFilePath], { shell: true });
-        } else {
-          // Single command execution – note the -c argument is a single string.
-          proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', sqlOrFilePath], { shell: true });
-        }
+      if (isFile) {
+        // Execute script file directly via -f flag
+        proc = spawn('psql', ['-d', DB_URI, '-f', sqlOrFilePath], { shell: true });
+      } else {
+        // Single command execution – note the -c argument is a single string.
+        proc = spawn('psql', ['-d', DB_URI, '-t', '-A', '-c', `"${sqlOrFilePath}"`], { shell: true });
+      }
     } else if (useDocker) {
       // Fallback to Docker exec using explicit credentials.
       if (isFile) {
@@ -69,9 +69,9 @@ console.log(`Use DB_URI: ${!!DB_URI}, useDocker: ${useDocker}, isFile: ${isFile}
         proc = spawn('psql', ['-U', DB_USER, '-d', DB_NAME, '-c', sqlOrFilePath], { shell: true });
       }
     }
-if (proc) {
-  console.log('Spawned psql process:', proc.spawnargs.join(' '));
-}
+    if (proc) {
+      console.log('Spawned psql process:', proc.spawnargs.join(' '));
+    }
 
     let stdout = '';
     let stderr = '';
@@ -96,7 +96,7 @@ if (proc) {
         });
       }
     }
-      // Duplicate file piping removed – handled earlier
+    // Duplicate file piping removed – handled earlier
 
 
     proc.on('close', (code) => {
@@ -188,7 +188,7 @@ async function executeScripts() {
   const results = [];
 
   for (const script of scripts) {
-        console.log(`Running script: ${script.fileName}`);
+    console.log(`Running script: ${script.fileName}`);
     const logItem = {
       fileName: script.fileName,
       status: 'running',
