@@ -21,9 +21,14 @@
 -- Run this separately:
 -- node -e "const bcrypt = require('bcrypt'); const pwd = bcrypt.hashSync('admin123', 10); console.log(pwd);"
 
+--insert into users (role, email, password_hash, name, is_active) VALUES
+--('admin', 'admin@psikolog.com', '$2a$06$WqlMW65/Uh8Vxy6Gnlg6oecaH00CSJ2mn/3uueQl.oolKvmgdP54C', 'Dr. Admin', true),
+--('psychologist', 'psikolog1@psikolog.com', '$2b$10$placeholder_psych_hash_change_me', 'Dr. Ayse Yilmaz', true);
+
 -- Mark initial users as active
+
 UPDATE users SET is_active = true, name = 'Dr. Admin'
-WHERE email = 'admin@psikolog.com' AND (password_hash = '$2b$10$placeholder_admin_hash_change_me' OR password_hash IS NULL);
+WHERE email = 'admin@psikolog.com' ;
 
 UPDATE users SET is_active = true, name = 'Dr. Ayse Yilmaz'
-WHERE email = 'psikolog1@psikolog.com' AND (password_hash = '$2b$10$placeholder_psych_hash_change_me' OR password_hash IS NULL);
+WHERE email = 'psikolog1@psikolog.com' ;

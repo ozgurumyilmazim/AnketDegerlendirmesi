@@ -7,6 +7,8 @@
 -- Then: psql -d mmpi_db -f 01_schema.sql
 -- Then: psql -d mmpi_db -f 02_data.sql
 
+
+
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -53,26 +55,49 @@ CREATE INDEX idx_participants_created ON participants(created_at);
 -- ============================================================
 -- TEST RESULTS TABLE
 -- ============================================================
-CREATE TABLE IF NOT EXISTS test_results (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    participant_id UUID REFERENCES participants(id) ON DELETE SET NULL,
-    participant_info JSONB NOT NULL DEFAULT '{}',
-    test_answers JSONB NOT NULL DEFAULT '{}',
-    start_time TIMESTAMP WITH TIME ZONE,
-    end_time TIMESTAMP WITH TIME ZONE,
-    dont_know_count INTEGER DEFAULT 0,
-    completed_questions INTEGER DEFAULT 0,
-    total_questions INTEGER DEFAULT 567,
-    test_type VARCHAR(50) DEFAULT 'MMPI',
-    test_version VARCHAR(20) DEFAULT '1.0',
-    status VARCHAR(20) DEFAULT 'completed' CHECK (status IN ('started', 'in_progress', 'completed', 'abandoned')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+CREATE TABLE IF NOT EXISTS public.test_results
+(
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    participant_id uuid,
+    test_answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+    start_time timestamp with time zone,
+    end_time timestamp with time zone,
+    dont_know_count integer DEFAULT 0,
+    completed_questions integer DEFAULT 0,
+    total_questions integer DEFAULT 567,
+    test_type character varying(50) COLLATE pg_catalog."default" DEFAULT 'MMPI'::character varying,
+    test_version character varying(20) COLLATE pg_catalog."default" DEFAULT '1.0'::character varying,
+    status character varying(20) COLLATE pg_catalog."default" DEFAULT 'completed'::character varying,
+    session_code character varying(11) COLLATE pg_catalog."default",
+    current_index integer DEFAULT 0,
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
+    CONSTRAINT test_results_pkey PRIMARY KEY (id),
+    CONSTRAINT test_results_participant_id_fkey FOREIGN KEY (participant_id)
+        REFERENCES public.participants (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE SET NULL,
+    CONSTRAINT test_results_status_check CHECK (status::text = ANY (ARRAY['started'::character varying, 'in_progress'::character varying, 'completed'::character varying, 'abandoned'::character varying]::text[]))
+)
 
-CREATE INDEX idx_test_results_created ON test_results(created_at);
-CREATE INDEX idx_test_results_status ON test_results(status);
-CREATE INDEX idx_test_results_participant ON test_results(participant_id);
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.test_results
+    OWNER to anon;
+
+GRANT ALL ON TABLE public.test_results TO authenticated;
+
+GRANT ALL ON TABLE public.test_results TO anon;
+
+
+-- Index: idx_test_results_created
+
+-- DROP INDEX IF EXISTS public.idx_test_results_created;
+
+CREATE INDEX IF NOT EXISTS idx_test_results_created
+    ON public.test_results USING btree
+    (created ASC NULLS LAST)
+    TABLESPACE pg_default;
 
 -- ============================================================
 -- TEST RESULTS MIN VIEW (for duplicate test detection)
@@ -80,7 +105,19 @@ CREATE INDEX idx_test_results_participant ON test_results(participant_id);
 CREATE OR REPLACE VIEW public.test_results_min AS
 SELECT id, participant_id, status, created_at
 FROM public.test_results;
-GRANT SELECT ON public.test_results_min TO anon;
+
+-- GRANT SELECT ON public.test_results_min TO anon;
+
+-- ============================================================
+-- QUESTION CATEGORIES TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS question_category (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- ============================================================
 -- QUESTIONS TABLE
@@ -121,7 +158,7 @@ CREATE TABLE IF NOT EXISTS scoring_keys (
     id SERIAL PRIMARY KEY,
     scale_name VARCHAR(10) NOT NULL,
     question_number INTEGER NOT NULL,
-    scoring_answer VARCHAR(20) NOT NULL CHECK (scoring_answer IN ('Doğru', 'Yanlis')),
+    scoring_answer VARCHAR(20) NOT NULL CHECK (scoring_answer IN ('Doğru', 'Yanlış')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT uk_scale_question UNIQUE (scale_name, question_number)
@@ -189,6 +226,28 @@ CREATE INDEX idx_mmpi_int_range ON mmpi_interpretations(scale_name, min_t_score,
 -- ============================================================
 -- PAGE CONTENT TABLE (anasayfa, hakkimizda, gizlilik, kullanim)
 -- ============================================================
+CREATE TABLE IF NOT EXISTS public.page_content
+(
+    id integer NOT NULL DEFAULT nextval('page_content_id_seq'::regclass),
+    page_key character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    page_title character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
+    page_subtitle text COLLATE pg_catalog."default" DEFAULT ''::text,
+    page_body text COLLATE pg_catalog."default" DEFAULT ''::text,
+    updated_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT page_content_pkey PRIMARY KEY (id),
+    CONSTRAINT page_content_page_key_key UNIQUE (page_key)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.page_content
+    OWNER to anon;
+
+GRANT ALL ON TABLE public.page_content TO authenticated;
+GRANT ALL ON TABLE public.page_content TO anon;
+
+
+/*
 CREATE TABLE IF NOT EXISTS page_content (
     id SERIAL PRIMARY KEY,
     page_key VARCHAR(50) UNIQUE NOT NULL,
@@ -197,6 +256,7 @@ CREATE TABLE IF NOT EXISTS page_content (
     page_body TEXT DEFAULT '',
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+*/
 
 -- ============================================================
 -- KVKK TABLE
@@ -210,16 +270,6 @@ CREATE TABLE IF NOT EXISTS kvkk (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================================
--- QUESTION CATEGORIES TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS question_category (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    sort_order INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
 
 -- ============================================================
 -- TASK DEFINITIONS TABLE
@@ -312,7 +362,7 @@ CREATE TRIGGER trg_settings_updated BEFORE UPDATE ON settings
 -- Change password on first login!
 -- ============================================================
 INSERT INTO users (email, password_hash, role, name) VALUES
-    ('admin@psikolog.com', '$2b$10$placeholder_admin_hash_change_me', 'admin', 'Dr. Admin')
+    ('admin@psikolog.com', '$2a$06$WqlMW65/Uh8Vxy6Gnlg6oecaH00CSJ2mn/3uueQl.oolKvmgdP54C', 'admin', 'Dr. Admin')
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO users (email, password_hash, role, name) VALUES

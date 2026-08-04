@@ -17,11 +17,11 @@ CREATE TABLE IF NOT EXISTS public.page_permissions
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.page_permissions
-    OWNER to mmpi_user;
+    OWNER to anon;
 
 GRANT ALL ON TABLE public.page_permissions TO authenticated;
 
-GRANT ALL ON TABLE public.page_permissions TO mmpi_user;
+GRANT ALL ON TABLE public.page_permissions TO anon;
 
 -- Trigger for updated timestamp
 DROP TRIGGER IF EXISTS trg_page_permissions_updated ON public.page_permissions;
