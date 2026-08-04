@@ -260,6 +260,16 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(204);
     res.end();
     return;
+
+  // DB connection health check endpoint
+  if (url === '/dbcheck' && req.method === 'GET') {
+    const dbRes = await runPsqlCommand('SELECT 1;');
+    const ok = dbRes.success;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok }));
+    return;
+  }
+
   }
 
   const url = req.url.replace('/setup-api', '');
