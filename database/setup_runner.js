@@ -309,7 +309,7 @@ const server = http.createServer(async (req, res) => {
 
   // Execute only the 00_create_anon.sql script
   if (url === '/execute/00' && req.method === 'POST') {
-    const scriptPath = join(PROJECT_DIR, 'database', '00_create_anon.sql');
+    const scriptPath = join(DB_DIR, '00_create_anon.sql');
     const scriptContent = readFileSync(scriptPath, 'utf8');
     const dbRes = await runPsqlCommand(scriptContent);
     const success = dbRes.success;
