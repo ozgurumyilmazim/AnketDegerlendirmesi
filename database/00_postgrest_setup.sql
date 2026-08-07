@@ -13,16 +13,16 @@
 -- anon: unauthenticated requests (can only call api.login)
 -- authenticated: logged-in users (can CRUD all tables)
 
-DO $$
-BEGIN
+--DO $$
+--BEGIN
   -- IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'anon') THEN
     CREATE ROLE anon NOINHERIT;
   -- END IF;
   -- IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
     CREATE ROLE authenticated NOINHERIT;
   -- END IF;
-END
-$$;
+--END
+--$$;
 
 -- ============================================================
 -- 2. Create api schema for RPC functions
