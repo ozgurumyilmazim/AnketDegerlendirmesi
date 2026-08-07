@@ -114,6 +114,8 @@ services:
       dockerfile: Dockerfile # you can add a minimal Dockerfile (see below)
     container_name: selma_setup_runner
     restart: unless-stopped
+    volumes:
+      - ./database:/app
     environment:
       DB_NAME: ${DB_NAME:-mydatabase}
       DB_USER: ${DB_USER:-postgres}
