@@ -307,14 +307,24 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Execute only the 00_create_anon.sql script
+  // Execute 00_create_anon.sql and 00_postgrest_setup.sql scripts
   if (url === '/execute/00' && req.method === 'POST') {
     const scriptPath = join(DB_DIR, '00_create_anon.sql');
     const scriptContent = readFileSync(scriptPath, 'utf8');
     const dbRes = await runPsqlCommand(scriptContent);
-    const success = dbRes.success;
+    if (!dbRes.success) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, result: dbRes }));
+      return;
+    }
+
+    const pgScriptPath = join(DB_DIR, '00_postgrest_setup.sql');
+    const pgScriptContent = readFileSync(pgScriptPath, 'utf8');
+    const pgDbRes = await runPsqlCommand(pgScriptContent);
+    const success = pgDbRes.success;
+    
     res.writeHead(success ? 200 : 400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success, result: dbRes }));
+    res.end(JSON.stringify({ success, result: pgDbRes }));
     return;
   }
 
