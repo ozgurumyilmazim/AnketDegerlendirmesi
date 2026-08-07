@@ -312,8 +312,9 @@ const server = http.createServer(async (req, res) => {
     console.log('[API] Starting /execute/00 request...');
     const scriptPath = join(DB_DIR, '00_create_anon.sql');
     console.log(`[API] Running script: ${scriptPath}`);
-    const scriptContent = readFileSync(scriptPath, 'utf8');
-    const dbRes = await runPsqlCommand(scriptContent);
+    
+    // Use isFile = true to execute the file directly, avoiding shell injection of $$ in SQL strings
+    const dbRes = await runPsqlCommand(scriptPath, true);
     if (!dbRes.success) {
       console.error('[API] Error running 00_create_anon.sql:', dbRes);
       res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -324,8 +325,8 @@ const server = http.createServer(async (req, res) => {
 
     const pgScriptPath = join(DB_DIR, '00_postgrest_setup.sql');
     console.log(`[API] Running script: ${pgScriptPath}`);
-    const pgScriptContent = readFileSync(pgScriptPath, 'utf8');
-    const pgDbRes = await runPsqlCommand(pgScriptContent);
+    
+    const pgDbRes = await runPsqlCommand(pgScriptPath, true);
     const success = pgDbRes.success;
     
     if (success) {
