@@ -6,3 +6,5 @@
        -- CREATE ROLE anon NOINHERIT;
    -- END IF;
 -- END $$;
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
