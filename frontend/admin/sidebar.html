@@ -66,8 +66,8 @@
 </nav>
 
 <script>
-    // Aktif sayfa belirleme
-    document.addEventListener('DOMContentLoaded', function () {
+    // Aktif sayfa belirleme ve yetkisiz linkleri gizleme
+    document.addEventListener('DOMContentLoaded', async function () {
         const currentPage = window.location.pathname.split('/').pop();
 
         // Tüm nav linklerinden active class'ını kaldır
@@ -83,15 +83,14 @@
             case 'test-results.html':
                 document.getElementById('nav-test-results')?.classList.add('active');
                 break;
-
             case 'reports.html':
-                document.getElementById('nav-reports').classList.add('active');
+                document.getElementById('nav-reports')?.classList.add('active');
                 break;
             case 'questions.html':
-                document.getElementById('nav-questions').classList.add('active');
+                document.getElementById('nav-questions')?.classList.add('active');
                 break;
             case 'task-definitions.html':
-                document.getElementById('nav-task-definitions').classList.add('active');
+                document.getElementById('nav-task-definitions')?.classList.add('active');
                 break;
             case 'setup.html':
                 document.getElementById('nav-setup')?.classList.add('active');
@@ -103,10 +102,72 @@
             case 'settings-pages.html':
             case 'settings-categories.html':
             case 'settings-permissions.html':
-                document.getElementById('nav-settings').classList.add('active');
+                document.getElementById('nav-settings')?.classList.add('active');
                 break;
         }
+
+        // Yetkisiz menü elemanlarını gizle
+        await filterMenuByPermissions();
     });
+
+    async function filterMenuByPermissions() {
+        try {
+            if (typeof window.AuthService === 'undefined' || typeof window.PG_API === 'undefined') {
+                return;
+            }
+
+            const userRole = await window.AuthService.getUserRole();
+            if (!userRole) return;
+
+            // Admin yetkisine sahip kullanıcılar tüm menü linklerini görebilir
+            if (userRole === 'admin') {
+                return;
+            }
+
+            // Sayfa yetkilerini veritabanından çek
+            const { data: permissions, error } = await window.PG_API
+                .from('page_permissions')
+                .select('page_name, psychologist');
+
+            if (error || !permissions) {
+                console.warn('Sayfa yetkileri menü için okunamadı:', error);
+                return;
+            }
+
+            const permMap = {};
+            permissions.forEach(p => {
+                permMap[p.page_name] = p.psychologist;
+            });
+
+            // Menü item'ları ile sayfa isimleri eşleştirmesi
+            const menuPermissions = {
+                'nav-dashboard': 'dashboard',
+                'nav-test-results': 'test-results',
+                'nav-reports': 'reports',
+                'nav-questions': 'questions',
+                'nav-task-definitions': 'task-definitions',
+                'nav-settings': 'settings'
+            };
+
+            // Sayfa yetkileri yönetim linki sadece Admin içindir
+            const permNavLink = document.getElementById('nav-permissions');
+            if (permNavLink) {
+                permNavLink.closest('li')?.remove();
+            }
+
+            Object.entries(menuPermissions).forEach(([navId, pageName]) => {
+                const isAllowed = permMap[pageName] !== undefined ? permMap[pageName] : true;
+                if (!isAllowed) {
+                    const el = document.getElementById(navId);
+                    if (el) {
+                        el.closest('li')?.remove();
+                    }
+                }
+            });
+        } catch (err) {
+            console.error('Menü yetki filtresi hatası:', err);
+        }
+    }
 
     // Sidebar toggle fonksiyonları
     function toggleSidebar() {
