@@ -141,12 +141,15 @@ CREATE TABLE IF NOT EXISTS reports (
     report_content JSONB NOT NULL DEFAULT '{}',
     report_type VARCHAR(50) DEFAULT 'standard',
     generated_by VARCHAR(100),
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_reports_test_result ON reports(test_result_id);
 CREATE INDEX idx_reports_participant ON reports(participant_id);
+CREATE INDEX idx_reports_created ON reports(created);
 
 -- ============================================================
 -- SCORING KEYS TABLE (L, F, K, Hs, D, Hy, Pd, Mf, Pa, Pt, Sc, Ma, Si)
