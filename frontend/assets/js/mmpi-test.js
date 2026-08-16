@@ -304,6 +304,7 @@ class MMPITest {
             console.error('Sorular yüklenirken hata oluştu:', error);
             this.handleLoadingError(error);
         }
+
     }
 
     bindEvents() {
@@ -359,6 +360,47 @@ class MMPITest {
                 }
             }
         });
+        // Desktop left/right click handling for true/false
+        $(document).on('mousedown', '.answer-option', (e) => {
+            if (e.button === 0) {
+                // Left click -> true
+                $('#answerTrue').prop('checked', true);
+                this.handleAnswerChange();
+            } else if (e.button === 2) {
+                // Right click -> false
+                $('#answerFalse').prop('checked', true);
+                this.handleAnswerChange();
+                e.preventDefault();
+            }
+        });
+        // Prevent context menu on right click
+        $(document).on('contextmenu', '.answer-option', (e) => {
+            e.preventDefault();
+        });
+
+        // Mobile swipe detection
+        let touchStartX = null;
+        $(document).on('touchstart', '.answer-option', (e) => {
+            const touch = e.originalEvent.touches[0];
+            touchStartX = touch.clientX;
+        });
+        $(document).on('touchend', '.answer-option', (e) => {
+            if (touchStartX === null) return;
+            const touch = e.originalEvent.changedTouches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const threshold = 30; // Minimum swipe distance in px
+            if (deltaX > threshold) {
+                // Swipe right -> true
+                $('#answerTrue').prop('checked', true);
+                this.handleAnswerChange();
+            } else if (deltaX < -threshold) {
+                // Swipe left -> false
+                $('#answerFalse').prop('checked', true);
+                this.handleAnswerChange();
+            }
+            touchStartX = null;
+        });
+
     }
 
     displayQuestion() {
