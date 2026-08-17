@@ -798,13 +798,13 @@ class MMPITest {
         };
         update(); // initial display
         this.timerInterval = setInterval(update, 1000);
-    },
+    }
     stopTimer() {
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
-    },
+    }
         const interval = testConfig?.autoSaveInterval || 30000;
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
