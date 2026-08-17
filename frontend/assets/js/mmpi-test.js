@@ -805,6 +805,8 @@ class MMPITest {
             this.timerInterval = null;
         }
     }
+
+    startAutoSave() {
         const interval = testConfig?.autoSaveInterval || 30000;
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
