@@ -13,7 +13,10 @@
 </head>
 
 <body>
-    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center position-relative">
+  <button type="button" class="btn btn-outline-primary btn-sm position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#infoModal">
+    <i class="fas fa-info-circle"></i> Talimatlar
+  </button>
         <div class="container">
             <div class="card fade-in">
                 <div class="logo">
@@ -38,20 +41,7 @@
                     <i class="fas fa-info-circle"></i>
                     <strong>Bilmiyorum Hakkı:</strong> <span id="dontKnowCount">10</span> / 10 kaldı
                 </div>
-<div class="card my-3">
-  <div class="card-header bg-primary text-white"><i class="fas fa-info-circle"></i> Test Talimatları</div>
-  <div class="card-body">
-    <ul class="list-unstyled">
-      <li><strong>Soru Numarası:</strong> Şu anki sorunun numarasını gösterir.</li>
-      <li><strong>Doğru butonu:</strong> Sorunun sizin durumunuza göre doğru olduğunu düşünüyorsanız işaretleyin.</li>
-      <li><strong>Yanlış butonu:</strong> Sorunun yanlış olduğunu işaretleyin.</li>
-      <li><strong>Bilmiyorum butonu:</strong> Eğer emin değilseniz seçin. En fazla 10 “Bilmiyorum” hakkınız vardır; kalan sayısı üstte gösterilir.</li>
-      <li><strong>Önceki / Sonraki:</strong> Sorular arasında geçiş yapar.</li>
-      <li><strong>Geçen Süre:</strong> Testin başladığı andan itibaren geçen zamanı gösterir.</li>
-      <li><strong>Kaydet ve Çık:</strong> Testi kaydederek daha sonra devam edebilirsiniz.</li>
-    </ul>
-  </div>
-</div>
+
 
                 <!-- Soru Konteyner -->
                 <div class="question-container" id="questionContainer">
@@ -346,4 +336,31 @@
     </div>
 </body>
 
+
+  <!-- Test Talimatları Modal -->
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="infoModalLabel"><i class="fas fa-info-circle"></i> Test Talimatları</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-unstyled">
+            <li><strong>Soru Numarası:</strong> Şu anki sorunun numarasını gösterir.</li>
+            <li><strong>Doğru butonu:</strong> Sorunun sizin durumunuza göre doğru olduğunu düşünüyorsanız işaretleyin.</li>
+            <li><strong>Yanlış butonu:</strong> Sorunun yanlış olduğunu işaretleyin.</li>
+            <li><strong>Bilmiyorum butonu:</strong> Eğer emin değilseniz seçin. En fazla 10 “Bilmiyorum” hakkınız vardır; kalan sayısı üstte gösterilir.</li>
+            <li><strong>Önceki / Sonraki:</strong> Sorular arasında geçiş yapar.</li>
+            <li><strong>Geçen Süre:</strong> Testin başladığı andan itibaren geçen zamanı gösterir.</li>
+            <li><strong>Kaydet ve Çık:</strong> Testi kaydederek daha sonra devam edebilirsiniz.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>
