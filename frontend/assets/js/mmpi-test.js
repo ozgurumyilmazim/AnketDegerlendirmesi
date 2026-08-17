@@ -784,17 +784,15 @@ class MMPITest {
         const maxDurationMs = (testConfig.maxDuration || 120) * 60 * 1000; // default 120 mins
         const update = () => {
             const now = new Date();
-            const elapsedMs = now - new Date(this.startTime);
-            const elapsedSec = Math.floor(elapsedMs / 1000);
-            const remainingMs = Math.max(maxDurationMs - elapsedMs, 0);
-            const remainingSec = Math.floor(remainingMs / 1000);
-            const elapsed = `${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`;
-            const remaining = `${Math.floor(remainingSec / 60)}:${String(remainingSec % 60).padStart(2, '0')}`;
-            $('#timerContainer').text(`Geçen Süre: ${elapsed} | Kalan Süre: ${remaining}`);
-            if (remainingMs <= 0) {
-                // Time's up - finish the test automatically
-                this.finishTest();
-            }
+const elapsedMs = now - new Date(this.startTime);
+const elapsedMin = Math.floor(elapsedMs / 60000);
+const remainingMs = Math.max(maxDurationMs - elapsedMs, 0);
+const remainingMin = Math.floor(remainingMs / 60000);
+$('#timerContainer').text(`Geçen Süre: ${elapsedMin} dakika | Kalan Süre: ${remainingMin} dakika`);
+if (remainingMs <= 0) {
+    this.finishTest();
+}
+
         };
         update(); // initial display
         this.timerInterval = setInterval(update, 1000);
