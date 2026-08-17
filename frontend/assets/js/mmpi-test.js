@@ -786,9 +786,9 @@ class MMPITest {
             const now = new Date();
             const elapsedMs = now - new Date(this.startTime);
             const elapsedSec = Math.floor(elapsedMs / 1000);
-            const elapsed = `${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`;
             const remainingMs = Math.max(maxDurationMs - elapsedMs, 0);
             const remainingSec = Math.floor(remainingMs / 1000);
+            const elapsed = `${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`;
             const remaining = `${Math.floor(remainingSec / 60)}:${String(remainingSec % 60).padStart(2, '0')}`;
             $('#timerContainer').text(`Geçen Süre: ${elapsed} | Kalan Süre: ${remaining}`);
             if (remainingMs <= 0) {
