@@ -15,7 +15,7 @@ const testConfig = {
     
     // UI ayarları
     showProgress: true,
-    showTimer: false,
+    showTimer: true,
     enableKeyboardShortcuts: true,
     
     // Kaydetme ayarları

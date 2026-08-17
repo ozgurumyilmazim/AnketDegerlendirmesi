@@ -778,7 +778,33 @@ class MMPITest {
         modal.show();
     }
 
-    startAutoSave() {
+    // Timer handling
+    startTimer() {
+        if (!this.startTime) return;
+        const maxDurationMs = (testConfig.maxDuration || 120) * 60 * 1000; // default 120 mins
+        const update = () => {
+            const now = new Date();
+            const elapsedMs = now - new Date(this.startTime);
+            const elapsedSec = Math.floor(elapsedMs / 1000);
+            const elapsed = `${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`;
+            const remainingMs = Math.max(maxDurationMs - elapsedMs, 0);
+            const remainingSec = Math.floor(remainingMs / 1000);
+            const remaining = `${Math.floor(remainingSec / 60)}:${String(remainingSec % 60).padStart(2, '0')}`;
+            $('#timerContainer').text(`Geçen Süre: ${elapsed} | Kalan Süre: ${remaining}`);
+            if (remainingMs <= 0) {
+                // Time's up - finish the test automatically
+                this.finishTest();
+            }
+        };
+        update(); // initial display
+        this.timerInterval = setInterval(update, 1000);
+    },
+    stopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    },
         const interval = testConfig?.autoSaveInterval || 30000;
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
@@ -792,6 +818,7 @@ class MMPITest {
             }
         }, interval);
         console.log('Otomatik kaydetme başlatıldı:', interval, 'ms');
+        this.startTimer();
     }
 
     stopAutoSave() {
