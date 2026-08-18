@@ -358,51 +358,49 @@
             </div>
         </div>
     </div>
-</body>
 
-
-  <!-- Test Talimatları Modal -->
-  <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="infoModalLabel"><i class="fas fa-info-circle"></i> Test Talimatları</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Test Talimatları Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="infoModalLabel"><i class="fas fa-info-circle"></i> Test Talimatları</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="mb-3"><i class="fas fa-mouse"></i> Masaüstü (Fare)</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><strong>Sol tık:</strong> <span class="text-success">Doğru</span> — otomatik sonraki soruya geçer</li>
+                        <li><strong>Sağ tık:</strong> <span class="text-danger">Yanlış</span> — otomatik sonraki soruya geçer</li>
+                        <li><strong>Orta tık (tekerlek):</strong> <span class="text-warning">Bilmiyorum</span> (en fazla 10 hak)</li>
+                    </ul>
+                    <h6 class="mb-3"><i class="fas fa-keyboard"></i> Klavye Kısayolları</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><strong>D veya 1:</strong> <span class="text-success">Doğru</span></li>
+                        <li><strong>Y veya 2:</strong> <span class="text-danger">Yanlış</span></li>
+                        <li><strong>B veya 3:</strong> <span class="text-warning">Bilmiyorum</span></li>
+                        <li><strong>← Sol ok:</strong> Önceki soru</li>
+                    </ul>
+                    <h6 class="mb-3"><i class="fas fa-hand-pointer"></i> Mobil (Dokunmatik)</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><strong>Sağa kaydır:</strong> <span class="text-success">Doğru</span></li>
+                        <li><strong>Sola kaydır:</strong> <span class="text-danger">Yanlış</span></li>
+                        <li><strong>Aşağı kaydır:</strong> <span class="text-warning">Bilmiyorum</span></li>
+                    </ul>
+                    <hr>
+                    <ul class="list-unstyled">
+                        <li><strong>Bilmiyorum Hakkı:</strong> En fazla 10 "Bilmiyorum" hakkınız vardır; kalan sayısı üstte gösterilir.</li>
+                        <li><strong>Önceki / Sonraki:</strong> Butonlarla sorular arasında geçiş yapabilirsiniz.</li>
+                        <li><strong>Geçen Süre:</strong> Testin başladığı andan itibaren geçen zamanı gösterir.</li>
+                        <li><strong>Kaydet ve Çık:</strong> Testi kaydederek daha sonra devam edebilirsiniz.</li>
+                    </ul>
+                    <img src="assets/images/instructions_sample.jpg" alt="Talimatlar screenshot" class="img-fluid mt-3 rounded" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <h6 class="mb-3"><i class="fas fa-mouse"></i> Masaüstü (Fare)</h6>
-          <ul class="list-unstyled mb-3">
-            <li><strong>Sol tık:</strong> <span class="text-success">Doğru</span> — otomatik sonraki soruya geçer</li>
-            <li><strong>Sağ tık:</strong> <span class="text-danger">Yanlış</span> — otomatik sonraki soruya geçer</li>
-            <li><strong>Orta tık (tekerlek):</strong> <span class="text-warning">Bilmiyorum</span> (en fazla 10 hak)</li>
-          </ul>
-          <h6 class="mb-3"><i class="fas fa-keyboard"></i> Klavye Kısayolları</h6>
-          <ul class="list-unstyled mb-3">
-            <li><strong>D veya 1:</strong> <span class="text-success">Doğru</span></li>
-            <li><strong>Y veya 2:</strong> <span class="text-danger">Yanlış</span></li>
-            <li><strong>B veya 3:</strong> <span class="text-warning">Bilmiyorum</span></li>
-            <li><strong>← Sol ok:</strong> Önceki soru</li>
-          </ul>
-          <h6 class="mb-3"><i class="fas fa-hand-pointer"></i> Mobil (Dokunmatik)</h6>
-          <ul class="list-unstyled mb-3">
-            <li><strong>Sağa kaydır:</strong> <span class="text-success">Doğru</span></li>
-            <li><strong>Sola kaydır:</strong> <span class="text-danger">Yanlış</span></li>
-            <li><strong>Aşağı kaydır:</strong> <span class="text-warning">Bilmiyorum</span></li>
-          </ul>
-          <hr>
-          <ul class="list-unstyled">
-            <li><strong>Bilmiyorum Hakkı:</strong> En fazla 10 "Bilmiyorum" hakkınız vardır; kalan sayısı üstte gösterilir.</li>
-            <li><strong>Önceki / Sonraki:</strong> Butonlarla sorular arasında geçiş yapabilirsiniz.</li>
-            <li><strong>Geçen Süre:</strong> Testin başladığı andan itibaren geçen zamanı gösterir.</li>
-            <li><strong>Kaydet ve Çık:</strong> Testi kaydederek daha sonra devam edebilirsiniz.</li>
-          </ul>
-          <img src="file:///C:/Users/ozgury/.gemini/antigravity-ide/brain/21b4bfab-095f-4536-aed2-2492876f9845/single_question_placeholder_1786950833138.jpg" alt="Talimatlar screenshot" class="img-fluid mt-3 rounded" />
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
-        </div>
-      </div>
     </div>
-  </div>
 </body>
 </html>
