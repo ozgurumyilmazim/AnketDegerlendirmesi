@@ -1,6 +1,6 @@
 # PROJECT_INFORMATION.md
 
-This file contains essential guidance for agents working in this repository. The project's primary documentation is Turkish and lives in `dokumanlar/`; `belgeler/` holds raw SQL/data dumps. You must be able to read Turkish (UI, DB data, and docs are Turkish).
+This file contains essential guidance for agents working in this repository.
 
 **Read `dokumanlar/ozKurallar.md` first** — it is the project's LLM rulebook (language rules, architecture, DB quirks). `tasks/` contains numbered functional specs for agent work — read the relevant one before touching those areas.
 
