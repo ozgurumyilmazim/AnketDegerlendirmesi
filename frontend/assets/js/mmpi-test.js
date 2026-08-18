@@ -457,7 +457,7 @@ class MMPITest {
         });
 
         // ── Masaüstü Fare Tıklama İşleyicisi (.question-container üzerinde) ──
-        // Sol tık -> Yanlış, Sağ tık -> Doğru, Orta tık -> Bilmiyorum
+        // Sol tık -> Doğru, Sağ tık -> Yanlış, Orta tık -> Bilmiyorum
         this.$questionContainer.on('mousedown', (e) => {
             // Eğer bir buton, link veya form elemanına tıklandıysa özel mousedown'u çalıştırma
             if ($(e.target).closest('button, a, input, select, .modal').length) return;
@@ -465,12 +465,12 @@ class MMPITest {
             if (this.isLoading || this.questions.length === 0) return;
 
             if (e.button === 0) {
-                // Sol tık -> Yanlış
-                this.submitAnswer('false');
-            } else if (e.button === 2) {
-                // Sağ tık -> Doğru
-                e.preventDefault();
+                // Sol tık -> Doğru
                 this.submitAnswer('true');
+            } else if (e.button === 2) {
+                // Sağ tık -> Yanlış
+                e.preventDefault();
+                this.submitAnswer('false');
             } else if (e.button === 1) {
                 // Orta tık -> Bilmiyorum
                 e.preventDefault();
