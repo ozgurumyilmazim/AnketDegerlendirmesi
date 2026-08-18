@@ -189,6 +189,12 @@ select:focus {
     padding: 25px;
     margin: 20px 0;
     border-left: 5px solid #667eea;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
 }
 
 .question-text {
@@ -197,6 +203,170 @@ select:focus {
     margin-bottom: 20px;
     color: #2c3e50;
     line-height: 1.6;
+}
+
+/* ── Fast-Answer Feedback Overlay ── */
+.answer-feedback-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 120ms ease;
+}
+
+.answer-feedback-overlay.show {
+    opacity: 1;
+}
+
+.answer-feedback-overlay.feedback-true {
+    background: rgba(46, 204, 113, 0.25);
+}
+
+.answer-feedback-overlay.feedback-false {
+    background: rgba(231, 76, 60, 0.25);
+}
+
+.answer-feedback-overlay.feedback-dontknow {
+    background: rgba(243, 156, 18, 0.25);
+}
+
+.answer-feedback-overlay .feedback-icon {
+    font-size: 3rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 150ms ease;
+}
+
+.answer-feedback-overlay.show .feedback-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.answer-feedback-overlay.feedback-true .feedback-icon {
+    color: #27ae60;
+}
+
+.answer-feedback-overlay.feedback-false .feedback-icon {
+    color: #e74c3c;
+}
+
+.answer-feedback-overlay.feedback-dontknow .feedback-icon {
+    color: #f39c12;
+}
+
+/* ── Direction Hint Overlay ── */
+.direction-hint-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 10px;
+    z-index: 20;
+    opacity: 1;
+    transition: opacity 400ms ease;
+    pointer-events: none;
+}
+
+.direction-hint-overlay.hidden {
+    opacity: 0;
+}
+
+.direction-hint-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 10px;
+}
+
+.direction-hint-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.direction-hint-item.hint-false {
+    color: #e74c3c;
+}
+
+.direction-hint-item.hint-true {
+    color: #27ae60;
+}
+
+.direction-hint-item.hint-dontknow {
+    color: #f39c12;
+}
+
+.direction-hint-item i {
+    font-size: 1.5rem;
+}
+
+.direction-hint-separator {
+    width: 2px;
+    height: 30px;
+    background: #ccc;
+    border-radius: 1px;
+}
+
+.direction-hint-sub {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 6px;
+}
+
+/* ── Card Slide Animation ── */
+@keyframes slideOutLeft {
+    to {
+        transform: translateX(-40px);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutRight {
+    to {
+        transform: translateX(40px);
+        opacity: 0;
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.question-container.slide-in-right {
+    animation: slideInFromRight 180ms ease-out;
+}
+
+.question-container.slide-in-left {
+    animation: slideInFromLeft 180ms ease-out;
 }
 
 .answer-options {

@@ -26,6 +26,11 @@ class MMPITest {
         this.$nextBtn = $('#nextBtn');
         this.$finishBtn = $('#finishBtn');
         this.$saveExitBtn = $('#saveExitBtn');
+        this.$answerFeedbackOverlay = $('#answerFeedbackOverlay');
+        this.$feedbackIcon = $('#feedbackIcon');
+        this.$directionHintOverlay = $('#directionHintOverlay');
+        this.isAdvancing = false;
+        this.hintTimer = null;
 
         // Test başlat
         this.initializeTest();
@@ -307,103 +312,217 @@ class MMPITest {
 
     }
 
+    // Cevap görsel geri bildirimi (flash)
+    showAnswerFeedback(value) {
+        if (!this.$answerFeedbackOverlay.length) {
+            this.$answerFeedbackOverlay = $('#answerFeedbackOverlay');
+            this.$feedbackIcon = $('#feedbackIcon');
+        }
+        if (!this.$answerFeedbackOverlay.length) return;
+
+        this.$answerFeedbackOverlay.removeClass('feedback-true feedback-false feedback-dontknow show');
+
+        if (value === 'true') {
+            this.$answerFeedbackOverlay.addClass('feedback-true show');
+            this.$feedbackIcon.html('<i class="fas fa-check"></i> Doğru');
+        } else if (value === 'false') {
+            this.$answerFeedbackOverlay.addClass('feedback-false show');
+            this.$feedbackIcon.html('<i class="fas fa-times"></i> Yanlış');
+        } else if (value === 'dont_know') {
+            this.$answerFeedbackOverlay.addClass('feedback-dontknow show');
+            this.$feedbackIcon.html('<i class="fas fa-question"></i> Bilmiyorum');
+        }
+
+        setTimeout(() => {
+            this.$answerFeedbackOverlay.removeClass('show');
+        }, 160);
+    }
+
+    // Yönlendirme ipucu göster (oturumda ilk kez açıldığında)
+    showDirectionHint() {
+        if (sessionStorage.getItem('mmpi_hint_dismissed') === 'true') {
+            if (this.$directionHintOverlay.length) {
+                this.$directionHintOverlay.addClass('hidden').hide();
+            }
+            return;
+        }
+
+        if (this.$directionHintOverlay.length) {
+            this.$directionHintOverlay.removeClass('hidden').show();
+            if (this.hintTimer) clearTimeout(this.hintTimer);
+            this.hintTimer = setTimeout(() => {
+                this.dismissDirectionHint();
+            }, 4000);
+        }
+    }
+
+    // Yönlendirme ipucunu kapat
+    dismissDirectionHint() {
+        if (this.hintTimer) {
+            clearTimeout(this.hintTimer);
+            this.hintTimer = null;
+        }
+        if (this.$directionHintOverlay.length) {
+            this.$directionHintOverlay.addClass('hidden');
+            setTimeout(() => {
+                this.$directionHintOverlay.hide();
+            }, 350);
+        }
+        sessionStorage.setItem('mmpi_hint_dismissed', 'true');
+    }
+
+    // Hızlı cevap verme (fare, kaydırma, klavye ve radio tıklamalarında çağrılır)
+    submitAnswer(value) {
+        if (this.isLoading || this.questions.length === 0 || this.isAdvancing) return;
+
+        // Bilmiyorum sınırı kontrolü
+        if (value === 'dont_know') {
+            const currentQuestion = this.questions[this.currentQuestionIndex];
+            const currentAnswer = this.answers[currentQuestion?.question_number];
+            if (this.dontKnowCount >= this.maxDontKnow && currentAnswer !== 'Bilmiyorum') {
+                this.showWarning(`En fazla ${this.maxDontKnow} adet "Bilmiyorum" cevabı verebilirsiniz.`);
+                return;
+            }
+        }
+
+        this.dismissDirectionHint();
+
+        // Radio butonunu işaretle
+        $(`input[name="answer"][value="${value}"]`).prop('checked', true);
+
+        // Cevabı kaydet ve UI'ı güncelle
+        this.handleAnswerChange();
+
+        // Görsel geri bildirim göster (flash)
+        this.showAnswerFeedback(value);
+
+        // Son soru değilse 200 ms sonra otomatik bir sonraki soruya geç
+        if (this.currentQuestionIndex < this.questions.length - 1) {
+            this.isAdvancing = true;
+            setTimeout(() => {
+                this.nextQuestion();
+                this.isAdvancing = false;
+            }, 200);
+        }
+    }
+
     bindEvents() {
         console.log('bindEvents çağrıldı');
 
-        // Cevap seçenekleri
+        // Cevap seçenekleri (Radio buton doğrudan tıklandığında)
         $('input[name="answer"]').on('change', () => {
-            this.handleAnswerChange();
+            const selectedValue = $('input[name="answer"]:checked').val();
+            if (selectedValue) {
+                this.submitAnswer(selectedValue);
+            }
         });
 
         // Navigasyon butonları
-        this.$prevBtn.on('click', () => {
+        this.$prevBtn.on('click', (e) => {
+            e.stopPropagation();
             this.previousQuestion();
         });
 
-        this.$nextBtn.on('click', () => {
+        this.$nextBtn.on('click', (e) => {
+            e.stopPropagation();
             this.nextQuestion();
         });
 
-        this.$finishBtn.on('click', () => {
+        this.$finishBtn.on('click', (e) => {
+            e.stopPropagation();
             this.finishTest();
         });
 
-        this.$saveExitBtn.on('click', () => {
+        this.$saveExitBtn.on('click', (e) => {
+            e.stopPropagation();
             this.saveAndExit();
         });
 
-        // Klavye kısayolları
+        // ── Klavye kısayolları ──
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' && this.prevBtn && !this.prevBtn.disabled) {
+            // Eğer bir modal veya input içindeyse klavye kısayollarını çalıştırma
+            if ($(e.target).is('input, textarea, select')) return;
+
+            if (e.key === 'ArrowLeft' && this.$prevBtn && !this.$prevBtn.prop('disabled')) {
                 this.previousQuestion();
-            } else if (e.key === 'ArrowRight' && this.nextBtn && !this.nextBtn.disabled) {
+            } else if (e.key === 'ArrowRight' && this.$nextBtn && !this.$nextBtn.prop('disabled')) {
                 this.nextQuestion();
             } else if (e.key === '1' || e.key === 'D' || e.key === 'd') {
-                const answerTrue = document.getElementById('answerTrue');
-                if (answerTrue) {
-                    answerTrue.checked = true;
-                    this.handleAnswerChange();
-                }
+                this.submitAnswer('true');
             } else if (e.key === '2' || e.key === 'Y' || e.key === 'y') {
-                const answerFalse = document.getElementById('answerFalse');
-                if (answerFalse) {
-                    answerFalse.checked = true;
-                    this.handleAnswerChange();
-                }
+                this.submitAnswer('false');
             } else if (e.key === '3' || e.key === 'B' || e.key === 'b') {
-                if (this.dontKnowCount < this.maxDontKnow) {
-                    const answerDontKnow = document.getElementById('answerDontKnow');
-                    if (answerDontKnow) {
-                        answerDontKnow.checked = true;
-                        this.handleAnswerChange();
-                    }
-                }
+                this.submitAnswer('dont_know');
             }
         });
-        // Desktop left/right click handling for true/false
-        $(document).on('mousedown', '.answer-option', (e) => {
+
+        // ── Masaüstü Fare Tıklama İşleyicisi (.question-container üzerinde) ──
+        // Sol tık -> Yanlış, Sağ tık -> Doğru, Orta tık -> Bilmiyorum
+        this.$questionContainer.on('mousedown', (e) => {
+            // Eğer bir buton, link veya form elemanına tıklandıysa özel mousedown'u çalıştırma
+            if ($(e.target).closest('button, a, input, select, .modal').length) return;
+
+            if (this.isLoading || this.questions.length === 0) return;
+
             if (e.button === 0) {
-                // Left click -> true
-                $('#answerTrue').prop('checked', true);
-                this.handleAnswerChange();
+                // Sol tık -> Yanlış
+                this.submitAnswer('false');
             } else if (e.button === 2) {
-                // Right click -> false
-                $('#answerFalse').prop('checked', true);
-                this.handleAnswerChange();
+                // Sağ tık -> Doğru
                 e.preventDefault();
+                this.submitAnswer('true');
+            } else if (e.button === 1) {
+                // Orta tık -> Bilmiyorum
+                e.preventDefault();
+                this.submitAnswer('dont_know');
             }
         });
-        // Prevent context menu on right click
-        $(document).on('contextmenu', '.answer-option', (e) => {
+
+        // Sağ tık bağlam menüsünü soru konteynerinde engelle
+        this.$questionContainer.on('contextmenu', (e) => {
             e.preventDefault();
         });
 
-        // Mobile swipe detection
+        // ── Mobil Dokunmatik Kaydırma (Swipe) İşleyicisi ──
+        // Sağa kaydır -> Doğru, Sola kaydır -> Yanlış, Aşağı kaydır -> Bilmiyorum
         let touchStartX = null;
-        $(document).on('touchstart', '.answer-option', (e) => {
+        let touchStartY = null;
+
+        this.$questionContainer.on('touchstart', (e) => {
             const touch = e.originalEvent.touches[0];
             touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
         });
-        $(document).on('touchend', '.answer-option', (e) => {
-            if (touchStartX === null) return;
+
+        this.$questionContainer.on('touchend', (e) => {
+            if (touchStartX === null || touchStartY === null) return;
             const touch = e.originalEvent.changedTouches[0];
             const deltaX = touch.clientX - touchStartX;
-            const threshold = 30; // Minimum swipe distance in px
-            if (deltaX > threshold) {
-                // Swipe right -> true
-                $('#answerTrue').prop('checked', true);
-                this.handleAnswerChange();
-            } else if (deltaX < -threshold) {
-                // Swipe left -> false
-                $('#answerFalse').prop('checked', true);
-                this.handleAnswerChange();
-            }
-            touchStartX = null;
-        });
+            const deltaY = touch.clientY - touchStartY;
+            const absX = Math.abs(deltaX);
+            const absY = Math.abs(deltaY);
+            const threshold = 40; // Minimum kaydırma mesafesi piksel olarak
 
+            if (absX > threshold && absX > absY) {
+                // Yatay kaydırma
+                if (deltaX > threshold) {
+                    // Sağa kaydırma -> Doğru
+                    this.submitAnswer('true');
+                } else if (deltaX < -threshold) {
+                    // Sola kaydırma -> Yanlış
+                    this.submitAnswer('false');
+                }
+            } else if (deltaY > threshold && absY > absX) {
+                // Dikey aşağı kaydırma -> Bilmiyorum
+                this.submitAnswer('dont_know');
+            }
+
+            touchStartX = null;
+            touchStartY = null;
+        });
     }
 
-    displayQuestion() {
+    displayQuestion(slideDirection = 'right') {
         console.log('displayQuestion çağrıldı');
         console.log('isLoading:', this.isLoading);
         console.log('questions.length:', this.questions.length);
@@ -438,11 +557,17 @@ class MMPITest {
         // Buton durumlarını güncelle
         this.updateButtons();
 
+        // Yönlendirme ipucunu göster (ilk soruda gösterilir)
+        if (this.currentQuestionIndex === 0) {
+            this.showDirectionHint();
+        }
+
         // Animasyon ekle
-        if (this.$questionContainer) {
-            this.$questionContainer.removeClass('fade-in');
+        if (this.$questionContainer.length) {
+            this.$questionContainer.removeClass('slide-in-right slide-in-left fade-in');
+            const animClass = slideDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
             setTimeout(() => {
-                this.$questionContainer.addClass('fade-in');
+                this.$questionContainer.addClass(animClass);
             }, 10);
         } else {
             console.error('questionContainer elementi bulunamadı');
@@ -551,7 +676,7 @@ class MMPITest {
     previousQuestion() {
         if (this.currentQuestionIndex > 0) {
             this.currentQuestionIndex--;
-            this.displayQuestion();
+            this.displayQuestion('left');
             this.updateProgress();
         }
     }
@@ -565,7 +690,7 @@ class MMPITest {
 
         if (this.currentQuestionIndex < this.questions.length - 1) {
             this.currentQuestionIndex++;
-            this.displayQuestion();
+            this.displayQuestion('right');
             this.updateProgress();
         }
     }
