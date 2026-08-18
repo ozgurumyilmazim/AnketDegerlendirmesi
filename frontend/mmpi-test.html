@@ -45,7 +45,7 @@
                 </div>
 
 
-                <!-- Soru Konteyner -->
+                <!-- Soru Konteyner (Soru Paleti) -->
                 <div class="question-container" id="questionContainer">
                     <!-- Visual Feedback Overlay -->
                     <div class="answer-feedback-overlay" id="answerFeedbackOverlay">
@@ -72,28 +72,29 @@
                     <div class="question-text" id="questionText">
                         Test yükleniyor...
                     </div>
+                </div>
 
-                    <div class="answer-options" id="answerOptions">
-                        <div class="answer-option">
-                            <input type="radio" id="answerTrue" name="answer" value="true">
-                            <label for="answerTrue">
-                                <i class="fas fa-check"></i> Doğru
-                            </label>
-                        </div>
+                <!-- Cevap Seçenekleri Butonları (Soru Paletinin Altında) -->
+                <div class="answer-options mb-3" id="answerOptions">
+                    <div class="answer-option option-true">
+                        <input type="radio" id="answerTrue" name="answer" value="true">
+                        <label for="answerTrue">
+                            <i class="fas fa-check"></i> Doğru
+                        </label>
+                    </div>
 
-                        <div class="answer-option">
-                            <input type="radio" id="answerFalse" name="answer" value="false">
-                            <label for="answerFalse">
-                                <i class="fas fa-times"></i> Yanlış
-                            </label>
-                        </div>
+                    <div class="answer-option option-false">
+                        <input type="radio" id="answerFalse" name="answer" value="false">
+                        <label for="answerFalse">
+                            <i class="fas fa-times"></i> Yanlış
+                        </label>
+                    </div>
 
-                        <div class="answer-option dont-know">
-                            <input type="radio" id="answerDontKnow" name="answer" value="dont_know">
-                            <label for="answerDontKnow">
-                                <i class="fas fa-question"></i> Bilmiyorum
-                            </label>
-                        </div>
+                    <div class="answer-option dont-know option-dontknow">
+                        <input type="radio" id="answerDontKnow" name="answer" value="dont_know">
+                        <label for="answerDontKnow">
+                            <i class="fas fa-question"></i> Bilmiyorum
+                        </label>
                     </div>
                 </div>
 

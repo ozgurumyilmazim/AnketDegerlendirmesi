@@ -182,27 +182,33 @@ select:focus {
     font-size: 18px;
 }
 
-/* Test Soruları */
+/* Test Soruları (Soru Paleti) */
 .question-container {
     background: #f8f9fa;
-    border-radius: 10px;
-    padding: 25px;
+    border-radius: 12px;
+    padding: 35px 25px;
     margin: 20px 0;
-    border-left: 5px solid #667eea;
+    border-left: 6px solid #667eea;
     position: relative;
     overflow: hidden;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     touch-action: pan-y;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 .question-text {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 20px;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 0;
     color: #2c3e50;
     line-height: 1.6;
+    text-align: center;
 }
 
 /* ── Fast-Answer Feedback Overlay ── */
@@ -374,6 +380,7 @@ select:focus {
     gap: 15px;
     flex-wrap: wrap;
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 .answer-option {
@@ -386,37 +393,80 @@ select:focus {
 }
 
 .answer-option label {
-    display: block;
-    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
     background: white;
     border: 2px solid #e1e8ed;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     font-weight: 600;
+    font-size: 16px;
+    user-select: none;
 }
 
-.answer-option label:hover {
-    border-color: #667eea;
-    background: #f0f3ff;
+/* Doğru Butonu */
+.answer-option.option-true label {
+    border-color: #d4edda;
+    color: #155724;
 }
 
-.answer-option input[type="radio"]:checked + label {
-    background: #667eea;
+.answer-option.option-true label:hover {
+    border-color: #28a745;
+    background: #eafaf1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+}
+
+.answer-option.option-true input[type="radio"]:checked + label {
+    background: #28a745;
     color: white;
-    border-color: #667eea;
+    border-color: #28a745;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-/* Bilmiyorum Seçeneği */
-.answer-option.dont-know input[type="radio"]:checked + label {
-    background: #f39c12;
-    border-color: #f39c12;
+/* Yanlış Butonu */
+.answer-option.option-false label {
+    border-color: #f8d7da;
+    color: #721c24;
 }
 
-.answer-option.dont-know label:hover {
+.answer-option.option-false label:hover {
+    border-color: #dc3545;
+    background: #fdedec;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+}
+
+.answer-option.option-false input[type="radio"]:checked + label {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Bilmiyorum Butonu */
+.answer-option.option-dontknow label {
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.answer-option.option-dontknow label:hover {
     border-color: #f39c12;
     background: #fef5e7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.15);
+}
+
+.answer-option.option-dontknow input[type="radio"]:checked + label {
+    background: #f39c12;
+    color: white;
+    border-color: #f39c12;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
 }
 
 /* Uyarı Mesajları */
