@@ -83,10 +83,46 @@ $(document).ready(function() {
     });
 });
 
+// Varsayılan referans verileri (API bağlantısı kurulamazsa kullanılır)
+const FALLBACK_DATA = {
+    genders: [
+        { name: 'Erkek', code: 'erkek' },
+        { name: 'Kadın', code: 'kadin' },
+        { name: 'Diğer', code: 'other' }
+    ],
+    professions: [
+        { name: 'Öğrenci' }, { name: 'Öğretmen' }, { name: 'Doktor' },
+        { name: 'Hemşire' }, { name: 'Mühendis' }, { name: 'Avukat' },
+        { name: 'Mimar' }, { name: 'İşletmeci' }, { name: 'Memur' },
+        { name: 'İşçi' }, { name: 'Emekli' }, { name: 'Ev Hanımı' },
+        { name: 'Serbest Meslek' }, { name: 'Güvenlik Görevlisi' },
+        { name: 'Teknisyen' }, { name: 'Esnaf' }, { name: 'Çiftçi' },
+        { name: 'Diğer' }
+    ],
+    educationLevels: [
+        { name: 'İlkokul' }, { name: 'Ortaokul' }, { name: 'Lise' },
+        { name: 'Ön Lisans' }, { name: 'Lisans' }, { name: 'Yüksek Lisans' },
+        { name: 'Doktora' }, { name: 'Profesörlük' }
+    ],
+    maritalStatuses: [
+        { name: 'Bekar' }, { name: 'Evli' }, { name: 'Boşanmış' }, { name: 'Dul' }
+    ],
+    institutions: [
+        { institution_code: 'KUR001', institution_name: 'İstanbul Üniversitesi' },
+        { institution_code: 'KUR002', institution_name: 'Ankara Üniversitesi' },
+        { institution_code: 'KUR003', institution_name: 'Ege Üniversitesi' },
+        { institution_code: 'KUR004', institution_name: 'Bilkent Üniversitesi' },
+        { institution_code: 'KUR005', institution_name: 'ODTÜ' }
+    ]
+};
+
 // Referans verilerini API'den yükle ve dropdown'ları doldur
 async function loadReferenceData() {
+    // Önce varsayılan verileri yükle (API başarısız olursa bile form çalışsın)
+    populateFallbackData();
+
     if (typeof PG_API === 'undefined' || !PG_API) {
-        console.log('PG_API bağlantısı mevcut değil, referans verileri yüklenemiyor.');
+        console.log('PG_API bağlantısı mevcut değil, varsayılan veriler kullanılıyor.');
         return;
     }
     
@@ -96,8 +132,9 @@ async function loadReferenceData() {
             .from('genders')
             .select('name, code')
             .order('sort_order', { ascending: true });
-        if (!genderErr && genders) {
+        if (!genderErr && genders && genders.length > 0) {
             const $gender = $('#gender');
+            $gender.find('option:not(:first)').remove();
             genders.forEach(g => {
                 $gender.append(`<option value="${g.code}">${g.name}</option>`);
             });
@@ -108,8 +145,9 @@ async function loadReferenceData() {
             .from('professions')
             .select('name')
             .order('sort_order', { ascending: true });
-        if (!profErr && professions) {
+        if (!profErr && professions && professions.length > 0) {
             const $profession = $('#profession');
+            $profession.find('option:not(:first)').remove();
             professions.forEach(p => {
                 $profession.append(`<option value="${p.name}">${p.name}</option>`);
             });
@@ -120,8 +158,9 @@ async function loadReferenceData() {
             .from('education_levels')
             .select('name')
             .order('sort_order', { ascending: true });
-        if (!eduErr && educationLevels) {
+        if (!eduErr && educationLevels && educationLevels.length > 0) {
             const $education = $('#education');
+            $education.find('option:not(:first)').remove();
             educationLevels.forEach(e => {
                 $education.append(`<option value="${e.name}">${e.name}</option>`);
             });
@@ -132,8 +171,9 @@ async function loadReferenceData() {
             .from('marital_statuses')
             .select('name')
             .order('sort_order', { ascending: true });
-        if (!marErr && maritalStatuses) {
+        if (!marErr && maritalStatuses && maritalStatuses.length > 0) {
             const $marital = $('#maritalStatus');
+            $marital.find('option:not(:first)').remove();
             maritalStatuses.forEach(m => {
                 $marital.append(`<option value="${m.name}">${m.name}</option>`);
             });
@@ -144,8 +184,9 @@ async function loadReferenceData() {
             .from('institutions')
             .select('institution_code, institution_name')
             .order('sort_order', { ascending: true });
-        if (!instErr && institutions) {
+        if (!instErr && institutions && institutions.length > 0) {
             const $institution = $('#institution');
+            $institution.find('option:not(:first)').remove();
             institutions.forEach(i => {
                 $institution.append(
                     `<option value="${i.institution_code}" data-code="${i.institution_code}" data-name="${i.institution_name}">${i.institution_code} - ${i.institution_name}</option>`
@@ -154,8 +195,38 @@ async function loadReferenceData() {
         }
         
     } catch (error) {
-        console.error('Referans verileri yüklenirken hata:', error);
+        console.error('Referans verileri yüklenirken hata, varsayılan veriler kullanılıyor:', error);
     }
+}
+
+// Varsayılan verileri dropdown'lara yükle
+function populateFallbackData() {
+    const $gender = $('#gender');
+    FALLBACK_DATA.genders.forEach(g => {
+        $gender.append(`<option value="${g.code}">${g.name}</option>`);
+    });
+
+    const $profession = $('#profession');
+    FALLBACK_DATA.professions.forEach(p => {
+        $profession.append(`<option value="${p.name}">${p.name}</option>`);
+    });
+
+    const $education = $('#education');
+    FALLBACK_DATA.educationLevels.forEach(e => {
+        $education.append(`<option value="${e.name}">${e.name}</option>`);
+    });
+
+    const $marital = $('#maritalStatus');
+    FALLBACK_DATA.maritalStatuses.forEach(m => {
+        $marital.append(`<option value="${m.name}">${m.name}</option>`);
+    });
+
+    const $institution = $('#institution');
+    FALLBACK_DATA.institutions.forEach(i => {
+        $institution.append(
+            `<option value="${i.institution_code}" data-code="${i.institution_code}" data-name="${i.institution_name}">${i.institution_code} - ${i.institution_name}</option>`
+        );
+    });
 }
 
 // Katılımcı bilgilerini PG_API'e kaydet

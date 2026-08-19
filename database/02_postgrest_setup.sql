@@ -250,6 +250,19 @@ GRANT SELECT ON public.reports TO anon;
 GRANT SELECT ON public.kvkk TO anon;
 GRANT SELECT ON public.test_results_min TO anon;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;
+
+-- Grants for reference tables (created by 10_personal_info_references.sql)
+-- Use DO blocks to avoid errors if tables don't exist yet
+DO $$ BEGIN
+    GRANT SELECT ON public.genders TO anon;
+    GRANT SELECT ON public.professions TO anon;
+    GRANT SELECT ON public.education_levels TO anon;
+    GRANT SELECT ON public.marital_statuses TO anon;
+    GRANT SELECT ON public.institutions TO anon;
+EXCEPTION WHEN undefined_table THEN
+    RAISE NOTICE 'Reference tables not yet created, skipping grants';
+END $$;
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO anon;
 
 -- ============================================================
