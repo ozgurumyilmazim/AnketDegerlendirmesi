@@ -4,6 +4,8 @@ This file contains essential guidance for agents working in this repository.
 
 **Read `dokumanlar/ozKurallar.md` first** — it is the project's LLM rulebook (language rules, architecture, DB quirks). `tasks/` contains numbered functional specs for agent work — read the relevant one before touching those areas.
 
+**For any database question (tables, columns, types, defaults, constraints, views, functions, triggers, roles/grants, seed data), read `database/database_tables.md`** — it is the authoritative schema reference, generated from the `database/NN_*.sql` migration scripts. Read it instead of grepping the SQL files.
+
 ## Rules
 
 - No Turkish code comments or commit messages; commit messages are short English.
@@ -25,7 +27,11 @@ This file contains essential guidance for agents working in this repository.
 
 ## DB gotchas (top bug sources)
 
-- Timestamp column names differ per table: `participants`, `test_results`, `reports` use `created`/`updated` (no `_at` — see `database/scripts/*.sql`, `database_tables.md`); other tables (`questions`, `task_definitions`, `settings`, etc.) use `created_at`/`updated_at`. **Reference `01_schema.sql` uses `_at` everywhere — do not trust it.** JS sorts those three tables with `.order('created')`.
+- Timestamp column names differ per table (see `database/database_tables.md`):
+  - `test_results` and `page_permissions` use `created`/`updated` (no `_at`); `reports` defines both `created`/`updated` and `created_at`/`updated_at`.
+  - **`participants` uses `created_at`/`updated_at`** (not `created`/`updated` — unlike the old `database/scripts/*.sql` docs).
+  - All other tables (`users`, `questions`, `scoring_keys`, `t_score_norms`, `t_score_params`, `mmpi_interpretations`, `kvkk`, `task_definitions`, `settings`, `question_category`) use `created_at`/`updated_at`; `sessions` has only `created_at`.
+  - JS sorts `test_results` and `reports` with `.order('created')` — never on `participants`.
 - Never send timestamps in INSERT/UPDATE on `participants`, `test_results`, `reports` — let `DEFAULT now()` fire (explicit payloads have caused PGRST204).
 - Gender stored in DB as `'erkek'`/`'kadin'`; HTML forms submit `'male'`/`'female'` — map `{ male: 'erkek', female: 'kadin', other: 'other' }`.
 - `anon` (pre-login) PostgREST role needs explicit SELECT grants on every table test-takers read (`participants`, `test_results`, `questions`, `kvkk`, `reports`, `test_results_min`) — see `00_postgrest_setup.sql`.
