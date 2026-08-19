@@ -10,12 +10,12 @@ function generateTckn() {
 }
 
 function generateGender() {
-  return Math.random() < 0.5 ? 'male' : 'female';
+  return Math.random() < 0.5 ? 'erkek' : 'kadin';
 }
 
 export const GENDER_DISPLAY = {
-  male: 'Erkek',
-  female: 'Kadın',
+  erkek: 'Erkek',
+  kadin: 'Kadın',
 };
 
 export function createTestParticipant() {
@@ -26,9 +26,9 @@ export function createTestParticipant() {
     tcNo: generateTckn(),
     gender: generateGender(),
     age: 30,
-    institutionCode: 'TEST001',
-    institutionName: 'Test Kurumu',
-    profession: 'Yazilim Gelistirici',
+    institutionCode: 'KUR001',
+    institutionName: 'İstanbul Üniversitesi',
+    profession: 'Mühendis',
     education: 'Lisans',
     maritalStatus: 'Bekar',
   };

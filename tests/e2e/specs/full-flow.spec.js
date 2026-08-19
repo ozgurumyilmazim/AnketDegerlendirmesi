@@ -23,9 +23,8 @@ async function fillPersonalInfo(page, participant) {
   await page.fill('#tcNo', participant.tcNo);
   await page.selectOption('#gender', participant.gender);
   await page.fill('#age', String(participant.age));
-  await page.fill('#institutionCode', participant.institutionCode);
-  await page.fill('#institutionName', participant.institutionName);
-  await page.fill('#profession', participant.profession);
+  await page.selectOption('#institution', participant.institutionCode);
+  await page.selectOption('#profession', participant.profession);
   await page.selectOption('#education', participant.education);
   await page.selectOption('#maritalStatus', participant.maritalStatus);
 }
@@ -89,8 +88,8 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     await page.waitForURL('**/personal-info.html', { timeout: 15000 });
     await expect(page.locator('#personalInfoForm')).toBeVisible();
 
-    // "Kayıtlı teste devam et" linki mevcut mu?
-    const resumeLink = page.locator('a[href="test-devam.html"]', { hasText: 'Kayıtlı teste devam et' });
+    // "Kayıtlı teste devam etmek için tıklayın" linki mevcut mu?
+    const resumeLink = page.locator('a[href="test-devam.html"]', { hasText: 'Kayıtlı teste devam etmek için tıklayın' });
     await expect(resumeLink).toBeVisible();
 
     await fillPersonalInfo(page, participant);
