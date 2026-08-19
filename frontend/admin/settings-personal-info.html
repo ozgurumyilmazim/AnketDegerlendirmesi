@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kişisel Bilgi Referansları - MMPI Test Sistemi</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .breadcrumb-nav { margin-bottom: 1.5rem; }
+        .breadcrumb-nav a { color: #667eea; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .breadcrumb-nav a:hover { text-decoration: underline; }
+        .breadcrumb-nav span { color: #6b7280; font-size: 0.9rem; margin: 0 0.5rem; }
+        .breadcrumb-nav .current { color: #1a1d2e; font-weight: 600; }
+        .page-title { font-size: 1.75rem; font-weight: 700; color: #1a1d2e; margin-bottom: 0.25rem; }
+        .page-subtitle { color: #6b7280; margin: 0; }
+        .header-section { margin-bottom: 2rem; }
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel-header h5 { margin: 0; font-weight: 700; font-size: 1rem; }
+        .panel-body { padding: 1.5rem; }
+        .form-label { font-weight: 600; font-size: 0.875rem; color: #374151; margin-bottom: 0.4rem; }
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.15);
+        }
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102,126,234,0.35);
+            color: white;
+        }
+        .ref-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+        .ref-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+        .ref-table tbody tr:last-child td { border-bottom: none; }
+        .ref-table tbody tr:hover { background: #eef0fc; }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-icon-edit { background: #fff3cd; color: #856404; }
+        .btn-icon-edit:hover { background: #ffc107; color: white; transform: scale(1.1); }
+        .btn-icon-delete { background: #f8d7da; color: #721c24; }
+        .btn-icon-delete:hover { background: #dc3545; color: white; transform: scale(1.1); }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #9ca3af;
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+        .info-banner {
+            background: linear-gradient(135deg, #eef0fc, #e8eaf6);
+            border-left: 4px solid #667eea;
+            border-radius: 0 10px 10px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .info-banner i { color: #667eea; margin-right: 0.5rem; }
+        .sort-order-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eef0fc;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .nav-tabs .nav-link {
+            font-weight: 600;
+            color: #6b7280;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #667eea;
+            background: #eef0fc;
+        }
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 2px solid #667eea;
+        }
+        .tab-content { padding: 1.5rem; }
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+
+    <div class="main-content" id="mainContent">
+        <div class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">Kişisel Bilgi Referansları</span>
+        </div>
+
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-database me-2" style="color:#667eea;"></i>Kişisel Bilgi Referansları</h1>
+                <p class="page-subtitle">Katılımcı formunda kullanılan referans verilerini yönetin</p>
+            </div>
+            <div>
+                <a href="settings.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ayarlara Dön
+                </a>
+            </div>
+        </div>
+
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            Bu ekrandan katılımcı giriş formundaki açılır kutuların (Cinsiyet, Meslek, Eğitim Seviyesi, Medeni Durum, Kurum) seçeneklerini ekleyebilir, düzenleyebilir ve silebilirsiniz.
+        </div>
+
+        <div class="panel-card">
+            <ul class="nav nav-tabs" id="refTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="genders-tab" data-bs-toggle="tab" data-bs-target="#genders-pane" type="button" role="tab">
+                        <i class="fas fa-venus-mars me-1"></i>Cinsiyet
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="professions-tab" data-bs-toggle="tab" data-bs-target="#professions-pane" type="button" role="tab">
+                        <i class="fas fa-briefcase me-1"></i>Meslek
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education-pane" type="button" role="tab">
+                        <i class="fas fa-graduation-cap me-1"></i>Eğitim Seviyesi
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="marital-tab" data-bs-toggle="tab" data-bs-target="#marital-pane" type="button" role="tab">
+                        <i class="fas fa-heart me-1"></i>Medeni Durum
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="institutions-tab" data-bs-toggle="tab" data-bs-target="#institutions-pane" type="button" role="tab">
+                        <i class="fas fa-building me-1"></i>Kurumlar
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="refTabContent">
+                <!-- Cinsiyet Tab -->
+                <div class="tab-pane fade show active" id="genders-pane" role="tabpanel">
+                    <div class="panel-header mb-3">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Yeni Cinsiyet Ekle</h5>
+                    </div>
+                    <form id="addGenderForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Cinsiyet Adı</label>
+                                <input type="text" class="form-control" id="genderName" placeholder="Örn: Erkek" maxlength="50">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Kod</label>
+                                <input type="text" class="form-control" id="genderCode" placeholder="Örn: erkek" maxlength="20">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="genderSortOrder" min="0" value="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-add w-100" onclick="addItem('gender')">
+                                    <i class="fas fa-plus me-1"></i>Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="panel-header"><h5><i class="fas fa-list me-2"></i>Mevcut Cinsiyetler</h5></div>
+                    <div id="genderTableWrapper" class="table-responsive mt-2">
+                        <table class="table ref-table mb-0">
+                            <thead><tr><th style="width:10%">Sıra</th><th style="width:30%">Ad</th><th style="width:30%">Kod</th><th style="width:30%" class="text-end">İşlemler</th></tr></thead>
+                            <tbody id="genderTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="genderEmpty" class="empty-state d-none"><i class="fas fa-venus-mars"></i><p>Henüz cinsiyet tanımlanmamış.</p></div>
+                </div>
+
+                <!-- Meslek Tab -->
+                <div class="tab-pane fade" id="professions-pane" role="tabpanel">
+                    <div class="panel-header mb-3">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Yeni Meslek Ekle</h5>
+                    </div>
+                    <form id="addProfessionForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Meslek Adı</label>
+                                <input type="text" class="form-control" id="professionName" placeholder="Örn: Doktor" maxlength="150">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="professionSortOrder" min="0" value="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-add w-100" onclick="addItem('profession')">
+                                    <i class="fas fa-plus me-1"></i>Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="panel-header"><h5><i class="fas fa-list me-2"></i>Mevcut Meslekler</h5></div>
+                    <div id="professionTableWrapper" class="table-responsive mt-2">
+                        <table class="table ref-table mb-0">
+                            <thead><tr><th style="width:15%">Sıra</th><th style="width:55%">Meslek Adı</th><th style="width:30%" class="text-end">İşlemler</th></tr></thead>
+                            <tbody id="professionTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="professionEmpty" class="empty-state d-none"><i class="fas fa-briefcase"></i><p>Henüz meslek tanımlanmamış.</p></div>
+                </div>
+
+                <!-- Eğitim Seviyesi Tab -->
+                <div class="tab-pane fade" id="education-pane" role="tabpanel">
+                    <div class="panel-header mb-3">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Yeni Eğitim Seviyesi Ekle</h5>
+                    </div>
+                    <form id="addEducationForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Eğitim Seviyesi</label>
+                                <input type="text" class="form-control" id="educationName" placeholder="Örn: Lisans" maxlength="100">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="educationSortOrder" min="0" value="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-add w-100" onclick="addItem('education')">
+                                    <i class="fas fa-plus me-1"></i>Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="panel-header"><h5><i class="fas fa-list me-2"></i>Mevcut Eğitim Seviyeleri</h5></div>
+                    <div id="educationTableWrapper" class="table-responsive mt-2">
+                        <table class="table ref-table mb-0">
+                            <thead><tr><th style="width:15%">Sıra</th><th style="width:55%">Eğitim Seviyesi</th><th style="width:30%" class="text-end">İşlemler</th></tr></thead>
+                            <tbody id="educationTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="educationEmpty" class="empty-state d-none"><i class="fas fa-graduation-cap"></i><p>Henüz eğitim seviyesi tanımlanmamış.</p></div>
+                </div>
+
+                <!-- Medeni Durum Tab -->
+                <div class="tab-pane fade" id="marital-pane" role="tabpanel">
+                    <div class="panel-header mb-3">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Yeni Medeni Durum Ekle</h5>
+                    </div>
+                    <form id="addMaritalForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Medeni Durum</label>
+                                <input type="text" class="form-control" id="maritalName" placeholder="Örn: Bekar" maxlength="50">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="maritalSortOrder" min="0" value="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-add w-100" onclick="addItem('marital')">
+                                    <i class="fas fa-plus me-1"></i>Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="panel-header"><h5><i class="fas fa-list me-2"></i>Mevcut Medeni Durumlar</h5></div>
+                    <div id="maritalTableWrapper" class="table-responsive mt-2">
+                        <table class="table ref-table mb-0">
+                            <thead><tr><th style="width:15%">Sıra</th><th style="width:55%">Medeni Durum</th><th style="width:30%" class="text-end">İşlemler</th></tr></thead>
+                            <tbody id="maritalTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="maritalEmpty" class="empty-state d-none"><i class="fas fa-heart"></i><p>Henüz medeni durum tanımlanmamış.</p></div>
+                </div>
+
+                <!-- Kurumlar Tab -->
+                <div class="tab-pane fade" id="institutions-pane" role="tabpanel">
+                    <div class="panel-header mb-3">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Yeni Kurum Ekle</h5>
+                    </div>
+                    <form id="addInstitutionForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Kurum Kodu</label>
+                                <input type="text" class="form-control" id="institutionCode" placeholder="Örn: KUR001" maxlength="50">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Kurum Adı</label>
+                                <input type="text" class="form-control" id="institutionName" placeholder="Örn: İstanbul Üniversitesi" maxlength="200">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Sıralama</label>
+                                <input type="number" class="form-control" id="institutionSortOrder" min="0" value="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-add w-100" onclick="addItem('institution')">
+                                    <i class="fas fa-plus me-1"></i>Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="panel-header"><h5><i class="fas fa-list me-2"></i>Mevcut Kurumlar</h5></div>
+                    <div id="institutionTableWrapper" class="table-responsive mt-2">
+                        <table class="table ref-table mb-0">
+                            <thead><tr><th style="width:10%">Sıra</th><th style="width:20%">Kurum Kodu</th><th style="width:40%">Kurum Adı</th><th style="width:30%" class="text-end">İşlemler</th></tr></thead>
+                            <tbody id="institutionTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="institutionEmpty" class="empty-state d-none"><i class="fas fa-building"></i><p>Henüz kurum tanımlanmamış.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalTitle">Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId">
+                        <input type="hidden" id="editType">
+                        <div id="editFormFields"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="updateBtn">
+                        <i class="fas fa-save"></i> Güncelle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1055;">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">İşlem başarıyla tamamlandı!</div>
+        </div>
+        <div id="errorToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">İşlem sırasında bir hata oluştu!</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+    <script src="../assets/js/page-permissions.js"></script>
+
+    <script>
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        }).catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <script>
+        const TABLES = {
+            gender:       { table: 'genders',              nameCol: 'name',       extraCols: ['code'],          label: 'Cinsiyet' },
+            profession:   { table: 'professions',          nameCol: 'name',       extraCols: [],                label: 'Meslek' },
+            education:    { table: 'education_levels',     nameCol: 'name',       extraCols: [],                label: 'Eğitim Seviyesi' },
+            marital:      { table: 'marital_statuses',     nameCol: 'name',       extraCols: [],                label: 'Medeni Durum' },
+            institution:  { table: 'institutions',         nameCol: 'institution_name', extraCols: ['institution_code'], label: 'Kurum' }
+        };
+
+        function showToast(type, message) {
+            const toast = document.getElementById(type + 'Toast');
+            document.getElementById(type + 'ToastBody').textContent = message;
+            new bootstrap.Toast(toast, { delay: 3500 }).show();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function loadAll() {
+            for (const [key, cfg] of Object.entries(TABLES)) {
+                await loadItems(key);
+            }
+        }
+
+        async function loadItems(type) {
+            const cfg = TABLES[type];
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı bulunamadı.');
+                const { data, error } = await window.PG_API
+                    .from(cfg.table)
+                    .select('*')
+                    .order('sort_order', { ascending: true });
+                if (error) throw error;
+                renderItems(type, data || []);
+            } catch (err) {
+                showToast('error', cfg.label + ' yüklenemedi: ' + (err?.message || err));
+            }
+        }
+
+        function renderItems(type, items) {
+            const cfg = TABLES[type];
+            const tbody = document.getElementById(type + 'TableBody');
+            const wrapper = document.getElementById(type + 'TableWrapper');
+            const empty = document.getElementById(type + 'Empty');
+            tbody.innerHTML = '';
+
+            if (items.length === 0) {
+                wrapper.classList.add('d-none');
+                empty.classList.remove('d-none');
+                return;
+            }
+            wrapper.classList.remove('d-none');
+            empty.classList.add('d-none');
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                let cells = `<td><span class="sort-order-badge">${item.sort_order || item.id}</span></td>`;
+                cells += `<td><strong>${escapeHtml(item[cfg.nameCol])}</strong></td>`;
+                cfg.extraCols.forEach(col => {
+                    cells += `<td>${escapeHtml(item[col])}</td>`;
+                });
+
+                const editData = { id: item.id, name: item[cfg.nameCol], sort_order: item.sort_order || 0 };
+                cfg.extraCols.forEach(col => { editData[col] = item[col]; });
+
+                cells += `<td class="text-end">
+                    <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick='editItem("${type}", ${JSON.stringify(editData)})'>
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-icon-delete" title="Sil" onclick='deleteItem("${type}", "${item.id}", "${escapeHtml(item[cfg.nameCol])}")'>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>`;
+                tr.innerHTML = cells;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function addItem(type) {
+            const cfg = TABLES[type];
+            const nameInput = document.getElementById(type === 'institution' ? 'institutionName' : type + 'Name');
+            const sortInput = document.getElementById(type + 'SortOrder');
+            const nameVal = nameInput.value.trim();
+            const sortVal = parseInt(sortInput.value) || 0;
+
+            if (!nameVal) {
+                showToast('error', cfg.label + ' adı zorunludur.');
+                return;
+            }
+
+            const row = { [cfg.nameCol]: nameVal, sort_order: sortVal };
+            cfg.extraCols.forEach(col => {
+                const inputId = type === 'institution' && col === 'institution_code' ? 'institutionCode' :
+                                type === 'gender' && col === 'code' ? 'genderCode' : type + capitalize(col);
+                const el = document.getElementById(inputId);
+                if (el) row[col] = el.value.trim();
+            });
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+                const { error } = await window.PG_API.from(cfg.table).insert([row]);
+                if (error) throw error;
+                showToast('success', `"${nameVal}" eklendi.`);
+                // Reset the form
+                const formId = type === 'gender' ? 'addGenderForm' :
+                               type === 'profession' ? 'addProfessionForm' :
+                               type === 'education' ? 'addEducationForm' :
+                               type === 'marital' ? 'addMaritalForm' : 'addInstitutionForm';
+                document.getElementById(formId).reset();
+                sortInput.value = '1';
+                loadItems(type);
+            } catch (err) {
+                showToast('error', 'Eklenirken hata: ' + (err?.message || err));
+            }
+        }
+
+        function capitalize(s) {
+            return s.replace(/_([a-z])/g, (_, c) => c.toUpperCase()).replace(/^./, c => c.toUpperCase());
+        }
+
+        function editItem(type, data) {
+            const cfg = TABLES[type];
+            document.getElementById('editId').value = data.id;
+            document.getElementById('editType').value = type;
+            document.getElementById('editModalTitle').textContent = cfg.label + ' Düzenle';
+
+            let html = '';
+            html += `<div class="mb-3"><label class="form-label">${cfg.nameCol === 'institution_name' ? 'Kurum Adı' : cfg.label + ' Adı'}</label>`;
+            html += `<input type="text" class="form-control" id="editName" value="${escapeHtml(data.name)}" maxlength="200"></div>`;
+            cfg.extraCols.forEach(col => {
+                const label = col === 'code' ? 'Kod' : col === 'institution_code' ? 'Kurum Kodu' : col;
+                html += `<div class="mb-3"><label class="form-label">${label}</label>`;
+                html += `<input type="text" class="form-control" id="editExtra_${col}" value="${escapeHtml(data[col])}" maxlength="200"></div>`;
+            });
+            html += `<div class="mb-3"><label class="form-label">Sıralama</label>`;
+            html += `<input type="number" class="form-control" id="editSortOrder" value="${data.sort_order}" min="0"></div>`;
+            document.getElementById('editFormFields').innerHTML = html;
+
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        }
+
+        document.getElementById('updateBtn').addEventListener('click', async () => {
+            const id = document.getElementById('editId').value;
+            const type = document.getElementById('editType').value;
+            const cfg = TABLES[type];
+            const nameVal = document.getElementById('editName').value.trim();
+            const sortOrder = parseInt(document.getElementById('editSortOrder').value) || 0;
+
+            if (!nameVal) {
+                showToast('error', 'Ad zorunludur.');
+                return;
+            }
+
+            const update = { [cfg.nameCol]: nameVal, sort_order: sortOrder };
+            cfg.extraCols.forEach(col => {
+                update[col] = document.getElementById('editExtra_' + col).value.trim();
+            });
+
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+                const { error } = await window.PG_API.from(cfg.table).eq('id', id).update(update);
+                if (error) throw error;
+                showToast('success', cfg.label + ' güncellendi.');
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                loadItems(type);
+            } catch (err) {
+                showToast('error', 'Güncellenirken hata: ' + (err?.message || err));
+            }
+        });
+
+        async function deleteItem(type, id, name) {
+            const cfg = TABLES[type];
+            if (!confirm(`"${name}" kaydını silmek istediğinizden emin misiniz?`)) return;
+            try {
+                if (!window.PG_API) throw new Error('Veritabanı bağlantısı yok');
+                const { error } = await window.PG_API.from(cfg.table).eq('id', id).delete();
+                if (error) throw error;
+                showToast('success', `"${name}" silindi.`);
+                loadItems(type);
+            } catch (err) {
+                showToast('error', 'Silme başarısız: ' + (err?.message || err));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof window.AuthService !== 'undefined') {
+                const isAdmin = await window.AuthService.isAdmin();
+                if (!isAdmin) {
+                    showToast('error', 'Bu sayfaya erişim yetkiniz bulunmamaktadır.');
+                    setTimeout(() => { window.location.href = 'settings.html'; }, 2000);
+                    return;
+                }
+            }
+            const hasPermission = await checkPagePermission('settings-personal-info');
+            if (!hasPermission) return;
+            loadAll();
+        });
+    </script>
+</body>
+</html>
