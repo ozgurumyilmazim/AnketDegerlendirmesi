@@ -301,11 +301,24 @@ async function getTestResults() {
         // Katılımcı bilgilerini çek (gerekli alanlar)
         const { data: participants, error: participantError } = await PG_API
             .from('participants')
-            .select('id, first_name, last_name, tc_no, age, gender, education, profession, institution_code, institution_name, marital_status');
+            .select('id, first_name, last_name, tc_no, age, gender, education, profession, institution_code, marital_status');
 
         if (participantError) {
             console.error('Katılımcı bilgileri çekilirken hata:', participantError);
             return [];
+        }
+
+        // Kurum bilgilerini çek
+        const { data: institutions, error: instError } = await PG_API
+            .from('institutions')
+            .select('institution_code, institution_name');
+
+        // Kurum adını bulmak için map oluştur
+        const institutionsMap = {};
+        if (!instError && institutions) {
+            institutions.forEach(inst => {
+                institutionsMap[inst.institution_code] = inst.institution_name;
+            });
         }
 
         // Soru metinlerini çek
@@ -376,7 +389,7 @@ async function getTestResults() {
                     education: participant.education,
                     profession: participant.profession,
                     institutionCode: participant.institution_code,
-                    institutionName: participant.institution_name,
+                    institutionName: institutionsMap[participant.institution_code] || '',
                     maritalStatus: participant.marital_status
                 } : null
             };

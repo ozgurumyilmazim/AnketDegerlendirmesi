@@ -269,7 +269,6 @@ async function saveParticipantToPostgreSQL(participantData) {
                 gender: participantData.gender,
                 age: participantData.age,
                 institution_code: participantData.institutionCode,
-                institution_name: participantData.institutionName,
                 profession: participantData.profession,
                 education: participantData.education,
                 marital_status: participantData.maritalStatus

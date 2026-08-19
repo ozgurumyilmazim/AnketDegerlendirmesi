@@ -118,7 +118,7 @@
             // Önce katılımcıyı TC No ile bul
             const { data: participants, error: pErr } = await PG_API
                 .from('participants')
-                .select('id, first_name, last_name, tc_no, gender, age, institution_code, institution_name, profession, education, marital_status')
+                .select('id, first_name, last_name, tc_no, gender, age, institution_code, profession, education, marital_status')
                 .eq('tc_no', tcNo)
                 .limit(1);
 
@@ -131,6 +131,20 @@
             }
 
             const participant = participants[0];
+
+            // Kurum adını bul
+            let institutionName = '';
+            if (participant.institution_code) {
+                const { data: instData } = await PG_API
+                    .from('institutions')
+                    .select('institution_name')
+                    .eq('institution_code', participant.institution_code)
+                    .limit(1);
+                if (instData && instData.length > 0) {
+                    institutionName = instData[0].institution_name;
+                }
+            }
+            participant.institution_name = institutionName;
 
             // Devam etmekte olan testi oturum kodu ile bul
             const { data: tests, error: tErr } = await PG_API

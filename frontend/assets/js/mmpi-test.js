@@ -1046,7 +1046,6 @@ if (remainingMs <= 0) {
                         gender: dbGender,
                         age: personalInfo.age,
                         institution_code: personalInfo.institutionCode,
-                        institution_name: personalInfo.institutionName,
                         profession: personalInfo.profession,
                         education: personalInfo.education,
                         marital_status: personalInfo.maritalStatus
@@ -1315,11 +1314,10 @@ if (remainingMs <= 0) {
                 .update({
                     first_name: participantData.firstName,
                     last_name: participantData.lastName,
-                    tc_no: participantData.tcNo, // Yeni TC No'yu da güncelle
+                    tc_no: participantData.tcNo,
                     gender: dbGender,
                     age: participantData.age,
                     institution_code: participantData.institutionCode || null,
-                    institution_name: participantData.institutionName || null,
                     profession: participantData.profession || null,
                     education: participantData.education,
                     marital_status: participantData.maritalStatus
