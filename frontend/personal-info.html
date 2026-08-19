@@ -44,8 +44,6 @@
                                     <label for="gender" class="form-label">Cinsiyet *</label>
                                     <select class="form-select" id="gender" required>
                                         <option value="">Seçiniz</option>
-                                        <option value="male">Erkek</option>
-                                        <option value="female">Kadın</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -55,37 +53,31 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="institutionCode" class="form-label">Kurum Kodu</label>
-                                    <input type="text" class="form-control" id="institutionCode">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="institutionName" class="form-label">Kurum Adı</label>
-                                    <input type="text" class="form-control" id="institutionName">
+                                    <label for="institution" class="form-label">Kurum</label>
+                                    <select class="form-select" id="institution">
+                                        <option value="">Seçiniz</option>
+                                    </select>
                                 </div>
                             </div>
+                            <input type="hidden" id="institutionCode">
+                            <input type="hidden" id="institutionName">
                             <div class="mb-3">
                                 <label for="profession" class="form-label">Meslek</label>
-                                <input type="text" class="form-control" id="profession">
+                                <select class="form-select" id="profession">
+                                    <option value="">Seçiniz</option>
+                                </select>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="education" class="form-label">Eğitim Seviyesi *</label>
                                     <select class="form-select" id="education" required>
                                         <option value="">Seçiniz</option>
-                                        <option value="İlkokul">İlkokul</option>
-                                        <option value="Ortaokul">Ortaokul</option>
-                                        <option value="Lise">Lise</option>
-                                        <option value="Lisans">Lisans</option>
-                                        <option value="Yüksek Lisans">Yüksek Lisans</option>
-                                        <option value="Doktora">Doktora</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="maritalStatus" class="form-label">Medeni Durum *</label>
                                     <select class="form-select" id="maritalStatus" required>
                                         <option value="">Seçiniz</option>
-                                        <option value="Bekar">Bekar</option>
-                                        <option value="Evli">Evli</option>
                                     </select>
                                 </div>
                             </div>

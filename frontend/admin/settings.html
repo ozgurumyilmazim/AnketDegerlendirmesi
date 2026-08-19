@@ -93,6 +93,7 @@
         .card-categories::after { background: linear-gradient(90deg, #667eea, #764ba2); }
         .card-permissions::after { background: linear-gradient(90deg, #f093fb, #f5576c); }
         .card-debug::after { background: linear-gradient(90deg, #7c3aed, #4f46e5); }
+        .card-personal-info::after { background: linear-gradient(90deg, #10b981, #3b82f6); }
 
         .card-icon-wrap {
             padding: 2rem 2rem 1rem;
@@ -119,6 +120,7 @@
         .icon-categories { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .icon-permissions { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
         .icon-debug   { background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); color: white; }
+        .icon-personal-info { background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); color: white; }
 
         .card-info {
             flex: 1;
@@ -174,6 +176,7 @@
         .feat-letters { color: #4facfe; }
         .feat-pages   { color: #f5576c; }
         .feat-categories { color: #667eea; }
+        .feat-personal-info { color: #10b981; }
 
         .card-footer-link {
             padding: 1rem 2rem;
@@ -192,6 +195,7 @@
         .link-categories { color: #667eea; }
         .link-permissions { color: #f5576c; }
         .link-debug   { color: #7c3aed; }
+        .link-personal-info { color: #10b981; }
 
         .card-footer-link i {
             transition: transform 0.25s ease;
@@ -368,6 +372,32 @@
                     </ul>
                 </div>
                 <div class="card-footer-link link-categories">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Kişisel Bilgi Referansları -->
+            <a href="settings-personal-info.html" class="settings-card card-personal-info">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-personal-info">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Kişisel Bilgi Referansları</h3>
+                        <p>Katılımcı formunda kullanılan referans verilerini yönetin.</p>
+                    </div>
+                </div>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check feat-personal-info"></i> Cinsiyet seçeneklerini yönet</li>
+                        <li><i class="fas fa-check feat-personal-info"></i> Meslek listesini düzenle</li>
+                        <li><i class="fas fa-check feat-personal-info"></i> Eğitim seviyelerini ayarla</li>
+                        <li><i class="fas fa-check feat-personal-info"></i> Medeni durum seçeneklerini belirle</li>
+                        <li><i class="fas fa-check feat-personal-info"></i> Kurum bilgilerini yönet</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-personal-info">
                     <span>Ayarlara Git</span>
                     <i class="fas fa-arrow-right"></i>
                 </div>

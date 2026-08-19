@@ -4,12 +4,24 @@ $(document).ready(function() {
     const $form = $('#personalInfoForm');
     const $tcNoInput = $('#tcNo');
     
+    // Referans verilerini yükle
+    loadReferenceData();
+    
     // Test için alanları doldur
     fillTestData();
     
     // TC Kimlik No sadece rakam girişi
     $tcNoInput.on('input', function() {
         $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+    
+    // Kurum seçildiğinde kod ve adı otomatik doldur
+    $('#institution').on('change', function() {
+        const selected = $(this).find(':selected');
+        const code = selected.data('code') || '';
+        const name = selected.data('name') || '';
+        $('#institutionCode').val(code);
+        $('#institutionName').val(name);
     });
     
     // Form gönderimi
@@ -71,6 +83,81 @@ $(document).ready(function() {
     });
 });
 
+// Referans verilerini API'den yükle ve dropdown'ları doldur
+async function loadReferenceData() {
+    if (typeof PG_API === 'undefined' || !PG_API) {
+        console.log('PG_API bağlantısı mevcut değil, referans verileri yüklenemiyor.');
+        return;
+    }
+    
+    try {
+        // Cinsiyetleri yükle
+        const { data: genders, error: genderErr } = await PG_API
+            .from('genders')
+            .select('name, code')
+            .order('sort_order', { ascending: true });
+        if (!genderErr && genders) {
+            const $gender = $('#gender');
+            genders.forEach(g => {
+                $gender.append(`<option value="${g.code}">${g.name}</option>`);
+            });
+        }
+        
+        // Meslekleri yükle
+        const { data: professions, error: profErr } = await PG_API
+            .from('professions')
+            .select('name')
+            .order('sort_order', { ascending: true });
+        if (!profErr && professions) {
+            const $profession = $('#profession');
+            professions.forEach(p => {
+                $profession.append(`<option value="${p.name}">${p.name}</option>`);
+            });
+        }
+        
+        // Eğitim seviyelerini yükle
+        const { data: educationLevels, error: eduErr } = await PG_API
+            .from('education_levels')
+            .select('name')
+            .order('sort_order', { ascending: true });
+        if (!eduErr && educationLevels) {
+            const $education = $('#education');
+            educationLevels.forEach(e => {
+                $education.append(`<option value="${e.name}">${e.name}</option>`);
+            });
+        }
+        
+        // Medeni durumları yükle
+        const { data: maritalStatuses, error: marErr } = await PG_API
+            .from('marital_statuses')
+            .select('name')
+            .order('sort_order', { ascending: true });
+        if (!marErr && maritalStatuses) {
+            const $marital = $('#maritalStatus');
+            maritalStatuses.forEach(m => {
+                $marital.append(`<option value="${m.name}">${m.name}</option>`);
+            });
+        }
+        
+        // Kurumları yükle
+        const { data: institutions, error: instErr } = await PG_API
+            .from('institutions')
+            .select('institution_code, institution_name')
+            .order('sort_order', { ascending: true });
+        if (!instErr && institutions) {
+            const $institution = $('#institution');
+            institutions.forEach(i => {
+                $institution.append(
+                    `<option value="${i.institution_code}" data-code="${i.institution_code}" data-name="${i.institution_name}">${i.institution_code} - ${i.institution_name}</option>`
+                );
+            });
+        }
+        
+    } catch (error) {
+        console.error('Referans verileri yüklenirken hata:', error);
+    }
+}
+
 // Katılımcı bilgilerini PG_API'e kaydet
 async function saveParticipantToPostgreSQL(participantData) {
     // PG_API bağlantısı kontrolü
@@ -100,18 +187,15 @@ async function saveParticipantToPostgreSQL(participantData) {
         
         console.log('Gender değeri:', participantData.gender);
         
-        // Cinsiyet değerini veritabanı formatına çevir (male/female → erkek/kadin)
-        const genderMap = { 'male': 'erkek', 'female': 'kadin', 'other': 'other' };
-        const dbGender = genderMap[participantData.gender] || participantData.gender;
-        
         // Yeni katılımcı kaydet
+        // gender değeri artık doğrudan veritabanındaki code değeridir (erkek/kadin/other)
         const { data, error } = await PG_API
             .from('participants')
             .insert([{
                 first_name: participantData.firstName,
                 last_name: participantData.lastName,
                 tc_no: participantData.tcNo,
-                gender: dbGender,
+                gender: participantData.gender,
                 age: participantData.age,
                 institution_code: participantData.institutionCode,
                 institution_name: participantData.institutionName,
@@ -279,13 +363,21 @@ function fillTestData() {
         if (!$('#firstName').val()) $('#firstName').val('Test');
         if (!$('#lastName').val()) $('#lastName').val('Kullanıcı');
         if (!$('#tcNo').val()) $('#tcNo').val('12345678921');
-        if (!$('#gender').val()) $('#gender').val('male');
         if (!$('#age').val()) $('#age').val('16');
-        if (!$('#institutionCode').val()) $('#institutionCode').val('TEST001');
-        if (!$('#institutionName').val()) $('#institutionName').val('Test Kurumu');
-        if (!$('#profession').val()) $('#profession').val('Öğrenci');
-        if (!$('#education').val()) $('#education').val('Lise');
-        if (!$('#maritalStatus').val()) $('#maritalStatus').val('Bekar');
+        
+        // Referans verileri yüklendikten sonra dropdown değerlerini ayarla
+        setTimeout(() => {
+            if (!$('#gender').val()) $('#gender').val('erkek');
+            if (!$('#profession').val()) $('#profession').val('Öğrenci');
+            if (!$('#education').val()) $('#education').val('Lise');
+            if (!$('#maritalStatus').val()) $('#maritalStatus').val('Bekar');
+            if (!$('#institution').val()) {
+                const $inst = $('#institution');
+                if ($inst.find('option[value="KUR001"]').length) {
+                    $inst.val('KUR001').trigger('change');
+                }
+            }
+        }, 500);
     }
     // Canlı ortamda alanlar boş kalacak
 }
