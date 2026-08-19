@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.kvkk
     kvkk_title text COLLATE pg_catalog."default",
     kvkk_text text COLLATE pg_catalog."default" NOT NULL,
     kvkk_required boolean DEFAULT true,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT kvkk_pkey PRIMARY KEY (id)
 )
 

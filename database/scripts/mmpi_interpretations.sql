@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS public.mmpi_interpretations
     description text COLLATE pg_catalog."default" NOT NULL,
     category character varying(20) COLLATE pg_catalog."default" NOT NULL,
     gender character varying(10) COLLATE pg_catalog."default",
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT mmpi_interpretations_pkey PRIMARY KEY (id),
     CONSTRAINT mmpi_interpretations_category_check CHECK (category::text = ANY (ARRAY['validity'::character varying, 'clinical'::character varying]::text[]))
 )

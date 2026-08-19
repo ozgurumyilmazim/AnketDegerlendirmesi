@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS public.t_score_params
     mean_m numeric(6,2) NOT NULL,
     sd numeric(6,2) NOT NULL,
     k_correction numeric(4,2) NOT NULL DEFAULT 0,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT t_score_params_pkey PRIMARY KEY (id),
     CONSTRAINT uq_tparam UNIQUE (test_version, locale, age_group, scale_name, gender),
     CONSTRAINT t_score_params_gender_check CHECK (gender = ANY (ARRAY['male'::text, 'female'::text]))

@@ -256,9 +256,7 @@ class TaskDefinitionsManager {
             }
 
             let newTask = {
-                ...formData,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                ...formData
             };
             
             let savedToDb = false;
@@ -341,8 +339,7 @@ class TaskDefinitionsManager {
 
             const updatedTask = {
                 ...this.tasks[taskIndex],
-                ...formData,
-                updated_at: new Date().toISOString()
+                ...formData
             };
             
             console.log('Updated task:', updatedTask);
@@ -448,7 +445,7 @@ class TaskDefinitionsManager {
                     const { error } = await window.PG_API
                         .from('task_definitions')
                         .eq('id', taskId)
-                        .update({ is_active: newStatus, updated_at: new Date().toISOString() });
+                        .update({ is_active: newStatus });
                     
                     if (error) throw new Error(error);
                 } catch (dbError) {
@@ -457,7 +454,6 @@ class TaskDefinitionsManager {
             }
 
             this.tasks[taskIndex].is_active = newStatus;
-            this.tasks[taskIndex].updated_at = new Date().toISOString();
             
             this.filterTasks();
             this.updateStatistics();
@@ -494,7 +490,7 @@ class TaskDefinitionsManager {
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Kategori:</strong> ${this.getCategoryName(task.category)}</p>
-                                    <p><strong>Güncelleme:</strong> ${new Date(task.updated_at).toLocaleString('tr-TR')}</p>
+                                    <p><strong>Güncelleme:</strong> ${new Date(task.updated).toLocaleString('tr-TR')}</p>
                                 </div>
                             </div>
                             <hr>

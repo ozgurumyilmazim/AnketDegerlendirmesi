@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.questions
     question_number integer NOT NULL,
     question_text text COLLATE pg_catalog."default" NOT NULL,
     category_id integer,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT questions_pkey PRIMARY KEY (id),
     CONSTRAINT questions_question_number_key UNIQUE (question_number),
     CONSTRAINT questions_category_id_fkey FOREIGN KEY (category_id)

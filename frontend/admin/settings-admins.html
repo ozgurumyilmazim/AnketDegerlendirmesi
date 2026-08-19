@@ -558,7 +558,7 @@
                     throw new Error('Veritabanı bağlantısı bulunamadı.');
                 }
 
-                const { data, error } = await window.PG_API.from('users').select('*').order('created_at', { ascending: false });
+                const { data, error } = await window.PG_API.from('users').select('*').order('created', { ascending: false });
 
                 if (error) throw error;
 

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS public.scoring_keys
     scale_name character varying(10) COLLATE pg_catalog."default" NOT NULL,
     question_number integer NOT NULL,
     scoring_answer character varying(20) COLLATE pg_catalog."default" NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT scoring_keys_pkey PRIMARY KEY (id),
     CONSTRAINT uk_scale_question UNIQUE (scale_name, question_number),
     CONSTRAINT scoring_keys_scoring_answer_check CHECK (scoring_answer::text = ANY (ARRAY['Doğru'::character varying, 'Yanlis'::character varying]::text[]))

@@ -7,8 +7,8 @@ CREATE TABLE mmpi_interpretations (
     description TEXT NOT NULL,
     category VARCHAR(20) NOT NULL, -- 'validity' (L,F,K için) veya 'clinical' (diğerleri için)
     gender VARCHAR(10), -- Mf ölçeği için 'male' veya 'female', diğerleri için NULL
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- İndeksler

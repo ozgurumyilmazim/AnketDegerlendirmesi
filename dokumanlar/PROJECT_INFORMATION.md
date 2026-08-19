@@ -27,12 +27,10 @@ This file contains essential guidance for agents working in this repository.
 
 ## DB gotchas (top bug sources)
 
-- Timestamp column names differ per table (see `database/database_tables.md`):
-  - `test_results` and `page_permissions` use `created`/`updated` (no `_at`); `reports` defines both `created`/`updated` and `created_at`/`updated_at`.
-  - **`participants` uses `created_at`/`updated_at`** (not `created`/`updated` — unlike the old `database/scripts/*.sql` docs).
-  - All other tables (`users`, `questions`, `scoring_keys`, `t_score_norms`, `t_score_params`, `mmpi_interpretations`, `kvkk`, `task_definitions`, `settings`, `question_category`) use `created_at`/`updated_at`; `sessions` has only `created_at`.
-  - JS sorts `test_results` and `reports` with `.order('created')` — never on `participants`.
-- Never send timestamps in INSERT/UPDATE on `participants`, `test_results`, `reports` — let `DEFAULT now()` fire (explicit payloads have caused PGRST204).
+- Timestamp column names are consistent across all tables (see `database/database_tables.md`):
+  - All tables use `created`/`updated` (no `_at` suffix).
+  - JS sorts with `.order('created')` on all tables.
+- Never send timestamps in INSERT/UPDATE — let `DEFAULT now()` fire (explicit payloads have caused PGRST204).
 - Gender stored in DB as `'erkek'`/`'kadin'`; HTML forms submit `'male'`/`'female'` — map `{ male: 'erkek', female: 'kadin', other: 'other' }`.
 - `anon` (pre-login) PostgREST role needs explicit SELECT grants on every table test-takers read (`participants`, `test_results`, `questions`, `kvkk`, `reports`, `test_results_min`) — see `00_postgrest_setup.sql`.
 - Auth is `POST /rpc/login {email, password}` → JWT signed by the `api.login()` DB function (pgcrypto HMAC); `JWT_SECRET` is passed to PostgREST as `app.jwt_secret` via the DB URI `options` param in `docker-compose.yaml`.

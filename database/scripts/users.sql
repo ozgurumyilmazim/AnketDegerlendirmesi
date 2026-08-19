@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS public.users
     name character varying(200) COLLATE pg_catalog."default",
     is_active boolean DEFAULT true,
     last_login timestamp with time zone,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
     CONSTRAINT users_role_check CHECK (role::text = ANY (ARRAY['admin'::character varying, 'psychologist'::character varying]::text[]))

@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS kvkk (
     id SERIAL PRIMARY KEY,
     kvkk_title TEXT,
     kvkk_text TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Varsayılan KVKK ayarlarını ekle
@@ -75,13 +75,13 @@ INSERT INTO kvkk (id, kvkk_text, kvkk_required) VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Updated_at trigger'ı oluştur
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION update_updated_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = NOW();
+    NEW.updated = NOW();
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_kvkk_updated_at BEFORE UPDATE ON kvkk
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_kvkk_updated BEFORE UPDATE ON kvkk
+    FOR EACH ROW EXECUTE FUNCTION update_updated_column();

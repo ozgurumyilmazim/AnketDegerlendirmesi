@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS public.t_score_norms
     t_score integer NOT NULL,
     age_group text COLLATE pg_catalog."default",
     notes text COLLATE pg_catalog."default",
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    updated timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT t_score_norms_pkey PRIMARY KEY (id),
     CONSTRAINT t_score_norms_test_version_locale_scale_name_gender_raw_sco_key UNIQUE (test_version, locale, scale_name, gender, raw_score),
     CONSTRAINT t_score_norms_gender_check CHECK (gender = ANY (ARRAY['erkek'::text, 'kadin'::text])),
@@ -30,12 +30,12 @@ GRANT ALL ON TABLE public.t_score_norms TO admin_user;
 
 GRANT ALL ON TABLE public.t_score_norms TO authenticated;
 
--- Trigger: t_score_norms_set_updated_at
+-- Trigger: trg_t_score_norms_updated
 
--- DROP TRIGGER IF EXISTS t_score_norms_set_updated_at ON public.t_score_norms;
+-- DROP TRIGGER IF EXISTS trg_t_score_norms_updated ON public.t_score_norms;
 
-CREATE OR REPLACE TRIGGER t_score_norms_set_updated_at
+CREATE OR REPLACE TRIGGER trg_t_score_norms_updated
     BEFORE UPDATE 
     ON public.t_score_norms
     FOR EACH ROW
-    EXECUTE FUNCTION public.set_updated_at();
+    EXECUTE FUNCTION public.update_updated_column();

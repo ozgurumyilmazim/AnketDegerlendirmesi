@@ -193,7 +193,7 @@ BEGIN
     role = COALESCE(update_user.role, public.users.role),
     password_hash = CASE WHEN update_user.password IS NOT NULL THEN crypt(update_user.password, gen_salt('bf')) ELSE public.users.password_hash END,
     is_active = COALESCE(update_user.is_active, public.users.is_active),
-    updated_at = NOW()
+    updated = NOW()
   WHERE id = update_user.user_id
   RETURNING * INTO user_record;
 

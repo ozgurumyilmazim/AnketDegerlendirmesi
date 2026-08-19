@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.sessions
     user_id uuid NOT NULL,
     token character varying(512) COLLATE pg_catalog."default" NOT NULL,
     expires_at timestamp with time zone NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
     CONSTRAINT sessions_pkey PRIMARY KEY (id),
     CONSTRAINT sessions_token_key UNIQUE (token),
     CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id)

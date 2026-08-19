@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS public.settings
     id integer NOT NULL DEFAULT nextval('settings_id_seq'::regclass),
     setting_key character varying(100) COLLATE pg_catalog."default" NOT NULL,
     setting_value text COLLATE pg_catalog."default",
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT settings_pkey PRIMARY KEY (id),
     CONSTRAINT settings_setting_key_key UNIQUE (setting_key)
 )

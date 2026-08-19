@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.page_content
     page_title character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
     page_subtitle text COLLATE pg_catalog."default" DEFAULT ''::text,
     page_body text COLLATE pg_catalog."default" DEFAULT ''::text,
-    updated_at timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT page_content_pkey PRIMARY KEY (id),
     CONSTRAINT page_content_page_key_key UNIQUE (page_key)
 )

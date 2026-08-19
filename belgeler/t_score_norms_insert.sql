@@ -1384,5 +1384,5 @@ INSERT INTO public.t_score_norms (test_version, locale, scale_name, gender, raw_
 ('MMPI','TR','Si','female',68,120,'adult','NON-OFFICIAL-FORMULA'),
 ('MMPI','TR','Si','female',69,120,'adult','NON-OFFICIAL-FORMULA'),
 ('MMPI','TR','Si','female',70,120,'adult','NON-OFFICIAL-FORMULA')
-ON CONFLICT (test_version, locale, scale_name, gender, raw_score) DO UPDATE SET t_score=EXCLUDED.t_score, age_group=EXCLUDED.age_group, notes=EXCLUDED.notes, updated_at=now();
+ON CONFLICT (test_version, locale, scale_name, gender, raw_score) DO UPDATE SET t_score=EXCLUDED.t_score, age_group=EXCLUDED.age_group, notes=EXCLUDED.notes, updated=now();
 COMMIT;

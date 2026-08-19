@@ -254,9 +254,7 @@ class QuestionsManager {
             }
 
             let newQuestion = {
-                ...formData,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                ...formData
             };
 
             let savedToDb = false;
@@ -318,8 +316,7 @@ class QuestionsManager {
 
             const updatedQuestion = {
                 ...this.questions[questionIndex],
-                ...formData,
-                updated_at: new Date().toISOString()
+                ...formData
             };
 
             let savedToDb = false;
@@ -408,7 +405,7 @@ class QuestionsManager {
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>ID:</strong> ${q.id}</p>
-                                    <p><strong>Güncelleme:</strong> ${new Date(q.updated_at).toLocaleString('tr-TR')}</p>
+                                    <p><strong>Güncelleme:</strong> ${new Date(q.updated).toLocaleString('tr-TR')}</p>
                                 </div>
                             </div>
                             <hr>

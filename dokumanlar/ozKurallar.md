@@ -106,7 +106,7 @@ python3 -m http.server 8000   # from frontend/
 
 ## ⚠️ DB schema quirks (most common bugs)
 
-1. **Column names**: `database/scripts/*.sql` (the actual DB) uses `created`/`updated` (no `_at` suffix) on `participants`, `test_results`, `reports`. The reference file `01_schema.sql` uses `created_at`/`updated_at`. **JS code must use `created`/`updated`** in SELECT/ORDER BY for these tables.
+1. **Column names**: All tables in `database/scripts/*.sql` use `created`/`updated` (no `_at` suffix). The reference file `01_schema.sql` also uses `created`/`updated`. **JS code must use `created`/`updated`** in SELECT/ORDER BY for all tables.
 2. **Never send timestamps in INSERT** — let DB use `DEFAULT now()`. Both `created` and `created_at` payloads have caused PGRST204 errors.
 3. **Gender values** in DB: `'erkek'`/`'kadin'`. HTML form sends `'male'`/`'female'`. Map via `{ male: 'erkek', female: 'kadin', other: 'other' }`.
 

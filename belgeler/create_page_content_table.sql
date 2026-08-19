@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS page_content (
     page_title VARCHAR(255) NOT NULL DEFAULT '',
     page_subtitle TEXT DEFAULT '',
     page_body TEXT DEFAULT '',
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Varsayılan kayıtları ekle (çakışma varsa dokunma)

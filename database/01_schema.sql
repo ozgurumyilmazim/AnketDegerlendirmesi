@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(200),
     is_active BOOLEAN DEFAULT true,
     last_login TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_users_email ON users(email);
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS participants (
     profession VARCHAR(100),
     education VARCHAR(50),
     marital_status VARCHAR(50),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_participants_tc_no ON participants(tc_no);
-CREATE INDEX idx_participants_created ON participants(created_at);
+CREATE INDEX idx_participants_created ON participants(created);
 
 -- ============================================================
 -- TEST RESULTS TABLE
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS question_category (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     sort_order INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ============================================================
@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS questions (
     question_number INTEGER NOT NULL UNIQUE,
     question_text TEXT NOT NULL,
     category_id INTEGER REFERENCES question_category(id) ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_questions_number ON questions(question_number);
@@ -142,9 +142,7 @@ CREATE TABLE IF NOT EXISTS reports (
     report_type VARCHAR(50) DEFAULT 'standard',
     generated_by VARCHAR(100),
     created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_reports_test_result ON reports(test_result_id);
@@ -159,8 +157,8 @@ CREATE TABLE IF NOT EXISTS scoring_keys (
     scale_name VARCHAR(10) NOT NULL,
     question_number INTEGER NOT NULL,
     scoring_answer VARCHAR(20) NOT NULL CHECK (scoring_answer IN ('Doğru', 'Yanlış')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT uk_scale_question UNIQUE (scale_name, question_number)
 );
 
@@ -180,8 +178,8 @@ CREATE TABLE IF NOT EXISTS t_score_norms (
     t_score INTEGER NOT NULL CHECK (t_score BETWEEN 20 AND 120),
     age_group TEXT DEFAULT 'adult',
     notes TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT uq_tnorm UNIQUE (test_version, locale, scale_name, gender, raw_score)
 );
 
@@ -200,8 +198,8 @@ CREATE TABLE IF NOT EXISTS t_score_params (
     mean_m NUMERIC(6,2) NOT NULL,
     sd NUMERIC(6,2) NOT NULL,
     k_correction NUMERIC(4,2) NOT NULL DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT uq_tparam UNIQUE (test_version, locale, age_group, scale_name, gender)
 );
 
@@ -216,8 +214,8 @@ CREATE TABLE IF NOT EXISTS mmpi_interpretations (
     description TEXT NOT NULL,
     category VARCHAR(20) NOT NULL CHECK (category IN ('validity', 'clinical')),
     gender VARCHAR(10),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_mmpi_int_scale ON mmpi_interpretations(scale_name);
@@ -233,7 +231,7 @@ CREATE TABLE IF NOT EXISTS public.page_content
     page_title character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
     page_subtitle text COLLATE pg_catalog."default" DEFAULT ''::text,
     page_body text COLLATE pg_catalog."default" DEFAULT ''::text,
-    updated_at timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT page_content_pkey PRIMARY KEY (id),
     CONSTRAINT page_content_page_key_key UNIQUE (page_key)
 )
@@ -254,7 +252,7 @@ CREATE TABLE IF NOT EXISTS page_content (
     page_title VARCHAR(255) NOT NULL DEFAULT '',
     page_subtitle TEXT DEFAULT '',
     page_body TEXT DEFAULT '',
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 */
 
@@ -266,8 +264,8 @@ CREATE TABLE IF NOT EXISTS kvkk (
     kvkk_title TEXT,
     kvkk_text TEXT NOT NULL,
     kvkk_required BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 
@@ -280,8 +278,8 @@ CREATE TABLE IF NOT EXISTS task_definitions (
     task_description TEXT,
     is_active BOOLEAN DEFAULT true,
     category VARCHAR(100),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_task_definitions_id ON task_definitions(id);
@@ -293,8 +291,8 @@ CREATE TABLE IF NOT EXISTS settings (
     id SERIAL PRIMARY KEY,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
     setting_value TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ============================================================
@@ -305,14 +303,14 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token VARCHAR(512) UNIQUE NOT NULL,
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_sessions_token ON sessions(token);
 CREATE INDEX idx_sessions_user ON sessions(user_id);
 
 -- ============================================================
--- TRIGGER: auto-update updated_at columns
+-- TRIGGER: auto-update updated columns
 -- ============================================================
 CREATE OR REPLACE FUNCTION update_updated_column()
 RETURNS TRIGGER AS $$

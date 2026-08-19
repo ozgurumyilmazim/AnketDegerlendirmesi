@@ -72,8 +72,7 @@ class TaskDefinitionsMigration {
                 .from('reports')
                 .eq('id', report.id)
                 .update({
-                    task_definitions_evaluation: migratedData,
-                    updated_at: new Date().toISOString()
+                    task_definitions_evaluation: migratedData
                 });
 
             if (error) {

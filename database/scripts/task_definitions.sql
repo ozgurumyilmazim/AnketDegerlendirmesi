@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS public.task_definitions
     task_description text COLLATE pg_catalog."default",
     is_active boolean DEFAULT true,
     category character varying(100) COLLATE pg_catalog."default",
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
+    created timestamp with time zone DEFAULT now(),
+    updated timestamp with time zone DEFAULT now(),
     CONSTRAINT task_definitions_pkey PRIMARY KEY (id)
 )
 

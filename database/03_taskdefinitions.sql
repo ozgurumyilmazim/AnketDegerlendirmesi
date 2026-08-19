@@ -1,5 +1,5 @@
 INSERT INTO "task_definitions" 
-("id", "task_number", "task_description", "is_active", "category", "created_at", "updated_at") VALUES 
+("id", "task_number", "task_description", "is_active", "category", "created", "updated") VALUES 
 ('00878b69-0691-480b-aa80-0e9c0c84bb95', 39, 'Müşterilerin çanta, paket, poşet vb. malzemelerini şüpheli görürse gerektiği hallerde 5188 sayılı Kanun kapsamında dedektörle kontrol etmek', true, 'security', '2025-09-26 12:34:52.227316+00', '2025-09-26 12:34:52.227316+00'), 
 ('04ebbe55-d179-4b23-ae5c-5e32ff4c3b45', 18, 'Görevi ile ilgili olmayan hiçbir cihaz, teçhizat ve aracı kullanmamak', true, 'security', '2025-09-26 12:34:52.227316+00', '2025-09-26 12:34:52.227316+00'), 
 ('0753d527-6319-4c46-aca8-034c79742ccd', 26, 'Seyyar satıcıların hizmet binaları içerisine girmelerini engellemek', true, 'security', '2025-09-26 12:34:52.227316+00', '2025-09-26 12:34:52.227316+00'), 

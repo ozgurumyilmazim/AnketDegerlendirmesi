@@ -98,7 +98,7 @@ async function loadReport() {
             report: {
                 ...report.report_content,
                 id: report.id,
-                created_at: report.created,
+                created: report.created,
                 // Yeni psikolog değerlendirmesi alanları
                 psychologist_name: report.psychologist_name,
                 evaluation_date: report.evaluation_date,

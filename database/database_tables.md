@@ -43,8 +43,8 @@ Application users (psychologists and admins).
 - `name` (varchar(200))
 - `is_active` (boolean) - default `true`
 - `last_login` (timestamptz)
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Indexes: `idx_users_email`, `idx_users_role`.
 
@@ -61,8 +61,8 @@ Individuals taking the test.
 - `profession` (varchar(100))
 - `education` (varchar(50))
 - `marital_status` (varchar(50))
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Indexes: `idx_participants_tc_no`, `idx_participants_created`.
 
@@ -91,8 +91,8 @@ Categories for MMPI questions.
 - `id` (serial) - PK
 - `name` (varchar(100)) - Required, Unique
 - `sort_order` (integer) - default `0`
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Seed data: `Genel`, `Aile`, `Sağlık`, `Cinsellik`, `Duygusal`, `Sosyal`.
 
@@ -102,8 +102,8 @@ The MMPI questions.
 - `question_number` (integer) - Required, Unique
 - `question_text` (text) - Required
 - `category_id` (integer) - FK → `question_category(id)` ON DELETE SET NULL
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Indexes: `idx_questions_number`, `idx_questions_category`. Seed data: 566 questions.
 
@@ -117,8 +117,6 @@ Generated evaluation reports for test results.
 - `generated_by` (varchar(100))
 - `created` (timestamptz) - default `now()`
 - `updated` (timestamptz) - default `now()`
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
 
 Indexes: `idx_reports_test_result`, `idx_reports_participant`, `idx_reports_created`.
 
@@ -128,8 +126,8 @@ Maps questions to scales with the answer that scores a point.
 - `scale_name` (varchar(10)) - Required (L, F, K, Hs, D, Hy, Pd, Mf, Pa, Pt, Sc, Ma, Si)
 - `question_number` (integer) - Required
 - `scoring_answer` (varchar(20)) - Required, CHECK (`Doğru`, `Yanlış`)
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 - UNIQUE (`scale_name`, `question_number`)
 
 Indexes: `idx_scoring_keys_scale`, `idx_scoring_keys_question`. Seed data covers all 13 scales.
@@ -145,8 +143,8 @@ Normative mappings from raw scores to T-scores.
 - `t_score` (integer) - Required, CHECK (`20 <= t_score <= 120`)
 - `age_group` (text) - default `'adult'`
 - `notes` (text)
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 - UNIQUE (`test_version`, `locale`, `scale_name`, `gender`, `raw_score`)
 
 Indexes: `idx_tnorm_lookup(scale_name, gender, raw_score)`. Note: this table has no seed data in the migration scripts.
@@ -162,8 +160,8 @@ Parameters (mean, standard deviation, K correction) for T-score calculation.
 - `mean_m` (numeric(6,2)) - Required
 - `sd` (numeric(6,2)) - Required
 - `k_correction` (numeric(4,2)) - default `0`
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 - UNIQUE (`test_version`, `locale`, `age_group`, `scale_name`, `gender`)
 
 Seed data: 26 rows (13 scales × 2 genders).
@@ -177,8 +175,8 @@ Interpretation texts based on MMPI scale T-score ranges.
 - `description` (text) - Required
 - `category` (varchar(20)) - Required, CHECK (`validity`, `clinical`)
 - `gender` (varchar(10)) - used for gender-specific scales (e.g. `Mf`)
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Indexes: `idx_mmpi_int_scale`, `idx_mmpi_int_range(scale_name, min_t_score, max_t_score)`. Seed data: 56 rows (50 non-gender-specific + 6 `Mf` rows split by male/female).
 
@@ -189,7 +187,7 @@ Dynamic content for public pages.
 - `page_title` (varchar(255)) - Required, default `''`
 - `page_subtitle` (text) - default `''`
 - `page_body` (text) - default `''`
-- `updated_at` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Owner: `anon`. Seed data: `gizlilik`, `kullanim`, `hakkimizda`.
 
@@ -199,8 +197,8 @@ KVKK (Personal Data Protection) consent text.
 - `kvkk_title` (text)
 - `kvkk_text` (text) - Required
 - `kvkk_required` (boolean) - default `true`
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Seed data: 1 KVKK consent row.
 
@@ -211,8 +209,8 @@ Predefined security/competency tasks used in psychologist evaluations.
 - `task_description` (text)
 - `is_active` (boolean) - default `true`
 - `category` (varchar(100)) - e.g. `'security'`
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Indexes: `idx_task_definitions_id`. Seed data: 44 rows (category `security`).
 
@@ -221,8 +219,8 @@ General application settings (key-value).
 - `id` (serial) - PK
 - `setting_key` (varchar(100)) - Required, Unique
 - `setting_value` (text)
-- `created_at` (timestamptz) - default `now()`
-- `updated_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
+- `updated` (timestamptz) - default `now()`
 
 Seed data: `test_version=MMPI`, `max_dont_know=10`, `auto_save_interval=30000`, `app_name=MMPI Psikolojik Degerlendirme Sistemi`.
 
@@ -232,7 +230,7 @@ Authentication sessions (replaces PG_API Auth sessions).
 - `user_id` (uuid) - Required, FK → `users(id)` ON DELETE CASCADE
 - `token` (varchar(512)) - Required, Unique
 - `expires_at` (timestamptz) - Required
-- `created_at` (timestamptz) - default `now()`
+- `created` (timestamptz) - default `now()`
 
 Indexes: `idx_sessions_token`, `idx_sessions_user`. Note: the migration scripts no longer seed sessions; authentication is JWT-based.
 
@@ -274,7 +272,7 @@ Lightweight view over `test_results` for duplicate-test detection.
 ## Functions
 
 ### `public.update_updated_column()` (trigger function)
-Auto-updates timestamp columns on row modification. Sets `updated` and/or `updated_at` (whichever column exists) to `NOW()`. Final version defined in `09_fix_update_updated_column.sql`.
+Auto-updates timestamp columns on row modification. Sets `updated` to `NOW()`. Final version defined in `09_fix_update_updated_column.sql`.
 
 ### `public.update_page_permissions_updated()` (trigger function)
 Sets `updated = now()` on `page_permissions`.
