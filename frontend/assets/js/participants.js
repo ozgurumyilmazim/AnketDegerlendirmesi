@@ -122,7 +122,7 @@ function initializeDataTable() {
                 targets: [2], // Cinsiyet sütunu
                 render: function(data, type, row) {
                     if (type === 'display') {
-                        return data === 'male' ? 'Erkek' : 'Kadın';
+                        return data === 'erkek' ? 'Erkek' : 'Kadın';
                     }
                     return data;
                 }
@@ -363,7 +363,7 @@ function exportParticipants() {
             `"${participant.lastName}"`,
             participant.tcNo,
             participant.age,
-            participant.gender === 'male' ? 'Erkek' : 'Kadın',
+            participant.gender === 'erkek' ? 'Erkek' : 'Kadın',
             participant.education,
             `"${participant.email || ''}"`,
             `"${participant.phone || ''}"`,
@@ -424,7 +424,7 @@ function viewParticipantDetail(participantId) {
                         <tr><td><strong>Ad Soyad:</strong></td><td>${participant.firstName} ${participant.lastName}</td></tr>
                         <tr><td><strong>TC No:</strong></td><td>${participant.tcNo}</td></tr>
                         <tr><td><strong>Yaş:</strong></td><td>${participant.age}</td></tr>
-                        <tr><td><strong>Cinsiyet:</strong></td><td>${participant.gender === 'male' ? 'Erkek' : 'Kadın'}</td></tr>
+                        <tr><td><strong>Cinsiyet:</strong></td><td>${participant.gender === 'erkek' ? 'Erkek' : 'Kadın'}</td></tr>
                         <tr><td><strong>Eğitim:</strong></td><td>${participant.education}</td></tr>
                         <tr><td><strong>E-posta:</strong></td><td>${participant.email || 'Belirtilmemiş'}</td></tr>
                         <tr><td><strong>Telefon:</strong></td><td>${participant.phone || 'Belirtilmemiş'}</td></tr>

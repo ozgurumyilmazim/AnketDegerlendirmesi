@@ -662,7 +662,7 @@ async function viewTestDetail(testId) {
                     <h6 class="text-primary fw-bold mb-3"><i class="fas fa-id-card me-2"></i>Katılımcı Bilgileri</h6>
                     <p class="mb-1"><strong>Ad Soyad:</strong> ${escapeHtml(test.participantName || '')}</p>
                     <p class="mb-1"><strong>TC No:</strong> ${escapeHtml(p.tcNo || '-')}</p>
-                    <p class="mb-1"><strong>Yaş / Cinsiyet:</strong> ${p.age || '-'} / ${p.gender === 'male' ? 'Erkek' : (p.gender === 'female' ? 'Kadın' : '-')}</p>
+                    <p class="mb-1"><strong>Yaş / Cinsiyet:</strong> ${p.age || '-'} / ${p.gender === 'erkek' ? 'Erkek' : (p.gender === 'kadin' ? 'Kadın' : '-')}</p>
                     <p class="mb-1"><strong>Meslek / Eğitim:</strong> ${escapeHtml(p.profession || '-')} / ${escapeHtml(p.education || '-')}</p>
                     <p class="mb-0"><strong>Kurum:</strong> ${escapeHtml(p.institutionName || '-')} (${escapeHtml(p.institutionCode || '-')})</p>
                 </div>

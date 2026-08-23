@@ -353,7 +353,7 @@ function generateTestResultsHTML(testResults, format) {
                 <h3 style="color: #2563eb; margin-bottom: 10px;">${index + 1}. ${test.participant_name}</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                     <div><strong>TC No:</strong> ${test.tc_no || 'Belirtilmemiş'}</div>
-                    <div><strong>Cinsiyet:</strong> ${test.gender === 'male' ? 'Erkek' : 'Kadın'}</div>
+                    <div><strong>Cinsiyet:</strong> ${test.gender === 'erkek' ? 'Erkek' : 'Kadın'}</div>
                     <div><strong>Yaş:</strong> ${test.age || 'Belirtilmemiş'}</div>
                     <div><strong>Test Tarihi:</strong> ${formatDate(test.created)}</div>
                 </div>

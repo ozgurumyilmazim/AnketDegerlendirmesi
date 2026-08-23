@@ -195,7 +195,7 @@
         document.getElementById('testTime').textContent = new Date().toLocaleTimeString('tr-TR');
         document.getElementById('participantName').textContent = (personalInfo.firstName || '') + ' ' + (personalInfo.lastName || '');
         document.getElementById('participantAge').textContent = personalInfo.age || '-';
-        document.getElementById('participantGender').textContent = personalInfo.gender === 'male' ? 'Erkek' : personalInfo.gender === 'female' ? 'Kadın' : personalInfo.gender || '-';
+        document.getElementById('participantGender').textContent = personalInfo.gender === 'erkek' ? 'Erkek' : personalInfo.gender === 'kadin' ? 'Kadın' : personalInfo.gender || '-';
         document.getElementById('totalQuestions').textContent = Object.keys(testResults.answers || {}).length;
         document.getElementById('testDuration').textContent = duration;
         document.getElementById('dontKnowCount').textContent = dontKnowCount + ' / 10';

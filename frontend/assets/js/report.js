@@ -2028,7 +2028,7 @@ async function downloadMmpiProfilChartAsPDF() {
                 ['İstekte Bulunan', 'Psikolog']
             ];
 
-            var gender = participant.gender === 'male' ? 'ERKEK' : 'KADIN';
+            var gender = participant.gender === 'erkek' ? 'ERKEK' : 'KADIN';
             pdf.setFontSize(14);
             pdf.setFont(robotoBase64 ? 'Roboto' : 'helvetica', 'bold');
             pdf.text(gender, infoStartX + 30, currentY - 5);
