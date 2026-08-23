@@ -92,6 +92,9 @@ test.describe('MMPI Test Sistemi - Tam Akis Testi', () => {
     const resumeLink = page.locator('a[href="test-devam.html"]', { hasText: 'Kayıtlı teste devam etmek için tıklayın' });
     await expect(resumeLink).toBeVisible();
 
+    // API'den verilerin yüklenmesini bekle
+    await page.waitForLoadState('networkidle');
+
     await fillPersonalInfo(page, participant);
     await page.locator('#personalInfoForm button[type="submit"]').click();
 

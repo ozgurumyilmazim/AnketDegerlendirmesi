@@ -134,10 +134,12 @@ async function loadReferenceData() {
             .order('sort_order', { ascending: true });
         if (!genderErr && genders && genders.length > 0) {
             const $gender = $('#gender');
+            const selectedGender = $gender.val();
             $gender.find('option:not(:first)').remove();
             genders.forEach(g => {
                 $gender.append(`<option value="${g.code}">${g.name}</option>`);
             });
+            if (selectedGender) $gender.val(selectedGender);
         }
         
         // Meslekleri yükle
@@ -147,10 +149,12 @@ async function loadReferenceData() {
             .order('sort_order', { ascending: true });
         if (!profErr && professions && professions.length > 0) {
             const $profession = $('#profession');
+            const selectedProfession = $profession.val();
             $profession.find('option:not(:first)').remove();
             professions.forEach(p => {
                 $profession.append(`<option value="${p.name}">${p.name}</option>`);
             });
+            if (selectedProfession) $profession.val(selectedProfession);
         }
         
         // Eğitim seviyelerini yükle
@@ -160,10 +164,12 @@ async function loadReferenceData() {
             .order('sort_order', { ascending: true });
         if (!eduErr && educationLevels && educationLevels.length > 0) {
             const $education = $('#education');
+            const selectedEducation = $education.val();
             $education.find('option:not(:first)').remove();
             educationLevels.forEach(e => {
                 $education.append(`<option value="${e.name}">${e.name}</option>`);
             });
+            if (selectedEducation) $education.val(selectedEducation);
         }
         
         // Medeni durumları yükle
@@ -173,10 +179,12 @@ async function loadReferenceData() {
             .order('sort_order', { ascending: true });
         if (!marErr && maritalStatuses && maritalStatuses.length > 0) {
             const $marital = $('#maritalStatus');
+            const selectedMarital = $marital.val();
             $marital.find('option:not(:first)').remove();
             maritalStatuses.forEach(m => {
                 $marital.append(`<option value="${m.name}">${m.name}</option>`);
             });
+            if (selectedMarital) $marital.val(selectedMarital);
         }
         
         // Kurumları yükle
@@ -186,12 +194,14 @@ async function loadReferenceData() {
             .order('sort_order', { ascending: true });
         if (!instErr && institutions && institutions.length > 0) {
             const $institution = $('#institution');
+            const selectedInstitution = $institution.val();
             $institution.find('option:not(:first)').remove();
             institutions.forEach(i => {
                 $institution.append(
                     `<option value="${i.institution_code}" data-code="${i.institution_code}" data-name="${i.institution_name}">${i.institution_code} - ${i.institution_name}</option>`
                 );
             });
+            if (selectedInstitution) $institution.val(selectedInstitution).trigger('change');
         }
         
     } catch (error) {
