@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMPI Yorum Tanımları - MMPI Test Sistemi</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link href="style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-nav a {
+            color: #d97706;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-nav span {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .breadcrumb-nav .current {
+            color: #1a1d2e;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1d2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        /* Stat cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.15rem 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #f0f0f0;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.total { background: #fef3c7; color: #d97706; }
+        .stat-icon.validity { background: #e0e7ff; color: #4338ca; }
+        .stat-icon.clinical { background: #fee2e2; color: #b91c1c; }
+        .stat-icon.gendered { background: #dcfce7; color: #15803d; }
+
+        .stat-content h4 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1a1d2e;
+        }
+
+        .stat-content span {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Panel card */
+        .panel-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .panel-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* Filter bar */
+        .filter-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #374151;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.15);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.35rem;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+            color: white;
+        }
+
+        /* Table */
+        .interpretations-table th {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.85rem 1rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .interpretations-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .interpretations-table tbody tr:hover {
+            background: #fffbeb;
+        }
+
+        /* Badges */
+        .scale-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            width: 38px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        .scale-badge.validity {
+            background: #e0e7ff;
+            color: #3730a3;
+            border-color: #c7d2fe;
+        }
+
+        .scale-badge.clinical {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .category-badge {
+            padding: 0.3rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .category-badge.validity {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .category-badge.clinical {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .range-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .gender-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .gender-badge.male {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .gender-badge.female {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .gender-badge.all {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .desc-text {
+            color: #374151;
+            line-height: 1.5;
+            max-width: 550px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .desc-text.expanded {
+            -webkit-line-clamp: unset;
+        }
+
+        .btn-toggle-desc {
+            background: none;
+            border: none;
+            color: #d97706;
+            padding: 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.25rem;
+            display: inline-block;
+        }
+
+        .btn-toggle-desc:hover {
+            text-decoration: underline;
+        }
+
+        /* Action Buttons */
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon-edit {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .btn-icon-edit:hover {
+            background: #4f46e5;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-icon-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-icon-delete:hover {
+            background: #dc2626;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Empty & Loading states */
+        .empty-state {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-nav">
+            <a href="settings.html"><i class="fas fa-cog me-1"></i>Ayarlar</a>
+            <span>/</span>
+            <span class="current">MMPI Yorum Tanımları</span>
+        </nav>
+
+        <!-- Header Section -->
+        <div class="header-section d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="page-title"><i class="fas fa-comment-medical me-2" style="color: #f59e0b;"></i>MMPI Yorum Tanımları</h1>
+                <p class="page-subtitle">Ölçek ve T puanı aralıklarına göre test sonuçlarında gösterilen psikolojik değerlendirme metinlerini yönetin.</p>
+            </div>
+            <button class="btn btn-add" onclick="openAddModal()">
+                <i class="fas fa-plus"></i>
+                <span>Yeni Yorum Ekle</span>
+            </button>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total"><i class="fas fa-layer-group"></i></div>
+                <div class="stat-content">
+                    <h4 id="statTotalCount">0</h4>
+                    <span>Toplam Tanım</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon validity"><i class="fas fa-shield-alt"></i></div>
+                <div class="stat-content">
+                    <h4 id="statValidityCount">0</h4>
+                    <span>Geçerlilik Ölçekleri (L, F, K)</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon clinical"><i class="fas fa-heartbeat"></i></div>
+                <div class="stat-content">
+                    <h4 id="statClinicalCount">0</h4>
+                    <span>Klinik Ölçekler</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gendered"><i class="fas fa-venus-mars"></i></div>
+                <div class="stat-content">
+                    <h4 id="statGenderedCount">0</h4>
+                    <span>Cinsiyete Özel (Mf)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-card">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label" for="filterScale"><i class="fas fa-tag me-1 text-muted"></i>Ölçek</label>
+                    <select id="filterScale" class="form-select" onchange="applyFilters()">
+                        <option value="">Tüm Ölçekler</option>
+                        <optgroup label="Geçerlilik Ölçekleri">
+                            <option value="L">L (Yalan / Lie)</option>
+                            <option value="F">F (Sıklık / Infrequency)</option>
+                            <option value="K">K (Düzeltme / Correction)</option>
+                        </optgroup>
+                        <optgroup label="Klinik Ölçekler">
+                            <option value="Hs">Hs (Hipokondriyazis)</option>
+                            <option value="D">D (Depresyon)</option>
+                            <option value="Hy">Hy (Histeri)</option>
+                            <option value="Pd">Pd (Psikopatik Sapma)</option>
+                            <option value="Mf">Mf (Maskülinite/Feminite)</option>
+                            <option value="Pa">Pa (Paranoya)</option>
+                            <option value="Pt">Pt (Psikasteni)</option>
+                            <option value="Sc">Sc (Şizofreni)</option>
+                            <option value="Ma">Ma (Hipomani)</option>
+                            <option value="Si">Si (Sosyal İçe Dönüklük)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label" for="filterCategory"><i class="fas fa-folder me-1 text-muted"></i>Kategori</label>
+                    <select id="filterCategory" class="form-select" onchange="applyFilters()">
+                        <option value="">Tüm Kategoriler</option>
+                        <option value="validity">Geçerlilik (validity)</option>
+                        <option value="clinical">Klinik (clinical)</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label" for="filterGender"><i class="fas fa-venus-mars me-1 text-muted"></i>Cinsiyet</label>
+                    <select id="filterGender" class="form-select" onchange="applyFilters()">
+                        <option value="">Tümü</option>
+                        <option value="general">Genel (Belirtilmemiş)</option>
+                        <option value="male">Erkek (male)</option>
+                        <option value="female">Kadın (female)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label" for="searchKeyword"><i class="fas fa-search me-1 text-muted"></i>Açıklamada Ara</label>
+                    <input type="text" id="searchKeyword" class="form-control" placeholder="Açıklama içinde ara..." oninput="applyFilters()">
+                </div>
+                <div class="col-md-1 col-sm-12 text-end">
+                    <button class="btn btn-outline-secondary w-100" title="Filtreleri Temizle" onclick="resetFilters()">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interpretations List Card -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5><i class="fas fa-list me-2"></i>Kayıtlı MMPI Yorumları</h5>
+                    <span id="recordCountBadge" class="badge bg-white text-dark">Yükleniyor...</span>
+                </div>
+                <div class="text-white-50 small" id="filterStatusText"></div>
+            </div>
+            <div class="panel-body p-0">
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="empty-state">
+                    <div class="spinner-border text-warning" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+                    <p class="mt-2 mb-0">Yorum tanımları yükleniyor...</p>
+                </div>
+
+                <!-- Table Wrapper -->
+                <div id="tableWrapper" class="d-none">
+                    <div class="table-responsive">
+                        <table class="table interpretations-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Ölçek</th>
+                                    <th style="width: 110px;">Kategori</th>
+                                    <th style="width: 140px;">T-Skor Aralığı</th>
+                                    <th style="width: 100px;">Cinsiyet</th>
+                                    <th>Psikolojik Değerlendirme Metni</th>
+                                    <th style="width: 100px;" class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interpretationsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state d-none">
+                    <i class="fas fa-comment-slash"></i>
+                    <p id="emptyStateMsg">Herhangi bir yorum tanımı bulunamadı.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add / Edit Modal -->
+    <div class="modal fade" id="interpretationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white;">
+                    <h5 class="modal-title" id="modalTitle"><i class="fas fa-plus-circle me-2"></i>Yeni Yorum Ekle</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="interpretationForm" onsubmit="saveInterpretation(event)">
+                        <input type="hidden" id="editId" value="">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="inputScale" class="form-label">Ölçek Adı <span class="text-danger">*</span></label>
+                                <select id="inputScale" class="form-select" required onchange="onScaleChange()">
+                                    <option value="" disabled selected>Ölçek seçiniz...</option>
+                                    <optgroup label="Geçerlilik Ölçekleri">
+                                        <option value="L">L - Yalan (Lie)</option>
+                                        <option value="F">F - Sıklık (Infrequency)</option>
+                                        <option value="K">K - Düzeltme (Correction)</option>
+                                    </optgroup>
+                                    <optgroup label="Klinik Ölçekler">
+                                        <option value="Hs">Hs - Hipokondriyazis</option>
+                                        <option value="D">D - Depresyon</option>
+                                        <option value="Hy">Hy - Histeri</option>
+                                        <option value="Pd">Pd - Psikopatik Sapma</option>
+                                        <option value="Mf">Mf - Maskülinite / Feminite</option>
+                                        <option value="Pa">Pa - Paranoya</option>
+                                        <option value="Pt">Pt - Psikasteni</option>
+                                        <option value="Sc">Sc - Şizofreni</option>
+                                        <option value="Ma">Ma - Hipomani</option>
+                                        <option value="Si">Si - Sosyal İçe Dönüklük</option>
+                                    </optgroup>
+                                    <optgroup label="Diğer">
+                                        <option value="custom">+ Farklı Ölçek Gir</option>
+                                    </optgroup>
+                                </select>
+                                <div id="customScaleWrapper" class="mt-2 d-none">
+                                    <input type="text" id="inputCustomScale" class="form-control" placeholder="Örn: TR, VRIN..." maxlength="10">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="inputCategory" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                <select id="inputCategory" class="form-select" required>
+                                    <option value="validity">Geçerlilik (validity)</option>
+                                    <option value="clinical">Klinik (clinical)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="inputMinT" class="form-label">Min T Skoru <span class="text-danger">*</span></label>
+                                <input type="number" id="inputMinT" class="form-control" min="0" max="150" required placeholder="Örn: 65">
+                                <small class="text-muted">Aralığın başlangıcı (dahil)</small>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="inputMaxT" class="form-label">Max T Skoru <span class="text-danger">*</span></label>
+                                <input type="number" id="inputMaxT" class="form-control" min="0" max="150" required placeholder="Örn: 100">
+                                <small class="text-muted">Aralığın bitişi (dahil)</small>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="inputGender" class="form-label">Cinsiyet Filtresi</label>
+                                <select id="inputGender" class="form-select">
+                                    <option value="">Tümü / Genel (Her ikisi)</option>
+                                    <option value="male">Erkek (male)</option>
+                                    <option value="female">Kadın (female)</option>
+                                </select>
+                                <small class="text-muted" id="genderHelpText">Mf ölçeği için gereklidir</small>
+                            </div>
+                        </div>
+
+                        <!-- Range Overlap Warning alert -->
+                        <div id="overlapWarningAlert" class="alert alert-warning d-none py-2 px-3 small" role="alert">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <span id="overlapWarningText"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="inputDescription" class="form-label">Psikolojik Değerlendirme / Yorum Metni <span class="text-danger">*</span></label>
+                            <textarea id="inputDescription" class="form-control" rows="5" required placeholder="Bu T skoru aralığında raporda gösterilecek psikolojik yorum metnini giriniz..."></textarea>
+                        </div>
+
+                        <div class="modal-footer px-0 pb-0 pt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-add" id="btnSubmit">
+                                <i class="fas fa-save me-1"></i>
+                                <span id="btnSubmitText">Kaydet</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Yorum Tanımını Sil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-2">Aşağıdaki yorum tanımını kalıcı olarak silmek istediğinizden emin misiniz?</p>
+                    <div class="card bg-light border-0 p-3 mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="scale-badge" id="deleteScaleBadge">L</span>
+                            <span class="range-badge" id="deleteRangeBadge">T: 65 - 100</span>
+                            <span class="gender-badge all" id="deleteGenderBadge">Genel</span>
+                        </div>
+                        <p class="small text-muted mb-0" id="deleteDescSnippet"></p>
+                    </div>
+                    <div class="alert alert-warning py-2 px-3 small mb-0">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Bu aralığa denk gelen test sonuçlarında rapor oluşturulurken yorum bulunamayabilir.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete" onclick="executeDelete()">
+                        <i class="fas fa-trash me-1"></i>
+                        <span>Sil</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Başarılı</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successToastBody">İşlem başarıyla tamamlandı.</div>
+        </div>
+
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Hata</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorToastBody">Bir hata oluştu.</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/pg-config.js"></script>
+    <script src="../assets/js/page-permissions.js"></script>
+
+    <!-- Load Sidebar -->
+    <script>
+        fetch('sidebar.html')
+            .then(r => r.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; })
+            .catch(e => console.error('Sidebar yüklenemedi:', e));
+    </script>
+
+    <!-- Main Controller -->
+    <script>
+        // State
+        let allInterpretations = [];
+        let itemToDelete = null;
+        let interpretationModalInstance = null;
+        let deleteModalInstance = null;
+
+        const VALIDITY_SCALES = ['L', 'F', 'K'];
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Permission check
+            const hasPermission = await checkPagePermission('settings-interpretations');
+            if (!hasPermission) return;
+
+            interpretationModalInstance = new bootstrap.Modal(document.getElementById('interpretationModal'));
+            deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+            await loadInterpretations();
+        });
+
+        function showToast(type, message) {
+            const toastEl = document.getElementById(type + 'Toast');
+            const bodyEl = document.getElementById(type + 'ToastBody');
+            if (bodyEl) bodyEl.textContent = message;
+            if (toastEl) new bootstrap.Toast(toastEl, { delay: 3500 }).show();
+        }
+
+        async function loadInterpretations() {
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('tableWrapper').classList.add('d-none');
+            document.getElementById('emptyState').classList.add('d-none');
+
+            try {
+                if (typeof window.PG_API === 'undefined') {
+                    throw new Error('Veritabanı bağlantısı bulunamadı (PG_API undefined).');
+                }
+
+                const { data, error } = await window.PG_API
+                    .from('mmpi_interpretations')
+                    .select('*')
+                    .order('scale_name', { ascending: true })
+                    .order('min_t_score', { ascending: true });
+
+                if (error) throw error;
+
+                allInterpretations = data || [];
+                updateStats(allInterpretations);
+                applyFilters();
+            } catch (err) {
+                console.error('Yorumlar yüklenirken hata:', err);
+                showToast('error', 'Yorum verileri yüklenemedi: ' + (err.message || err));
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('emptyState').classList.remove('d-none');
+                document.getElementById('emptyStateMsg').textContent = 'Veriler yüklenirken bir hata meydana geldi.';
+            }
+        }
+
+        function updateStats(items) {
+            const total = items.length;
+            const validity = items.filter(i => i.category === 'validity' || VALIDITY_SCALES.includes(i.scale_name)).length;
+            const clinical = items.filter(i => i.category === 'clinical' && !VALIDITY_SCALES.includes(i.scale_name)).length;
+            const gendered = items.filter(i => !!i.gender).length;
+
+            document.getElementById('statTotalCount').textContent = total;
+            document.getElementById('statValidityCount').textContent = validity;
+            document.getElementById('statClinicalCount').textContent = clinical;
+            document.getElementById('statGenderedCount').textContent = gendered;
+        }
+
+        function applyFilters() {
+            const scaleFilter = document.getElementById('filterScale').value.trim();
+            const categoryFilter = document.getElementById('filterCategory').value.trim();
+            const genderFilter = document.getElementById('filterGender').value.trim();
+            const keyword = document.getElementById('searchKeyword').value.trim().toLowerCase();
+
+            let filtered = allInterpretations.filter(item => {
+                // Scale filter
+                if (scaleFilter && item.scale_name !== scaleFilter) return false;
+
+                // Category filter
+                if (categoryFilter && item.category !== categoryFilter) return false;
+
+                // Gender filter
+                if (genderFilter === 'general' && item.gender) return false;
+                if (genderFilter === 'male' && item.gender !== 'male') return false;
+                if (genderFilter === 'female' && item.gender !== 'female') return false;
+
+                // Search keyword
+                if (keyword) {
+                    const descMatch = (item.description || '').toLowerCase().includes(keyword);
+                    const scaleMatch = (item.scale_name || '').toLowerCase().includes(keyword);
+                    if (!descMatch && !scaleMatch) return false;
+                }
+
+                return true;
+            });
+
+            renderTable(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterScale').value = '';
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterGender').value = '';
+            document.getElementById('searchKeyword').value = '';
+            applyFilters();
+        }
+
+        function renderTable(items) {
+            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('recordCountBadge').textContent = items.length + ' / ' + allInterpretations.length;
+
+            const tbody = document.getElementById('interpretationsTableBody');
+            tbody.innerHTML = '';
+
+            if (items.length === 0) {
+                document.getElementById('tableWrapper').classList.add('d-none');
+                document.getElementById('emptyState').classList.remove('d-none');
+                document.getElementById('emptyStateMsg').textContent = allInterpretations.length === 0 
+                    ? 'Henüz kayıtlı bir MMPI yorumu bulunmamaktadır.' 
+                    : 'Arama ve filtre kriterlerinize uygun kayıt bulunamadı.';
+                return;
+            }
+
+            document.getElementById('emptyState').classList.add('d-none');
+            document.getElementById('tableWrapper').classList.remove('d-none');
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                const isVal = item.category === 'validity' || VALIDITY_SCALES.includes(item.scale_name);
+                
+                // Gender badge markup
+                let genderHtml = '<span class="gender-badge all"><i class="fas fa-users"></i> Genel</span>';
+                if (item.gender === 'male') {
+                    genderHtml = '<span class="gender-badge male"><i class="fas fa-mars"></i> Erkek</span>';
+                } else if (item.gender === 'female') {
+                    genderHtml = '<span class="gender-badge female"><i class="fas fa-venus"></i> Kadın</span>';
+                }
+
+                // Category markup
+                const catLabel = item.category === 'validity' ? 'Geçerlilik' : 'Klinik';
+                const catBadgeClass = item.category === 'validity' ? 'validity' : 'clinical';
+
+                const descSafe = escapeHtml(item.description);
+                const isLong = descSafe.length > 150;
+
+                tr.innerHTML = `
+                    <td>
+                        <span class="scale-badge ${isVal ? 'validity' : 'clinical'}">${escapeHtml(item.scale_name)}</span>
+                    </td>
+                    <td>
+                        <span class="category-badge ${catBadgeClass}">${catLabel}</span>
+                    </td>
+                    <td>
+                        <span class="range-badge">
+                            <i class="fas fa-arrows-alt-h text-muted"></i>
+                            T: ${item.min_t_score} - ${item.max_t_score}
+                        </span>
+                    </td>
+                    <td>
+                        ${genderHtml}
+                    </td>
+                    <td>
+                        <div class="desc-text" id="desc-${item.id}">${descSafe}</div>
+                        ${isLong ? `<button class="btn-toggle-desc" onclick="toggleDesc(${item.id})">Devamını göster...</button>` : ''}
+                    </td>
+                    <td class="text-end">
+                        <button class="btn-icon btn-icon-edit me-1" title="Düzenle" onclick="openEditModal(${item.id})">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-delete" title="Sil" onclick="openDeleteModal(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleDesc(id) {
+            const el = document.getElementById('desc-' + id);
+            if (!el) return;
+            el.classList.toggle('expanded');
+            const btn = el.nextElementSibling;
+            if (btn && btn.classList.contains('btn-toggle-desc')) {
+                btn.textContent = el.classList.contains('expanded') ? 'Daha az göster' : 'Devamını göster...';
+            }
+        }
+
+        function onScaleChange() {
+            const scaleSelect = document.getElementById('inputScale');
+            const customScaleWrap = document.getElementById('customScaleWrapper');
+            const customScaleInput = document.getElementById('inputCustomScale');
+            const categorySelect = document.getElementById('inputCategory');
+            const genderHelp = document.getElementById('genderHelpText');
+
+            if (scaleSelect.value === 'custom') {
+                customScaleWrap.classList.remove('d-none');
+                customScaleInput.required = true;
+            } else {
+                customScaleWrap.classList.add('d-none');
+                customScaleInput.required = false;
+
+                // Auto select category
+                if (VALIDITY_SCALES.includes(scaleSelect.value)) {
+                    categorySelect.value = 'validity';
+                } else if (scaleSelect.value) {
+                    categorySelect.value = 'clinical';
+                }
+
+                // Tip for Mf
+                if (scaleSelect.value === 'Mf') {
+                    genderHelp.textContent = 'Mf ölçeği kadın ve erkek için ayrı yorumlanır.';
+                    genderHelp.classList.add('text-warning', 'fw-semibold');
+                    genderHelp.classList.remove('text-muted');
+                } else {
+                    genderHelp.textContent = 'Diğer ölçekler için boş bırakabilirsiniz.';
+                    genderHelp.classList.remove('text-warning', 'fw-semibold');
+                    genderHelp.classList.add('text-muted');
+                }
+            }
+
+            checkRangeOverlap();
+        }
+
+        function checkRangeOverlap() {
+            const editId = document.getElementById('editId').value;
+            let scale = document.getElementById('inputScale').value;
+            if (scale === 'custom') {
+                scale = document.getElementById('inputCustomScale').value.trim();
+            }
+            const minT = parseInt(document.getElementById('inputMinT').value, 10);
+            const maxT = parseInt(document.getElementById('inputMaxT').value, 10);
+            const gender = document.getElementById('inputGender').value || null;
+
+            const alertEl = document.getElementById('overlapWarningAlert');
+            const textEl = document.getElementById('overlapWarningText');
+
+            if (!scale || isNaN(minT) || isNaN(maxT) || minT > maxT) {
+                alertEl.classList.add('d-none');
+                return;
+            }
+
+            // Check if there are overlapping ranges in existing records
+            const overlaps = allInterpretations.filter(item => {
+                if (editId && String(item.id) === String(editId)) return false;
+                if (item.scale_name !== scale) return false;
+                
+                // Compare gender: same or one is generic
+                const itemGender = item.gender || null;
+                if (gender !== null && itemGender !== null && gender !== itemGender) return false;
+
+                // Check overlap: max(minT, item.min_t_score) <= min(maxT, item.max_t_score)
+                return Math.max(minT, item.min_t_score) <= Math.min(maxT, item.max_t_score);
+            });
+
+            if (overlaps.length > 0) {
+                const sample = overlaps[0];
+                textEl.textContent = `Dikkat: Seçilen T skoru (${minT}-${maxT}), "${sample.scale_name}" ölçeğinde mevcut bir aralıkla (T: ${sample.min_t_score}-${sample.max_t_score}) çakışıyor!`;
+                alertEl.classList.remove('d-none');
+            } else {
+                alertEl.classList.add('d-none');
+            }
+        }
+
+        document.getElementById('inputMinT').addEventListener('input', checkRangeOverlap);
+        document.getElementById('inputMaxT').addEventListener('input', checkRangeOverlap);
+        document.getElementById('inputGender').addEventListener('change', checkRangeOverlap);
+
+        function openAddModal() {
+            document.getElementById('interpretationForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle me-2"></i>Yeni Yorum Ekle';
+            document.getElementById('btnSubmitText').textContent = 'Kaydet';
+            document.getElementById('customScaleWrapper').classList.add('d-none');
+            document.getElementById('overlapWarningAlert').classList.add('d-none');
+            onScaleChange();
+            interpretationModalInstance.show();
+        }
+
+        function openEditModal(id) {
+            const item = allInterpretations.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('interpretationForm').reset();
+            document.getElementById('editId').value = item.id;
+            document.getElementById('modalTitle').innerHTML = `<i class="fas fa-edit me-2"></i>Yorum Düzenle (#${item.id} - ${item.scale_name})`;
+            document.getElementById('btnSubmitText').textContent = 'Güncelle';
+            document.getElementById('overlapWarningAlert').classList.add('d-none');
+
+            // Scale
+            const scaleSelect = document.getElementById('inputScale');
+            const customScaleWrap = document.getElementById('customScaleWrapper');
+            const customScaleInput = document.getElementById('inputCustomScale');
+
+            let optionExists = false;
+            for (let opt of scaleSelect.options) {
+                if (opt.value === item.scale_name) {
+                    optionExists = true;
+                    break;
+                }
+            }
+
+            if (optionExists) {
+                scaleSelect.value = item.scale_name;
+                customScaleWrap.classList.add('d-none');
+            } else {
+                scaleSelect.value = 'custom';
+                customScaleInput.value = item.scale_name;
+                customScaleWrap.classList.remove('d-none');
+            }
+
+            document.getElementById('inputCategory').value = item.category || 'clinical';
+            document.getElementById('inputMinT').value = item.min_t_score;
+            document.getElementById('inputMaxT').value = item.max_t_score;
+            document.getElementById('inputGender').value = item.gender || '';
+            document.getElementById('inputDescription').value = item.description || '';
+
+            onScaleChange();
+            interpretationModalInstance.show();
+        }
+
+        async function saveInterpretation(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('editId').value;
+            const scaleSelect = document.getElementById('inputScale');
+            let scaleName = scaleSelect.value;
+            if (scaleName === 'custom') {
+                scaleName = document.getElementById('inputCustomScale').value.trim();
+            }
+
+            if (!scaleName) {
+                showToast('error', 'Lütfen geçerli bir ölçek adı seçin veya girin.');
+                return;
+            }
+
+            const category = document.getElementById('inputCategory').value;
+            const minT = parseInt(document.getElementById('inputMinT').value, 10);
+            const maxT = parseInt(document.getElementById('inputMaxT').value, 10);
+            const genderVal = document.getElementById('inputGender').value;
+            const gender = genderVal ? genderVal : null;
+            const description = document.getElementById('inputDescription').value.trim();
+
+            if (isNaN(minT) || isNaN(maxT)) {
+                showToast('error', 'Lütfen geçerli T skoru değerleri giriniz.');
+                return;
+            }
+
+            if (minT > maxT) {
+                showToast('error', 'Min T skoru, Max T skorundan büyük olamaz!');
+                return;
+            }
+
+            if (!description) {
+                showToast('error', 'Lütfen bir psikolojik açıklama metni giriniz.');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmit');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>İşleniyor...';
+
+            try {
+                const payload = {
+                    scale_name: scaleName,
+                    category: category,
+                    min_t_score: minT,
+                    max_t_score: maxT,
+                    gender: gender,
+                    description: description
+                };
+
+                let resp;
+                if (editId) {
+                    // Update
+                    resp = await window.PG_API
+                        .from('mmpi_interpretations')
+                        .update(payload)
+                        .eq('id', editId);
+                } else {
+                    // Insert
+                    resp = await window.PG_API
+                        .from('mmpi_interpretations')
+                        .insert([payload]);
+                }
+
+                if (resp.error) throw resp.error;
+
+                interpretationModalInstance.hide();
+                showToast('success', editId ? 'Yorum başarıyla güncellendi.' : 'Yeni yorum başarıyla eklendi.');
+                await loadInterpretations();
+            } catch (err) {
+                console.error('Kayıt kaydedilemedi:', err);
+                showToast('error', 'Kayıt sırasında hata oluştu: ' + (err.message || err));
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function openDeleteModal(id) {
+            const item = allInterpretations.find(x => x.id === id);
+            if (!item) return;
+
+            itemToDelete = item;
+            document.getElementById('deleteScaleBadge').textContent = item.scale_name;
+            document.getElementById('deleteRangeBadge').textContent = `T: ${item.min_t_score} - ${item.max_t_score}`;
+
+            const genderBadge = document.getElementById('deleteGenderBadge');
+            if (item.gender === 'male') {
+                genderBadge.className = 'gender-badge male';
+                genderBadge.textContent = 'Erkek';
+            } else if (item.gender === 'female') {
+                genderBadge.className = 'gender-badge female';
+                genderBadge.textContent = 'Kadın';
+            } else {
+                genderBadge.className = 'gender-badge all';
+                genderBadge.textContent = 'Genel';
+            }
+
+            const snippet = (item.description || '').substring(0, 120);
+            document.getElementById('deleteDescSnippet').textContent = `"${snippet}${item.description && item.description.length > 120 ? '...' : ''}"`;
+
+            deleteModalInstance.show();
+        }
+
+        async function executeDelete() {
+            if (!itemToDelete) return;
+
+            const btn = document.getElementById('btnConfirmDelete');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Siliniyor...';
+
+            try {
+                const { error } = await window.PG_API
+                    .from('mmpi_interpretations')
+                    .delete()
+                    .eq('id', itemToDelete.id);
+
+                if (error) throw error;
+
+                deleteModalInstance.hide();
+                showToast('success', `"${itemToDelete.scale_name}" yorum tanımı başarıyla silindi.`);
+                itemToDelete = null;
+                await loadInterpretations();
+            } catch (err) {
+                console.error('Silme hatası:', err);
+                showToast('error', 'Silme işlemi başarısız: ' + (err.message || err));
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

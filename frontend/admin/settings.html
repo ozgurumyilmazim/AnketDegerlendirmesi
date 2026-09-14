@@ -94,6 +94,7 @@
         .card-permissions::after { background: linear-gradient(90deg, #f093fb, #f5576c); }
         .card-debug::after { background: linear-gradient(90deg, #7c3aed, #4f46e5); }
         .card-personal-info::after { background: linear-gradient(90deg, #10b981, #3b82f6); }
+        .card-interpretations::after { background: linear-gradient(90deg, #f59e0b, #ef4444); }
 
         .card-icon-wrap {
             padding: 2rem 2rem 1rem;
@@ -121,6 +122,7 @@
         .icon-permissions { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
         .icon-debug   { background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); color: white; }
         .icon-personal-info { background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); color: white; }
+        .icon-interpretations { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; }
 
         .card-info {
             flex: 1;
@@ -177,6 +179,7 @@
         .feat-pages   { color: #f5576c; }
         .feat-categories { color: #667eea; }
         .feat-personal-info { color: #10b981; }
+        .feat-interpretations { color: #f59e0b; }
 
         .card-footer-link {
             padding: 1rem 2rem;
@@ -196,6 +199,7 @@
         .link-permissions { color: #f5576c; }
         .link-debug   { color: #7c3aed; }
         .link-personal-info { color: #10b981; }
+        .link-interpretations { color: #d97706; }
 
         .card-footer-link i {
             transition: transform 0.25s ease;
@@ -398,6 +402,31 @@
                     </ul>
                 </div>
                 <div class="card-footer-link link-personal-info">
+                    <span>Ayarlara Git</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- MMPI Yorum Tanımları -->
+            <a href="settings-interpretations.html" class="settings-card card-interpretations">
+                <div class="card-icon-wrap">
+                    <div class="card-icon icon-interpretations">
+                        <i class="fas fa-comment-medical"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>MMPI Yorum Tanımları</h3>
+                        <p>Ölçek ve T puanı aralıklarına göre psikolojik yorum metinlerini yönetin.</p>
+                    </div>
+                </div>
+                <div class="card-body-content">
+                    <ul class="card-features">
+                        <li><i class="fas fa-check feat-interpretations"></i> Ölçek bazlı dinamik yorumlar</li>
+                        <li><i class="fas fa-check feat-interpretations"></i> Min-Max T skoru aralıkları</li>
+                        <li><i class="fas fa-check feat-interpretations"></i> Cinsiyete özel değerlendirmeler (Mf)</li>
+                        <li><i class="fas fa-check feat-interpretations"></i> Geçerlilik ve klinik kategori desteği</li>
+                    </ul>
+                </div>
+                <div class="card-footer-link link-interpretations">
                     <span>Ayarlara Git</span>
                     <i class="fas fa-arrow-right"></i>
                 </div>
