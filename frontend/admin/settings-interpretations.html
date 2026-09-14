@@ -1101,8 +1101,8 @@
                     // Update
                     resp = await window.PG_API
                         .from('mmpi_interpretations')
-                        .update(payload)
-                        .eq('id', editId);
+                        .eq('id', editId)
+                        .update(payload);
                 } else {
                     // Insert
                     resp = await window.PG_API
@@ -1161,8 +1161,8 @@
             try {
                 const { error } = await window.PG_API
                     .from('mmpi_interpretations')
-                    .delete()
-                    .eq('id', itemToDelete.id);
+                    .eq('id', itemToDelete.id)
+                    .delete();
 
                 if (error) throw error;
 

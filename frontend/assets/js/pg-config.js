@@ -186,6 +186,7 @@ window.PG_API = {
         let _limit = null;
         let _single = false;
         let _insertData = null;
+        let _updateData = null;
         let _upsertData = null;
         let _onConflict = 'id';
         let _operation = 'select';
@@ -289,6 +290,25 @@ window.PG_API = {
                         body: JSON.stringify(body),
                         headers: { 'Prefer': 'return=representation, resolution=merge-duplicates' },
                     });
+                } else if (_operation === 'update') {
+                    const qs = _buildQuery();
+                    if (!qs) {
+                        const err = 'Update requires .eq() filter';
+                        reject?.({ message: err });
+                        return resolve?.({ data: null, error: err });
+                    }
+                    result = await self._fetch('/' + table + qs, {
+                        method: 'PATCH',
+                        body: JSON.stringify(_updateData),
+                    });
+                } else if (_operation === 'delete') {
+                    const qs = _buildQuery();
+                    if (!qs) {
+                        const err = 'Delete requires .eq() filter';
+                        reject?.({ message: err });
+                        return resolve?.({ data: null, error: err });
+                    }
+                    result = await self._fetch('/' + table + qs, { method: 'DELETE' });
                 } else {
                     const qs = _buildQuery();
                     const selectQs = _select !== '*' ? '?select=' + _select : '';
@@ -306,6 +326,7 @@ window.PG_API = {
                 if (!Array.isArray(data)) data = [data];
                 if (_single) data = data[0] || null;
                 _insertData = null;
+                _updateData = null;
                 _upsertData = null;
                 _onConflict = 'id';
                 _operation = 'select';
@@ -318,22 +339,14 @@ window.PG_API = {
                 _operation = 'insert';
                 return this;
             },
-            async update(values) {
-                const qs = _buildQuery();
-                if (!qs) return { data: null, error: 'Update requires .eq() filter' };
-                const result = await self._fetch('/' + table + qs, {
-                    method: 'PATCH',
-                    body: JSON.stringify(values),
-                });
-                if (result.error) return { data: null, error: result.error };
-                return { data: result.data, error: null };
+            update(values) {
+                _updateData = values;
+                _operation = 'update';
+                return this;
             },
-            async delete() {
-                const qs = _buildQuery();
-                if (!qs) return { data: null, error: 'Delete requires .eq() filter' };
-                const result = await self._fetch('/' + table + qs, { method: 'DELETE' });
-                if (result.error) return { data: null, error: result.error };
-                return { data: result.data || null, error: null };
+            delete() {
+                _operation = 'delete';
+                return this;
             },
             upsert(items, options) {
                 _upsertData = Array.isArray(items) ? items : [items];
