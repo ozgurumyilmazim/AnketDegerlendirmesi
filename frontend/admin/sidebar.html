@@ -38,12 +38,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="task-definitions.html" id="nav-task-definitions">
-                    <i class="fas fa-tasks me-2"></i>
-                    <span class="sidebar-text">Görev Tanımları</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="settings.html" id="nav-settings">
                     <i class="fas fa-cog me-2"></i>
                     <span class="sidebar-text">Ayarlar</span>
@@ -89,9 +83,6 @@
             case 'questions.html':
                 document.getElementById('nav-questions')?.classList.add('active');
                 break;
-            case 'task-definitions.html':
-                document.getElementById('nav-task-definitions')?.classList.add('active');
-                break;
             case 'setup.html':
                 document.getElementById('nav-setup')?.classList.add('active');
                 break;
@@ -105,6 +96,7 @@
             case 'settings-personal-info.html':
             case 'settings-debug.html':
             case 'settings-interpretations.html':
+            case 'task-definitions.html':
                 document.getElementById('nav-settings')?.classList.add('active');
                 break;
         }
@@ -148,7 +140,6 @@
                 'nav-test-results': 'test-results',
                 'nav-reports': 'reports',
                 'nav-questions': 'questions',
-                'nav-task-definitions': 'task-definitions',
                 'nav-settings': 'settings'
             };
 

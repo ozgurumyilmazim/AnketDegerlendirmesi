@@ -234,7 +234,7 @@ Rapor sayfasına `?id=` parametresi ile test sonucu ID'si verilerek erişilir.
 | `settings-pages.html` | Sayfa içerikleri (anasayfa, hakkımızda vb.) |
 | `settings-categories.html` | Kategori yönetimi |
 | `settings-letters.html` | Mektup şablonları |
-| `task-definitions.html` | Görev tanımları |
+| `task-definitions.html` | Görev tanımları (Ayarlar altında) |
 
 ---
 
